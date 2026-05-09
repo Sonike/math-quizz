@@ -1,0 +1,25 @@
+.timer {
+  position: relative;
+  width: 100%;
+  height: 1rem;
+  background: var(--color-timer-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.timer__bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-timer-fill-start), var(--color-timer-fill-end));
+  transition: width 60ms linear;
+}
+
+.timer__label {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-timer-text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}

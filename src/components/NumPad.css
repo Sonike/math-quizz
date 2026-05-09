@@ -1,0 +1,53 @@
+.numpad {
+  display: grid;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 22rem;
+  margin: 0 auto;
+}
+
+.numpad__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.numpad__key {
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 1rem 0;
+  border: none;
+  border-radius: 16px;
+  background: var(--color-key);
+  color: var(--color-key-text);
+  cursor: pointer;
+  transition: transform 0.05s ease, background 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.numpad__key:hover:not(:disabled) {
+  background: var(--color-key-hover);
+}
+
+.numpad__key:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.numpad__key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.numpad__key--erase {
+  background: var(--color-key-erase);
+}
+
+.numpad__key--validate {
+  background: var(--color-key-validate);
+  color: white;
+}
+
+.numpad__key--validate:hover:not(:disabled) {
+  background: var(--color-key-validate-hover);
+}
