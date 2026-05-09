@@ -7,18 +7,27 @@ runs entirely in the browser, stores progress in `localStorage`.
 ## Prerequisites
 
 - Node.js **22+**
-- npm **10+**
+- pnpm **10+** (install with `npm install -g pnpm` or
+  [`corepack enable`](https://pnpm.io/installation#using-corepack))
+
+This project uses pnpm; `pnpm-lock.yaml` is the source of truth. Don't mix
+with `npm install` (it would create a stray `package-lock.json` and a
+divergent `node_modules`).
 
 ## Install
 
 ```bash
-npm install
+pnpm install
 ```
+
+You may see a one-time warning `Ignored build scripts: esbuild` — it's
+benign. The native esbuild binary still ships via optional dependencies
+and the build works regardless.
 
 ## Develop
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Opens a Vite dev server (default `http://localhost:5173`) with hot module
@@ -28,8 +37,8 @@ the physical keyboard (digits, `Backspace`, `Enter`) drive answers.
 ## Test
 
 ```bash
-npm test          # one-off Vitest run
-npm run test:watch  # watch mode
+pnpm test           # one-off Vitest run
+pnpm test:watch     # watch mode
 ```
 
 Test files live in `src/__tests__/`.
@@ -37,7 +46,7 @@ Test files live in `src/__tests__/`.
 ## Build
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Produces a static bundle in `dist/`. The output is fully self-contained —
@@ -46,13 +55,13 @@ no backend, no environment variables, no runtime configuration.
 ## Preview the production build
 
 ```bash
-npm run preview
+pnpm preview
 ```
 
 Or with any static server, e.g.:
 
 ```bash
-npx serve dist
+pnpm dlx serve dist
 ```
 
 Either approach mirrors what GitHub Pages / Netlify / Vercel will serve.
