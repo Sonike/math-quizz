@@ -16,6 +16,7 @@ import type { SessionResult } from '../domain/session';
 const mkSession = (offsetMinutes: number): SessionResult => ({
   startedAt: new Date(Date.UTC(2026, 4, 9, 8, offsetMinutes, 0)).toISOString(),
   durationPerQuestionMs: 4000,
+  partialCreditFactor: 0.5,
   questionCount: 1,
   selectedTables: [7],
   mode: 'mul',
@@ -49,6 +50,22 @@ describe('settings', () => {
 
   test('storage key uses mathquizz:profile:default: prefix', () => {
     expect(STORAGE_KEYS.settings).toBe('mathquizz:profile:default:settings');
+  });
+
+  test('loadSettings fills missing fields from defaults (forward-compat)', () => {
+    // Simulate a settings blob saved before partialCreditFactor existed
+    localStorage.setItem(
+      STORAGE_KEYS.settings,
+      JSON.stringify({
+        durationPerQuestionMs: 5000,
+        questionCount: 10,
+        selectedTables: [7],
+        mode: 'mul',
+      }),
+    );
+    const loaded = loadSettings();
+    expect(loaded.durationPerQuestionMs).toBe(5000);
+    expect(loaded.partialCreditFactor).toBe(DEFAULT_SETTINGS.partialCreditFactor);
   });
 });
 

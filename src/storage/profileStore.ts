@@ -22,8 +22,13 @@ const safeParse = <T>(raw: string | null, fallback: T): T => {
   }
 };
 
-export const loadSettings = (): Settings =>
-  safeParse(localStorage.getItem(STORAGE_KEYS.settings), DEFAULT_SETTINGS);
+export const loadSettings = (): Settings => {
+  const stored = safeParse<Partial<Settings>>(
+    localStorage.getItem(STORAGE_KEYS.settings),
+    {},
+  );
+  return { ...DEFAULT_SETTINGS, ...stored };
+};
 
 export const saveSettings = (settings: Settings): void => {
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));

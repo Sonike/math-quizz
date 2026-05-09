@@ -28,6 +28,7 @@ export const SessionScreen = ({ settings, onComplete }: Props) => {
     onComplete({
       startedAt: startedAtRef.current,
       durationPerQuestionMs: settings.durationPerQuestionMs,
+      partialCreditFactor: settings.partialCreditFactor,
       questionCount: settings.questionCount,
       selectedTables: [...settings.selectedTables],
       mode: settings.mode,
@@ -35,7 +36,7 @@ export const SessionScreen = ({ settings, onComplete }: Props) => {
     });
   };
 
-  const submit = (value: number | null) => {
+  const submit = (value: number) => {
     if (completedRef.current) return;
     const record: AnswerRecord = {
       question: questions[index],
@@ -64,8 +65,6 @@ export const SessionScreen = ({ settings, onComplete }: Props) => {
     submit(Number(given));
   };
 
-  const handleTimeout = () => submit(null);
-
   useNumericKeyboard({
     onDigit: handleDigit,
     onErase: handleErase,
@@ -86,9 +85,8 @@ export const SessionScreen = ({ settings, onComplete }: Props) => {
           Question {index + 1} / {questions.length}
         </div>
         <Timer
-          durationMs={settings.durationPerQuestionMs}
+          targetMs={settings.durationPerQuestionMs}
           resetKey={index}
-          onTimeout={handleTimeout}
         />
       </div>
       <QuestionCard question={current} given={given} />

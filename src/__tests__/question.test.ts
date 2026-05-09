@@ -8,6 +8,7 @@ const baseSettings = (overrides: Partial<Settings> = {}): Settings => ({
   questionCount: 22,
   selectedTables: [7],
   mode: 'mul',
+  partialCreditFactor: 0.5,
   ...overrides,
 });
 

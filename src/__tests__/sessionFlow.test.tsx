@@ -8,6 +8,7 @@ const settings: Settings = {
   questionCount: 3,
   selectedTables: [7],
   mode: 'mul',
+  partialCreditFactor: 0.5,
 };
 
 beforeEach(() => {
@@ -29,11 +30,10 @@ const advance = (ms: number) =>
   });
 
 describe('SessionScreen flow', () => {
-  test('keyboard input + Enter → records correct answer', async () => {
+  test('keyboard input + Enter → records correct answer', () => {
     let result: SessionResult | null = null;
     render(<SessionScreen settings={settings} onComplete={(r) => (result = r)} />);
 
-    // First question, expected = 7 * b for some b
     fireEvent.keyDown(window, { key: '5' });
     fireEvent.keyDown(window, { key: '6' });
     fireEvent.keyDown(window, { key: 'Enter' });
@@ -51,17 +51,45 @@ describe('SessionScreen flow', () => {
     expect(result!.answers[2].given).toBe(1);
   });
 
-  test('timeout records given=null', async () => {
+  test('time past target does NOT auto-advance — child can take all the time they need', () => {
     let result: SessionResult | null = null;
     render(<SessionScreen settings={settings} onComplete={(r) => (result = r)} />);
 
-    // Let all 3 questions time out
-    for (let i = 0; i < 3; i++) {
-      advance(4100);
-    }
+    // Wait well past the target — nothing should happen on its own
+    advance(15_000);
+    expect(result).toBeNull();
+    expect(screen.getByText('Question 1 / 3')).toBeInTheDocument();
+
+    // Now answer slowly: the elapsed time is captured but the answer still counts
+    fireEvent.keyDown(window, { key: '5' });
+    fireEvent.keyDown(window, { key: '6' });
+    fireEvent.keyDown(window, { key: 'Enter' });
+
+    // Finish the remaining two quickly
+    advance(500);
+    fireEvent.keyDown(window, { key: '0' });
+    fireEvent.keyDown(window, { key: 'Enter' });
+    advance(300);
+    fireEvent.keyDown(window, { key: '1' });
+    fireEvent.keyDown(window, { key: 'Enter' });
 
     expect(result).not.toBeNull();
-    expect(result!.answers.map((a) => a.given)).toEqual([null, null, null]);
+    expect(result!.answers).toHaveLength(3);
+    expect(result!.answers[0].given).toBe(56);
+    expect(result!.answers[0].elapsedMs).toBeGreaterThan(settings.durationPerQuestionMs);
+  });
+
+  test('records partialCreditFactor on the SessionResult for self-contained scoring', () => {
+    let result: SessionResult | null = null;
+    render(<SessionScreen settings={settings} onComplete={(r) => (result = r)} />);
+
+    for (let i = 0; i < 3; i++) {
+      fireEvent.keyDown(window, { key: '0' });
+      fireEvent.keyDown(window, { key: 'Enter' });
+    }
+
+    expect(result!.partialCreditFactor).toBe(0.5);
+    expect(result!.durationPerQuestionMs).toBe(4000);
   });
 
   test('NumPad clicks erase + validate work', () => {
@@ -89,7 +117,6 @@ describe('SessionScreen flow', () => {
     fireEvent.keyDown(window, { key: 'Enter' });
     expect(screen.getByText('Question 1 / 3')).toBeInTheDocument();
 
-    // Confirm we can still complete normally
     fireEvent.keyDown(window, { key: '1' });
     fireEvent.keyDown(window, { key: 'Enter' });
     fireEvent.keyDown(window, { key: '2' });

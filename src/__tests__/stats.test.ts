@@ -6,6 +6,7 @@ import type { Question } from '../domain/question';
 const mkSession = (answers: SessionResult['answers']): SessionResult => ({
   startedAt: new Date('2026-05-09T08:00:00Z').toISOString(),
   durationPerQuestionMs: 4000,
+  partialCreditFactor: 0.5,
   questionCount: answers.length,
   selectedTables: [7, 8],
   mode: 'mul',

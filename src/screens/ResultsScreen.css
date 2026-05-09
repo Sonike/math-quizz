@@ -48,12 +48,22 @@
   border-left-color: var(--color-success);
 }
 
+.results__row--slow {
+  border-left-color: var(--color-warning);
+}
+
 .results__row--wrong {
   border-left-color: var(--color-error);
 }
 
 .results__row--timeout {
   border-left-color: var(--color-warning);
+}
+
+.results__legend {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-fg-muted);
 }
 
 .results__icon {
