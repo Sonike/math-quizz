@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { SessionResult, AnswerRecord } from '../domain/session';
 import { totalScore } from '../domain/scoring';
 import './ResultsScreen.css';
@@ -6,6 +7,8 @@ type Props = {
   result: SessionResult;
   onReplay: () => void;
   onHome: () => void;
+  /** Paper mode only: persist the self-marked result to history. */
+  onSave?: (final: SessionResult) => void;
 };
 
 type Kind = 'ok' | 'slow' | 'wrong' | 'timeout';
@@ -34,27 +37,14 @@ const ICON: Record<Kind, string> = {
 const formatPoints = (n: number): string =>
   Number.isInteger(n) ? n.toString() : n.toFixed(1);
 
-export const ResultsScreen = ({ result, onReplay, onHome }: Props) => {
-  const { points, max } = totalScore(result.answers, {
-    durationPerQuestionMs: result.durationPerQuestionMs,
-    partialCreditFactor: result.partialCreditFactor,
-  });
+const ScreenResults = ({ result }: { result: SessionResult }) => {
   const targetSeconds = (result.durationPerQuestionMs / 1000).toFixed(0);
-
   return (
-    <div className="results">
-      <header className="results__header">
-        <h2>Bilan</h2>
-        <div className="results__score">
-          {formatPoints(points)} / {max}
-        </div>
-      </header>
-
+    <>
       <p className="results__legend">
         Cible : {targetSeconds}s — réponse plus lente :{' '}
         {formatPoints(result.partialCreditFactor)} pt
       </p>
-
       <ul className="results__list">
         {result.answers.map((record, i) => {
           const kind = classify(record, result.durationPerQuestionMs);
@@ -79,12 +69,101 @@ export const ResultsScreen = ({ result, onReplay, onHome }: Props) => {
           );
         })}
       </ul>
+    </>
+  );
+};
+
+const PaperResults = ({
+  result,
+  marks,
+  onToggle,
+}: {
+  result: SessionResult;
+  marks: boolean[];
+  onToggle: (i: number) => void;
+}) => (
+  <>
+    <p className="results__legend">
+      Compare avec ta feuille, puis décoche ❌ les réponses fausses.
+    </p>
+    <ul className="results__list">
+      {result.answers.map((record, i) => (
+        <li
+          key={i}
+          className={`results__row results__row--${marks[i] ? 'ok' : 'wrong'}`}
+        >
+          <button
+            type="button"
+            className="results__mark"
+            aria-pressed={marks[i]}
+            aria-label={`${renderOperation(record)} ${marks[i] ? 'correct' : 'faux'}`}
+            onClick={() => onToggle(i)}
+          >
+            {marks[i] ? '✅' : '❌'}
+          </button>
+          <span className="results__operation">{renderOperation(record)}</span>
+        </li>
+      ))}
+    </ul>
+  </>
+);
+
+export const ResultsScreen = ({ result, onReplay, onHome, onSave }: Props) => {
+  const isPaper = result.answerMode === 'paper';
+  const [marks, setMarks] = useState<boolean[]>(() => result.answers.map(() => true));
+  const [saved, setSaved] = useState(false);
+
+  const scoredAnswers: AnswerRecord[] = isPaper
+    ? result.answers.map((a, i) => ({ ...a, selfMarkedCorrect: marks[i] }))
+    : result.answers;
+
+  const { points, max } = totalScore(scoredAnswers, {
+    durationPerQuestionMs: result.durationPerQuestionMs,
+    partialCreditFactor: result.partialCreditFactor,
+  });
+
+  const handleSave = () => {
+    if (saved) return;
+    setSaved(true);
+    onSave?.({ ...result, answers: scoredAnswers });
+  };
+
+  return (
+    <div className="results">
+      <header className="results__header">
+        <h2>Bilan</h2>
+        <div className="results__score">
+          {formatPoints(points)} / {max}
+        </div>
+      </header>
+
+      {isPaper ? (
+        <PaperResults
+          result={result}
+          marks={marks}
+          onToggle={(i) =>
+            setMarks((m) => m.map((v, j) => (j === i ? !v : v)))
+          }
+        />
+      ) : (
+        <ScreenResults result={result} />
+      )}
 
       <div className="results__actions">
+        {isPaper && !saved && (
+          <button type="button" className="results__btn" onClick={handleSave}>
+            💾 Enregistrer le résultat
+          </button>
+        )}
+        {isPaper && saved && <p className="results__saved">Enregistré ✓</p>}
         <button type="button" className="results__btn" onClick={onReplay}>
           🔁 Refaire la même config
         </button>
-        <button type="button" className="results__btn results__btn--secondary" onClick={onHome}>
+        <button
+          type="button"
+          className="results__btn results__btn--secondary"
+          onClick={onHome}
+        >
           🏠 Retour à l'accueil
         </button>
       </div>

@@ -105,3 +105,19 @@
   color: var(--color-fg);
   border: 2px solid var(--color-chip-border);
 }
+
+.results__mark {
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0.2rem 0.3rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.results__saved {
+  margin: 0;
+  text-align: center;
+  font-weight: 700;
+  color: var(--color-success);
+}
