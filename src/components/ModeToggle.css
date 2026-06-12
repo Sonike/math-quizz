@@ -28,3 +28,7 @@
   background: var(--color-accent);
   color: white;
 }
+
+.mode-toggle--two {
+  grid-template-columns: repeat(2, 1fr);
+}

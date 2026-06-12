@@ -1,0 +1,17 @@
+import { describe, expect, test, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { AnswerModeToggle } from '../components/AnswerModeToggle';
+
+describe('AnswerModeToggle', () => {
+  test('marks the active option and emits the other on click', () => {
+    const onChange = vi.fn();
+    render(<AnswerModeToggle value="screen" onChange={onChange} />);
+
+    expect(
+      screen.getByRole('radio', { name: "📱 Sur l'écran" }),
+    ).toHaveAttribute('aria-checked', 'true');
+
+    fireEvent.click(screen.getByRole('radio', { name: '✏️ Sur papier' }));
+    expect(onChange).toHaveBeenCalledWith('paper');
+  });
+});
