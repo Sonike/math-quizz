@@ -84,4 +84,26 @@ describe('pointsFor — self-marked (pen-and-paper)', () => {
   test('self-marked wrong → 0 points', () => {
     expect(pointsFor(paper(false), settings)).toBe(0);
   });
+
+  test('self-marked correct beats a slow time → 1 (proves elapsed is ignored)', () => {
+    // given matches expected but is slow; without the guard this would be partial credit (0.5)
+    const record: AnswerRecord = {
+      question: mkQ(7, 8),
+      given: 56,
+      elapsedMs: 999_999,
+      selfMarkedCorrect: true,
+    };
+    expect(pointsFor(record, settings)).toBe(1);
+  });
+
+  test('self-marked wrong beats a matching answer → 0 (proves given is ignored)', () => {
+    // given matches expected and is fast; without the guard this would score 1
+    const record: AnswerRecord = {
+      question: mkQ(7, 8),
+      given: 56,
+      elapsedMs: 0,
+      selfMarkedCorrect: false,
+    };
+    expect(pointsFor(record, settings)).toBe(0);
+  });
 });
