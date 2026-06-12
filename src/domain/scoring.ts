@@ -3,6 +3,9 @@ import type { AnswerRecord, Settings } from './session';
 type ScoringSettings = Pick<Settings, 'durationPerQuestionMs' | 'partialCreditFactor'>;
 
 export const pointsFor = (record: AnswerRecord, settings: ScoringSettings): number => {
+  if (record.selfMarkedCorrect !== undefined) {
+    return record.selfMarkedCorrect ? 1 : 0;
+  }
   if (record.given === null) return 0;
   if (record.given !== record.question.expected) return 0;
   return record.elapsedMs <= settings.durationPerQuestionMs

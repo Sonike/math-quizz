@@ -68,3 +68,20 @@ describe('totalScore', () => {
     expect(totalScore([], settings)).toEqual({ points: 0, max: 0 });
   });
 });
+
+describe('pointsFor — self-marked (pen-and-paper)', () => {
+  const paper = (correct: boolean): AnswerRecord => ({
+    question: mkQ(7, 8),
+    given: null,
+    elapsedMs: 0,
+    selfMarkedCorrect: correct,
+  });
+
+  test('self-marked correct → 1 point (ignores given/elapsed)', () => {
+    expect(pointsFor(paper(true), settings)).toBe(1);
+  });
+
+  test('self-marked wrong → 0 points', () => {
+    expect(pointsFor(paper(false), settings)).toBe(0);
+  });
+});
