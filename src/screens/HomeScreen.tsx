@@ -1,5 +1,6 @@
 import { TableSelector } from '../components/TableSelector';
 import { ModeToggle } from '../components/ModeToggle';
+import { AnswerModeToggle } from '../components/AnswerModeToggle';
 import type { Settings } from '../domain/session';
 import './HomeScreen.css';
 
@@ -38,6 +39,13 @@ export const HomeScreen = ({ settings, onChange, onStart, onOpenSettings }: Prop
         <ModeToggle
           value={settings.mode}
           onChange={(mode) => onChange({ ...settings, mode })}
+        />
+      </section>
+      <section className="home__panel">
+        <h2 className="home__panel-title">Saisie</h2>
+        <AnswerModeToggle
+          value={settings.answerMode}
+          onChange={(answerMode) => onChange({ ...settings, answerMode })}
         />
       </section>
       <p className="home__info">
