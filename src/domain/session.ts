@@ -1,9 +1,13 @@
 import type { Question, Mode } from './question';
 
+export type AnswerMode = 'screen' | 'paper';
+
 export type AnswerRecord = {
   question: Question;
   given: number | null;
   elapsedMs: number;
+  /** Set only for pen-and-paper records (self-marked on the results screen). */
+  selfMarkedCorrect?: boolean;
 };
 
 export type SessionResult = {
@@ -14,6 +18,8 @@ export type SessionResult = {
   selectedTables: number[];
   mode: Mode;
   answers: AnswerRecord[];
+  /** Missing on legacy history entries; treat absent as 'screen'. */
+  answerMode?: AnswerMode;
 };
 
 export type Settings = {
@@ -24,6 +30,8 @@ export type Settings = {
   mode: Mode;
   /** Credit awarded for a correct answer slower than the target. */
   partialCreditFactor: number;
+  /** How answers are collected. Absent reads as 'screen'. */
+  answerMode?: AnswerMode;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -32,4 +40,5 @@ export const DEFAULT_SETTINGS: Settings = {
   selectedTables: [2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 15],
   mode: 'mix',
   partialCreditFactor: 0.5,
+  answerMode: 'screen',
 };
