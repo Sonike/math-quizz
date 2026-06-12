@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HomeScreen } from './screens/HomeScreen';
 import { SessionScreen } from './screens/SessionScreen';
+import { PaperSessionScreen } from './screens/PaperSessionScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import type { SessionResult, Settings } from './domain/session';
@@ -23,9 +24,17 @@ export const App = () => {
   }, [settings]);
 
   const handleSessionComplete = (result: SessionResult) => {
-    recordSession(result);
+    // Paper sessions are recorded later, once the child has self-marked.
+    if (result.answerMode !== 'paper') {
+      recordSession(result);
+    }
     setLastResult(result);
     setScreen('results');
+  };
+
+  const handleSaveResult = (final: SessionResult) => {
+    recordSession(final);
+    setLastResult(final);
   };
 
   return (
@@ -38,14 +47,18 @@ export const App = () => {
           onOpenSettings={() => setScreen('settings')}
         />
       )}
-      {screen === 'session' && (
-        <SessionScreen settings={settings} onComplete={handleSessionComplete} />
-      )}
+      {screen === 'session' &&
+        (settings.answerMode === 'paper' ? (
+          <PaperSessionScreen settings={settings} onComplete={handleSessionComplete} />
+        ) : (
+          <SessionScreen settings={settings} onComplete={handleSessionComplete} />
+        ))}
       {screen === 'results' && lastResult && (
         <ResultsScreen
           result={lastResult}
           onReplay={() => setScreen('session')}
           onHome={() => setScreen('home')}
+          onSave={handleSaveResult}
         />
       )}
       {screen === 'settings' && (
