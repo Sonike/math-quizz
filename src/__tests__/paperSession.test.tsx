@@ -39,9 +39,18 @@ describe('PaperSessionScreen', () => {
     expect(screen.getByText('Question 1 / 2')).toBeInTheDocument();
   });
 
-  test('auto-advances through all questions and completes once with a draft result', () => {
+  test('auto-advances through all questions and completes exactly once with a draft result', () => {
     let result: SessionResult | null = null;
-    render(<PaperSessionScreen settings={settings} onComplete={(r) => (result = r)} />);
+    let callCount = 0;
+    render(
+      <PaperSessionScreen
+        settings={settings}
+        onComplete={(r) => {
+          callCount += 1;
+          result = r;
+        }}
+      />,
+    );
 
     advance(3000); // lead-in
     expect(screen.getByText('Question 1 / 2')).toBeInTheDocument();
@@ -52,6 +61,7 @@ describe('PaperSessionScreen', () => {
     expect(result).toBeNull();
 
     advance(4000); // second question elapses → complete
+    expect(callCount).toBe(1);
     expect(result).not.toBeNull();
     expect(result!.answerMode).toBe('paper');
     expect(result!.answers).toHaveLength(2);
@@ -60,7 +70,7 @@ describe('PaperSessionScreen', () => {
     expect(result!.answers[0].selfMarkedCorrect).toBeUndefined();
 
     advance(10000); // no double-complete
-    expect(result!.answers).toHaveLength(2);
+    expect(callCount).toBe(1);
   });
 
   test('shows the operation without an answer (a × b = ?)', () => {

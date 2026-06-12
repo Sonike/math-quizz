@@ -65,6 +65,7 @@ export const PaperSessionScreen = ({ settings, onComplete }: Props) => {
   };
 
   const advance = (current: number) => {
+    if (completedRef.current) return;
     if (current + 1 >= questions.length) {
       finish();
     } else {
