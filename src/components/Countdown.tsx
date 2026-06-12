@@ -18,8 +18,9 @@ export const Countdown = ({ durationMs, resetKey, onElapsed }: Props) => {
     let raf = 0;
     const tick = () => {
       const elapsed = performance.now() - start;
-      setRemainingMs(Math.max(0, durationMs - elapsed));
-      raf = requestAnimationFrame(tick);
+      const remaining = durationMs - elapsed;
+      setRemainingMs(Math.max(0, remaining));
+      if (remaining > 0) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     const timer = setTimeout(() => onElapsedRef.current(), durationMs);
