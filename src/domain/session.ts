@@ -37,7 +37,7 @@ export type Settings = {
 export const DEFAULT_SETTINGS: Settings = {
   durationPerQuestionMs: 4000,
   questionCount: 22,
-  selectedTables: [2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 15],
+  selectedTables: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 24, 25],
   mode: 'mix',
   partialCreditFactor: 0.5,
   answerMode: 'screen',

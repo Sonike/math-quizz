@@ -60,7 +60,7 @@ describe('generateQuestions', () => {
   });
 
   test('pool smaller than questionCount: returns questionCount questions with repetitions', () => {
-    // 1 selected table * 12 multipliers = 12 distinct couples
+    // 1 selected table * 11 multipliers = 11 distinct couples
     const questions = generateQuestions(
       baseSettings({ selectedTables: [7], questionCount: 30 }),
     );
