@@ -1,0 +1,15 @@
+.countdown {
+  width: 100%;
+  height: 12px;
+  background: var(--color-chip-bg);
+  border: 2px solid var(--color-chip-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.countdown__bar {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 999px;
+  transition: width 0.08s linear;
+}
