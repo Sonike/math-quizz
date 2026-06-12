@@ -71,4 +71,13 @@ describe('aggregateErrors / mergeIntoErrors', () => {
   test('aggregateErrors of empty history is empty', () => {
     expect(aggregateErrors([])).toEqual({});
   });
+
+  test('self-marked records count as attempts/errors, never timeouts', () => {
+    const session = mkSession([
+      { question: mkQ(7, 8), given: null, elapsedMs: 0, selfMarkedCorrect: true },
+      { question: mkQ(7, 8), given: null, elapsedMs: 0, selfMarkedCorrect: false },
+    ]);
+    const stats = aggregateErrors([session]);
+    expect(stats['7x8']).toEqual({ attempts: 2, errors: 1, timeouts: 0 });
+  });
 });

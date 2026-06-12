@@ -15,6 +15,9 @@ export const canonicalKey = (a: number, b: number): string => {
 };
 
 const classify = (record: AnswerRecord): keyof ErrorStat => {
+  if (record.selfMarkedCorrect !== undefined) {
+    return record.selfMarkedCorrect ? 'attempts' : 'errors';
+  }
   if (record.given === null) return 'timeouts';
   if (record.given !== record.question.expected) return 'errors';
   return 'attempts';
