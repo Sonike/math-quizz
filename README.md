@@ -73,11 +73,11 @@ The app is a static bundle hosted on **Firebase Hosting** (project
 Google-managed TLS certificate. There is no server — Firebase Hosting serves the
 `dist/` files directly from Google's edge CDN.
 
-Build and deploy in two steps:
+Build and publish to Firebase Hosting in one command (needs `firebase-tools`
+installed):
 
 ```bash
-pnpm build
-firebase deploy --only hosting
+pnpm ship   # = pnpm build && firebase deploy --only hosting
 ```
 
 `firebase.json` reproduces the old nginx behaviour: a `**` → `/index.html`

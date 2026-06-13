@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "ship": "pnpm build && firebase deploy --only hosting",
     "test": "vitest run",
     "test:watch": "vitest"
   },
