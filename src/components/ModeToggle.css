@@ -29,6 +29,13 @@
   color: white;
 }
 
+/* A selected option must keep its accent background on hover, otherwise the
+   base :hover rule (higher specificity than the single --on class) would wash
+   it out to a light overlay and leave white text unreadable. */
+.mode-toggle__option--on:hover {
+  background: var(--color-accent-hover);
+}
+
 .mode-toggle--two {
   grid-template-columns: repeat(2, 1fr);
 }

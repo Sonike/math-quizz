@@ -5,6 +5,17 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] - 2026-06-13
+
+### Fixed
+- Mode-toggle hover on a selected option. The base `.mode-toggle__option:hover`
+  rule (specificity 0,2,0) outranked the single `--on` modifier class (0,1,0),
+  so hovering a selected segment replaced its accent background with the light
+  `rgba(0,0,0,0.04)` overlay while keeping white text — unreadable light-on-light.
+  A selected option now darkens to `--color-accent-hover` on hover instead.
+  Affects the operation toggle, the answer-mode toggle, and the language selector
+  (all share the class).
+
 ## [0.5.0] - 2026-06-13
 
 ### Added

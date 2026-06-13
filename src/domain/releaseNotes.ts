@@ -18,6 +18,13 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.5.1',
+    date: '2026-06-13',
+    changes: [
+      'Les boutons que tu as choisis (comme l’opération ou la langue) restent bien lisibles quand tu passes la souris dessus.',
+    ],
+  },
+  {
     version: '0.5.0',
     date: '2026-06-13',
     changes: [
