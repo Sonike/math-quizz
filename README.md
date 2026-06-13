@@ -68,25 +68,27 @@ Either approach mirrors what GitHub Pages / Netlify / Vercel will serve.
 
 ## Deploy
 
-The app ships as a static bundle served by nginx in a container, hosted on
-**Google Cloud Run**. The image is built by the multi-stage `Dockerfile`
-(`pnpm build` → `nginx:alpine` serving `dist/` on port 8080); `nginx.conf`
-handles the SPA fallback and long-caches the content-hashed `/assets/`.
+The app is a static bundle hosted on **Firebase Hosting** (project
+`modern-ally-102412`), served at **https://math-quizz.mrpia.ch** with a free
+Google-managed TLS certificate. There is no server — Firebase Hosting serves the
+`dist/` files directly from Google's edge CDN.
 
-Build from source and roll out a new revision in one step — Cloud Build
-builds the `Dockerfile`, then Cloud Run shifts traffic:
+Build and deploy in two steps:
 
 ```bash
-gcloud run deploy math-quizz --source . --region europe-west6
+pnpm build
+firebase deploy --only hosting
 ```
 
-The service runs in `europe-west6` (Zürich). On a brand-new service, add
-`--allow-unauthenticated` to make it publicly reachable; redeploys preserve
-the existing access setting.
+`firebase.json` reproduces the old nginx behaviour: a `**` → `/index.html`
+rewrite for the SPA fallback, a 1-year immutable cache on the content-hashed
+`/assets/`, and `no-cache` on `sw.js` and `manifest.webmanifest`. Gzip/brotli
+compression is automatic. `.firebaserc` pins the default project. The
+`Dockerfile`/`nginx.conf` stay in-repo as a Cloud Run fallback.
 
-`.gcloudignore` keeps `node_modules`, the build output, and local-only files
-out of the upload. No environment variables or runtime config are required —
-the bundle is fully self-contained.
+> Custom domain DNS lives at the `mrpia.ch` registrar: the `math-quizz` host
+> points at Firebase Hosting via the record shown in the Firebase console →
+> Hosting. The Google-managed certificate renews automatically.
 
 ## Project layout
 

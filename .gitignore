@@ -11,3 +11,7 @@ dist-ssr
 *.tsbuildinfo
 coverage
 .superpowers/
+
+# Firebase CLI
+.firebase/
+*-debug.log

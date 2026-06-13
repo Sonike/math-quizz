@@ -42,8 +42,10 @@ verifies the section header exists, not its contents.
 
 ## Deploy
 
-Hosted on Google Cloud Run in `europe-west6` (Zürich). See `README.md` for the
-`gcloud run deploy` command.
+Static bundle on **Firebase Hosting** (GCP project `modern-ally-102412`), live at
+`math-quizz.mrpia.ch`. Deploy with `pnpm build && firebase deploy --only
+hosting`. See `README.md` and
+`docs/superpowers/specs/2026-06-13-firebase-hosting-design.md`.
 
 ## Conventions
 
