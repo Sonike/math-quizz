@@ -25,6 +25,13 @@ describe('InfoScreen', () => {
     ).toBeInTheDocument();
   });
 
+  test('shows the Zürich credit line and a contact email link', () => {
+    render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    expect(screen.getByText(/Conçu avec.*à Zürich, Suisse/i)).toBeInTheDocument();
+    const mail = screen.getByRole('link', { name: /info@mrpia\.ch/i });
+    expect(mail).toHaveAttribute('href', 'mailto:info@mrpia.ch');
+  });
+
   test('back button calls onBack', () => {
     const onBack = vi.fn();
     render(<InfoScreen version="9.9.9" onBack={onBack} />);

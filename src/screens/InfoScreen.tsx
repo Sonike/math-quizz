@@ -59,6 +59,15 @@ export const InfoScreen = ({ version, onBack }: Props) => {
           navigateur.
         </p>
       </section>
+
+      <section className="info__panel info__credit">
+        <p className="info__credit-line">
+          Conçu avec 🥰, ☕ et 🤖 à Zürich, Suisse 🇨🇭
+        </p>
+        <p className="info__contact">
+          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
+        </p>
+      </section>
     </div>
   );
 };
