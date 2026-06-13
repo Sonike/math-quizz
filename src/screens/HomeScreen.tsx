@@ -9,24 +9,43 @@ type Props = {
   onChange: (next: Settings) => void;
   onStart: () => void;
   onOpenSettings: () => void;
+  onOpenProgress: () => void;
 };
 
-export const HomeScreen = ({ settings, onChange, onStart, onOpenSettings }: Props) => {
-  const seconds = (settings.durationPerQuestionMs / 1000).toFixed(1).replace('.0', '');
+export const HomeScreen = ({
+  settings,
+  onChange,
+  onStart,
+  onOpenSettings,
+  onOpenProgress,
+}: Props) => {
+  const seconds = (settings.durationPerQuestionMs / 1000)
+    .toFixed(1)
+    .replace('.0', '');
   const canStart = settings.selectedTables.length > 0;
 
   return (
     <div className="home">
       <header className="home__header">
         <h1>Math Quizz</h1>
-        <button
-          type="button"
-          className="home__settings-btn"
-          onClick={onOpenSettings}
-          aria-label="paramètres"
-        >
-          ⚙
-        </button>
+        <div className="home__header-actions">
+          <button
+            type="button"
+            className="home__progress-btn"
+            onClick={onOpenProgress}
+            aria-label="mes résultats"
+          >
+            📈
+          </button>
+          <button
+            type="button"
+            className="home__settings-btn"
+            onClick={onOpenSettings}
+            aria-label="paramètres"
+          >
+            ⚙
+          </button>
+        </div>
       </header>
       <section className="home__panel">
         <TableSelector

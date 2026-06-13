@@ -1,0 +1,42 @@
+# Controls what `gcloud ... --source .` uploads to Cloud Build.
+# When this file exists, gcloud uses it INSTEAD of .gitignore, so it must
+# also cover the usual build artifacts.
+
+# Version control / metadata
+.git
+.gitignore
+.github
+.gitmodules
+
+# Dependencies & build output (rebuilt inside the container)
+node_modules
+dist
+dist-ssr
+coverage
+*.tsbuildinfo
+
+# Editor / OS
+.vscode
+.idea
+.DS_Store
+*.log
+
+# Secrets / env
+.env
+.env.*
+
+# Not needed to build the image
+docs
+.superpowers
+
+# Stray user dotfiles that happen to live in this working directory —
+# never upload these to Cloud Build.
+.bashrc
+.bash_profile
+.zshrc
+.zprofile
+.profile
+.gitconfig
+.ripgreprc
+.mcp.json
+.claude

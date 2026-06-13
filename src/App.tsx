@@ -4,6 +4,7 @@ import { SessionScreen } from './screens/SessionScreen';
 import { PaperSessionScreen } from './screens/PaperSessionScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { ProgressScreen } from './screens/ProgressScreen';
 import type { SessionResult, Settings } from './domain/session';
 import {
   loadSettings,
@@ -12,7 +13,7 @@ import {
   clearAll,
 } from './storage/profileStore';
 
-type Screen = 'home' | 'session' | 'results' | 'settings';
+type Screen = 'home' | 'session' | 'results' | 'settings' | 'progress';
 
 export const App = () => {
   const [screen, setScreen] = useState<Screen>('home');
@@ -45,6 +46,7 @@ export const App = () => {
           onChange={setSettings}
           onStart={() => setScreen('session')}
           onOpenSettings={() => setScreen('settings')}
+          onOpenProgress={() => setScreen('progress')}
         />
       )}
       {screen === 'session' &&
@@ -68,6 +70,9 @@ export const App = () => {
           onClearHistory={clearAll}
           onBack={() => setScreen('home')}
         />
+      )}
+      {screen === 'progress' && (
+        <ProgressScreen onBack={() => setScreen('home')} />
       )}
     </div>
   );
