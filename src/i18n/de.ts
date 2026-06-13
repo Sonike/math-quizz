@@ -93,5 +93,6 @@ export const de: Record<TranslationKey, string> = {
     'Deine Einstellungen, deine Antworten und deine Punkte bleiben nur in diesem Browser, auf diesem Gerät. Nichts wird ins Internet gesendet: kein Konto, kein Tracking. Deine Daten folgen dir also nicht auf ein anderes Gerät oder einen anderen Browser.',
   'info.dataP2':
     'Du kannst alles jederzeit über die Schaltfläche « Verlauf löschen » in den Einstellungen entfernen, oder indem du die Browserdaten löschst.',
-  'info.credit': 'Mit 🥰, ☕ und 🤖 in Zürich, Schweiz 🇨🇭 erstellt',
+  'info.credit': 'Mit 💖 in Zürich, Schweiz 🇨🇭 erstellt',
+  'info.coffee': 'Spendier mir einen Kaffee',
 };

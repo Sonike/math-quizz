@@ -32,6 +32,13 @@ describe('InfoScreen', () => {
     expect(mail).toHaveAttribute('href', 'mailto:info@mrpia.ch');
   });
 
+  test('shows a Buy Me a Coffee link (coffee emoji, opens in a new tab)', () => {
+    render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    const coffee = screen.getByRole('link', { name: /☕/ });
+    expect(coffee).toHaveAttribute('href', 'https://buymeacoffee.com/mrpia');
+    expect(coffee).toHaveAttribute('target', '_blank');
+  });
+
   test('back button calls onBack', () => {
     const onBack = vi.fn();
     render(<InfoScreen version="9.9.9" onBack={onBack} />);

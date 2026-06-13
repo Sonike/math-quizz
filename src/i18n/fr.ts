@@ -90,5 +90,6 @@ export const fr = {
     "Tes réglages, tes réponses et tes scores restent uniquement dans ce navigateur, sur cet appareil. Rien n'est envoyé sur Internet : pas de compte, pas de pistage. Tes données ne te suivent donc pas sur un autre appareil ou un autre navigateur.",
   'info.dataP2':
     "Tu peux tout effacer quand tu veux avec le bouton « Effacer l'historique » dans les Paramètres, ou en vidant les données de ton navigateur.",
-  'info.credit': 'Conçu avec 🥰, ☕ et 🤖 à Zürich, Suisse 🇨🇭',
+  'info.credit': 'Conçu avec 💖 à Zürich, Suisse 🇨🇭',
+  'info.coffee': 'Offre-moi un café',
 };

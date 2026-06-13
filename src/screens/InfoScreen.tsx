@@ -28,6 +28,34 @@ export const InfoScreen = ({ version, onBack }: Props) => {
         <p className="info__version">{t('info.version', { version })}</p>
       </section>
 
+      <section className="info__panel info__credit">
+        <p className="info__credit-line">
+          {t('info.credit')}
+        </p>
+        <p className="info__contact">
+          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
+        </p>
+        <p className="info__contact">
+          <a
+            href="https://buymeacoffee.com/mrpia"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ☕ {t('info.coffee')}
+          </a>
+        </p>
+      </section>
+
+      <section className="info__panel">
+        <h3 className="info__panel-title">{t('info.dataTitle')}</h3>
+        <p className="info__data">
+          {t('info.dataP1')}
+        </p>
+        <p className="info__data">
+          {t('info.dataP2')}
+        </p>
+      </section>
+
       <section className="info__panel">
         <h3 className="info__panel-title">{t('info.whatsNew')}</h3>
         {lang !== 'fr' && <p className="info__notes-lang">{t('info.notesInFrench')}</p>}
@@ -48,24 +76,6 @@ export const InfoScreen = ({ version, onBack }: Props) => {
         </ul>
       </section>
 
-      <section className="info__panel">
-        <h3 className="info__panel-title">{t('info.dataTitle')}</h3>
-        <p className="info__data">
-          {t('info.dataP1')}
-        </p>
-        <p className="info__data">
-          {t('info.dataP2')}
-        </p>
-      </section>
-
-      <section className="info__panel info__credit">
-        <p className="info__credit-line">
-          {t('info.credit')}
-        </p>
-        <p className="info__contact">
-          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
-        </p>
-      </section>
     </div>
   );
 };

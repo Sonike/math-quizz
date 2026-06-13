@@ -91,5 +91,6 @@ export const en: Record<TranslationKey, string> = {
     'Your settings, your answers and your scores stay only in this browser, on this device. Nothing is sent to the internet: no account, no tracking. So your data doesn\'t follow you to another device or browser.',
   'info.dataP2':
     'You can erase everything whenever you want with the "Clear history" button in Settings, or by clearing your browser\'s data.',
-  'info.credit': 'Made with 🥰, ☕ and 🤖 in Zürich, Switzerland 🇨🇭',
+  'info.credit': 'Made with 💖 in Zürich, Switzerland 🇨🇭',
+  'info.coffee': 'Buy me a coffee',
 };
