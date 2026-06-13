@@ -65,6 +65,21 @@ describe('TrainingScreen', () => {
     }
   });
 
+  test('feedback fills the input with the correct answer in green + small correction caption', () => {
+    const { container } = render(<TrainingScreen settings={settings} onComplete={() => {}} />);
+
+    // Deterministic (Math.random=0): Q1 is 7 × 3, so the correct answer is 21.
+    fireEvent.keyDown(window, { key: '1' }); // wrong answer
+    fireEvent.keyDown(window, { key: 'Enter' });
+
+    const answer = container.querySelector('.question-card__answer');
+    expect(answer).toHaveClass('question-card__answer--correct');
+    expect(answer).toHaveTextContent('21'); // the correct answer, not the typed "1"
+    expect(
+      screen.getByText('Tu as répondu 1 · la bonne réponse est 21'),
+    ).toBeInTheDocument();
+  });
+
   test('empty answer + Enter does not advance to feedback', () => {
     render(<TrainingScreen settings={settings} onComplete={() => {}} />);
     fireEvent.keyDown(window, { key: 'Enter' });

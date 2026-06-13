@@ -98,7 +98,8 @@ export const TrainingScreen = ({ settings, onComplete }: Props) => {
       </div>
       <QuestionCard
         question={current}
-        given={phase === 'feedback' && feedback ? String(feedback.given) : given}
+        given={phase === 'feedback' && feedback ? String(feedback.expected) : given}
+        answerTone={phase === 'feedback' && feedback ? 'correct' : 'neutral'}
       />
       {phase === 'answering' ? (
         <NumPad onDigit={handleDigit} onErase={handleErase} onValidate={handleValidate} />

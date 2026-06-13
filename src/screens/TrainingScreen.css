@@ -36,8 +36,8 @@
 
 .training__correction {
   margin: 0.5rem 0 0;
-  font-size: 1.05rem;
-  color: var(--color-fg);
+  font-size: 0.85rem;
+  color: var(--color-fg-muted);
 }
 
 .training__next-btn {
