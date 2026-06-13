@@ -136,5 +136,5 @@ and error stats; the user-facing `Settings` object is preserved.
 
 ## What's next
 
-See [`docs/roadmap.md`](docs/roadmap.md) for the V1.5+ backlog
+See [`docs/roadmap.md`](docs/roadmap.md) for the backlog
 (PWA, adaptive weighting, progress charts, multi-profile, etc.).
