@@ -1,8 +1,19 @@
+/* Bare row: drop the segmented-control container chrome (border, fill, padding)
+   to minimise footprint. We intentionally break the boxed radio-group look the
+   other toggles use. The grid (3 equal columns) from .mode-toggle is kept. */
+.language-toggle {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Code badge and native name on a single line, e.g. "FR Français". */
 .language-toggle__option {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.35rem;
 }
 
 .language-toggle__badge {
