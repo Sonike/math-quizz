@@ -7,17 +7,19 @@ import { DEFAULT_SETTINGS } from '../domain/session';
 describe('SettingsScreen language selector', () => {
   it('applies the chosen language immediately via onSave', () => {
     const onSave = vi.fn();
+    const onBack = vi.fn();
     renderWithLanguage(
       <SettingsScreen
         settings={DEFAULT_SETTINGS}
         onSave={onSave}
         onClearHistory={() => {}}
-        onBack={() => {}}
+        onBack={onBack}
       />,
       'fr',
     );
     fireEvent.click(screen.getByRole('radio', { name: 'Deutsch' }));
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ language: 'de' }));
+    expect(onBack).not.toHaveBeenCalled();
   });
 
   it('renders settings labels in the active language', () => {

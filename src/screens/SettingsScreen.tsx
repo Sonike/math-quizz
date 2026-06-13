@@ -84,7 +84,7 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
 
       <div className="settings__field">
         <span className="settings__label">{t('settings.language')}</span>
-        <div className="mode-toggle mode-toggle--two" role="radiogroup" aria-label={t('settings.language')}>
+        <div className="mode-toggle" role="radiogroup" aria-label={t('settings.language')}>
           {LANGUAGES.map((l) => (
             <button
               key={l.code}
