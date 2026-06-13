@@ -1,4 +1,5 @@
 import type { SessionScorePoint } from '../domain/progress';
+import { useI18n } from '../i18n/I18nContext';
 
 type Props = { points: SessionScorePoint[] };
 
@@ -20,6 +21,7 @@ const toLine = (vals: number[]): string =>
   vals.map((v, i) => `${xAt(i, vals.length)},${yAt(v)}`).join(' ');
 
 export const ScoreLineChart = ({ points }: Props) => {
+  const { t } = useI18n();
   const n = points.length;
   const correct = points.map((p) => p.correctRatio);
   const credit = points.map((p) => p.creditRatio);
@@ -30,24 +32,24 @@ export const ScoreLineChart = ({ points }: Props) => {
         className="chart__svg"
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label="Score sur les dernières sessions"
+        aria-label={t('chart.aria')}
       >
-        {TICKS.map((t) => (
-          <g key={t}>
+        {TICKS.map((tick) => (
+          <g key={tick}>
             <line
               className="chart__grid"
               x1={PAD.left}
-              y1={yAt(t)}
+              y1={yAt(tick)}
               x2={W - PAD.right}
-              y2={yAt(t)}
+              y2={yAt(tick)}
             />
             <text
               className="chart__axis"
               x={PAD.left - 5}
-              y={yAt(t) + 3}
+              y={yAt(tick) + 3}
               textAnchor="end"
             >
-              {Math.round(t * 100)}%
+              {Math.round(tick * 100)}%
             </text>
           </g>
         ))}
@@ -99,15 +101,15 @@ export const ScoreLineChart = ({ points }: Props) => {
           y={H - 8}
           textAnchor="end"
         >
-          dernière
+          {t('chart.last')}
         </text>
       </svg>
       <div className="chart__legend">
         <span className="chart__legend-item chart__legend-item--correct">
-          juste / total
+          {t('chart.legendCorrect')}
         </span>
         <span className="chart__legend-item chart__legend-item--credit">
-          score (crédit partiel)
+          {t('chart.legendCredit')}
         </span>
       </div>
     </div>

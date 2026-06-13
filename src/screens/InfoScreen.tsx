@@ -1,4 +1,5 @@
 import { releaseNotes } from '../domain/releaseNotes';
+import { useI18n } from '../i18n/I18nContext';
 import './InfoScreen.css';
 
 type Props = {
@@ -7,15 +8,16 @@ type Props = {
 };
 
 export const InfoScreen = ({ version, onBack }: Props) => {
+  const { t, lang } = useI18n();
   return (
     <div className="info">
       <header className="info__header">
-        <h2>À propos</h2>
+        <h2>{t('info.title')}</h2>
         <button
           type="button"
           className="info__back-btn"
           onClick={onBack}
-          aria-label="retour à l'accueil"
+          aria-label={t('common.backToHomeAria')}
         >
           🏠
         </button>
@@ -23,11 +25,12 @@ export const InfoScreen = ({ version, onBack }: Props) => {
 
       <section className="info__panel info__panel--version">
         <p className="info__app">Math Quizz</p>
-        <p className="info__version">version {version}</p>
+        <p className="info__version">{t('info.version', { version })}</p>
       </section>
 
       <section className="info__panel">
-        <h3 className="info__panel-title">Nouveautés</h3>
+        <h3 className="info__panel-title">{t('info.whatsNew')}</h3>
+        {lang !== 'fr' && <p className="info__notes-lang">{t('info.notesInFrench')}</p>}
         <ul className="info__notes">
           {releaseNotes.map((note) => (
             <li key={note.version} className="info__note">
@@ -46,23 +49,18 @@ export const InfoScreen = ({ version, onBack }: Props) => {
       </section>
 
       <section className="info__panel">
-        <h3 className="info__panel-title">Tes données</h3>
+        <h3 className="info__panel-title">{t('info.dataTitle')}</h3>
         <p className="info__data">
-          Tes réglages, tes réponses et tes scores restent uniquement dans ce
-          navigateur, sur cet appareil. Rien n'est envoyé sur Internet : pas de
-          compte, pas de pistage. Tes données ne te suivent donc pas sur un
-          autre appareil ou un autre navigateur.
+          {t('info.dataP1')}
         </p>
         <p className="info__data">
-          Tu peux tout effacer quand tu veux avec le bouton « Effacer
-          l'historique » dans les Paramètres, ou en vidant les données de ton
-          navigateur.
+          {t('info.dataP2')}
         </p>
       </section>
 
       <section className="info__panel info__credit">
         <p className="info__credit-line">
-          Conçu avec 🥰, ☕ et 🤖 à Zürich, Suisse 🇨🇭
+          {t('info.credit')}
         </p>
         <p className="info__contact">
           <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>

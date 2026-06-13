@@ -136,3 +136,8 @@ describe('clearAll', () => {
     expect(loadSettings().questionCount).toBe(11);
   });
 });
+
+it('defaults language to fr when absent from stored settings', () => {
+  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify({ questionCount: 10 }));
+  expect(loadSettings().language).toBe('fr');
+});

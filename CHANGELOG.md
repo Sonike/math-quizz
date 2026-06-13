@@ -5,6 +5,14 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-06-13
+
+### Added
+- Language choice (French, German, English) selectable in Settings; the whole
+  interface switches live and `<html lang>` follows the choice. French remains
+  the default. À propos labels are translated; the release notes themselves
+  stay in French, with a caption shown in other languages.
+
 ## [0.4.0] - 2026-06-13
 
 ### Added

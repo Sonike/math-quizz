@@ -6,6 +6,7 @@ import { NumPad } from '../components/NumPad';
 import { Timer } from '../components/Timer';
 import { QuestionCard } from '../components/QuestionCard';
 import { useNumericKeyboard } from '../hooks/useNumericKeyboard';
+import { useI18n } from '../i18n/I18nContext';
 import './SessionScreen.css';
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export const SessionScreen = ({ settings, onComplete }: Props) => {
+  const { t } = useI18n();
   const questions = useMemo<Question[]>(() => generateQuestions(settings), [settings]);
   const [index, setIndex] = useState(0);
   const [given, setGiven] = useState<string>('');
@@ -82,7 +84,7 @@ export const SessionScreen = ({ settings, onComplete }: Props) => {
     <div className="session">
       <div className="session__top">
         <div className="session__counter">
-          Question {index + 1} / {questions.length}
+          {t('session.counter', { n: index + 1, total: questions.length })}
         </div>
         <Timer
           targetMs={settings.durationPerQuestionMs}

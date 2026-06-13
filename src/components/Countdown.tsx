@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../i18n/I18nContext';
 import './Countdown.css';
 
 type Props = {
@@ -8,6 +9,7 @@ type Props = {
 };
 
 export const Countdown = ({ durationMs, resetKey, onElapsed }: Props) => {
+  const { t } = useI18n();
   const [remainingMs, setRemainingMs] = useState(durationMs);
   const onElapsedRef = useRef(onElapsed);
   onElapsedRef.current = onElapsed;
@@ -32,7 +34,7 @@ export const Countdown = ({ durationMs, resetKey, onElapsed }: Props) => {
 
   const pct = Math.max(0, Math.min(100, (remainingMs / durationMs) * 100));
   return (
-    <div className="countdown" role="timer" aria-label="temps restant">
+    <div className="countdown" role="timer" aria-label={t('countdown.aria')}>
       <div className="countdown__bar" style={{ width: `${pct}%` }} />
     </div>
   );

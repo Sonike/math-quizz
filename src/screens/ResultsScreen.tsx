@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { SessionResult, AnswerRecord } from '../domain/session';
 import { totalScore } from '../domain/scoring';
+import { useI18n } from '../i18n/I18nContext';
 import './ResultsScreen.css';
 
 type Props = {
@@ -38,12 +39,12 @@ const formatPoints = (n: number): string =>
   Number.isInteger(n) ? n.toString() : n.toFixed(1);
 
 const ScreenResults = ({ result }: { result: SessionResult }) => {
+  const { t } = useI18n();
   const targetSeconds = (result.durationPerQuestionMs / 1000).toFixed(0);
   return (
     <>
       <p className="results__legend">
-        Cible : {targetSeconds}s — réponse plus lente :{' '}
-        {formatPoints(result.partialCreditFactor)} pt
+        {t('results.legend', { seconds: targetSeconds, points: formatPoints(result.partialCreditFactor) })}
       </p>
       <ul className="results__list">
         {result.answers.map((record, i) => {
@@ -57,13 +58,13 @@ const ScreenResults = ({ result }: { result: SessionResult }) => {
               <span className="results__operation">{renderOperation(record)}</span>
               <span className="results__detail">
                 {kind === 'ok' && <>{elapsed}s</>}
-                {kind === 'slow' && <>{elapsed}s · trop lent</>}
+                {kind === 'slow' && <>{elapsed}s · {t('results.slow')}</>}
                 {kind === 'wrong' && (
                   <>
-                    {elapsed}s · réponse : {record.given}
+                    {elapsed}s · {t('results.wrongAnswer', { given: record.given ?? '' })}
                   </>
                 )}
-                {kind === 'timeout' && <>pas de réponse</>}
+                {kind === 'timeout' && <>{t('results.noAnswer')}</>}
               </span>
             </li>
           );
@@ -81,34 +82,38 @@ const PaperResults = ({
   result: SessionResult;
   marks: boolean[];
   onToggle: (i: number) => void;
-}) => (
-  <>
-    <p className="results__legend">
-      Compare avec ta feuille, puis décoche ❌ les réponses fausses.
-    </p>
-    <ul className="results__list">
-      {result.answers.map((record, i) => (
-        <li
-          key={i}
-          className={`results__row results__row--${marks[i] ? 'ok' : 'wrong'}`}
-        >
-          <button
-            type="button"
-            className="results__mark"
-            aria-pressed={marks[i]}
-            aria-label={`${renderOperation(record)} ${marks[i] ? 'correct' : 'faux'}`}
-            onClick={() => onToggle(i)}
+}) => {
+  const { t } = useI18n();
+  return (
+    <>
+      <p className="results__legend">
+        {t('results.paperLegend')}
+      </p>
+      <ul className="results__list">
+        {result.answers.map((record, i) => (
+          <li
+            key={i}
+            className={`results__row results__row--${marks[i] ? 'ok' : 'wrong'}`}
           >
-            {marks[i] ? '✅' : '❌'}
-          </button>
-          <span className="results__operation">{renderOperation(record)}</span>
-        </li>
-      ))}
-    </ul>
-  </>
-);
+            <button
+              type="button"
+              className="results__mark"
+              aria-pressed={marks[i]}
+              aria-label={`${renderOperation(record)} ${marks[i] ? t('results.markCorrect') : t('results.markWrong')}`}
+              onClick={() => onToggle(i)}
+            >
+              {marks[i] ? '✅' : '❌'}
+            </button>
+            <span className="results__operation">{renderOperation(record)}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
 
 export const ResultsScreen = ({ result, onReplay, onHome, onSave }: Props) => {
+  const { t } = useI18n();
   const isPaper = result.answerMode === 'paper';
   const [marks, setMarks] = useState<boolean[]>(() => result.answers.map(() => true));
   const [saved, setSaved] = useState(false);
@@ -131,7 +136,7 @@ export const ResultsScreen = ({ result, onReplay, onHome, onSave }: Props) => {
   return (
     <div className="results">
       <header className="results__header">
-        <h2>Bilan</h2>
+        <h2>{t('results.title')}</h2>
         <div className="results__score">
           {formatPoints(points)} / {max}
         </div>
@@ -152,19 +157,19 @@ export const ResultsScreen = ({ result, onReplay, onHome, onSave }: Props) => {
       <div className="results__actions">
         {isPaper && !saved && (
           <button type="button" className="results__btn" onClick={handleSave}>
-            💾 Enregistrer le résultat
+            {`💾 ${t('results.save')}`}
           </button>
         )}
-        {isPaper && saved && <p className="results__saved">Enregistré ✓</p>}
+        {isPaper && saved && <p className="results__saved">{`${t('results.saved')} ✓`}</p>}
         <button type="button" className="results__btn" onClick={onReplay}>
-          🔁 Refaire la même config
+          {`🔁 ${t('results.replay')}`}
         </button>
         <button
           type="button"
           className="results__btn results__btn--secondary"
           onClick={onHome}
         >
-          🏠 Retour à l'accueil
+          {`🏠 ${t('common.backToHome')}`}
         </button>
       </div>
     </div>

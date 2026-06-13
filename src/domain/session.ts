@@ -1,4 +1,5 @@
 import type { Question, Mode } from './question';
+import type { Language } from '../i18n/types';
 
 export type AnswerMode = 'screen' | 'paper';
 
@@ -32,6 +33,8 @@ export type Settings = {
   partialCreditFactor: number;
   /** How answers are collected. Absent reads as 'screen'. */
   answerMode?: AnswerMode;
+  /** UI language. Absent reads as 'fr'. */
+  language: Language;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -41,4 +44,5 @@ export const DEFAULT_SETTINGS: Settings = {
   mode: 'mix',
   partialCreditFactor: 0.5,
   answerMode: 'screen',
+  language: 'fr',
 };

@@ -9,6 +9,7 @@ const baseSettings = (overrides: Partial<Settings> = {}): Settings => ({
   selectedTables: [7],
   mode: 'mul',
   partialCreditFactor: 0.5,
+  language: 'fr',
   ...overrides,
 });
 

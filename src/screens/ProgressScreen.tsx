@@ -4,6 +4,7 @@ import { sessionScores, trickiestPairs, errorGrid } from '../domain/progress';
 import { ScoreLineChart } from '../components/ScoreLineChart';
 import { TrickiestPairsList } from '../components/TrickiestPairsList';
 import { ErrorHeatmap } from '../components/ErrorHeatmap';
+import { useI18n } from '../i18n/I18nContext';
 import './ProgressScreen.css';
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export const ProgressScreen = ({ onBack }: Props) => {
+  const { t } = useI18n();
   const history = useMemo(() => loadHistory(), []);
   const points = useMemo(() => sessionScores(history), [history]);
   const pairs = useMemo(() => trickiestPairs(history), [history]);
@@ -19,12 +21,12 @@ export const ProgressScreen = ({ onBack }: Props) => {
   return (
     <div className="progress">
       <header className="progress__header">
-        <h2>Mes résultats</h2>
+        <h2>{t('progress.title')}</h2>
         <button
           type="button"
           className="progress__back-btn"
           onClick={onBack}
-          aria-label="retour à l'accueil"
+          aria-label={t('common.backToHomeAria')}
         >
           🏠
         </button>
@@ -32,26 +34,25 @@ export const ProgressScreen = ({ onBack }: Props) => {
 
       {history.length === 0 ? (
         <p className="progress__empty">
-          Joue quelques sessions pour voir ta progression 📈
+          {`${t('progress.empty')} 📈`}
         </p>
       ) : (
         <>
           <section className="progress__panel">
-            <h3 className="progress__panel-title">Score par session</h3>
+            <h3 className="progress__panel-title">{t('progress.scoreTitle')}</h3>
             <ScoreLineChart points={points} />
             <p className="progress__caption">
-              Chaque point = une session. Les tables et le mode choisis
-              changent la difficulté, donc le score.
+              {t('progress.scoreCaption')}
             </p>
           </section>
 
           <section className="progress__panel">
-            <h3 className="progress__panel-title">Paires à revoir</h3>
+            <h3 className="progress__panel-title">{t('progress.pairsTitle')}</h3>
             <TrickiestPairsList pairs={pairs} />
           </section>
 
           <section className="progress__panel">
-            <h3 className="progress__panel-title">Carte des tables</h3>
+            <h3 className="progress__panel-title">{t('progress.tablesTitle')}</h3>
             <ErrorHeatmap grid={grid} />
           </section>
         </>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { LanguageProvider } from './i18n/I18nContext';
 import { HomeScreen } from './screens/HomeScreen';
 import { SessionScreen } from './screens/SessionScreen';
 import { PaperSessionScreen } from './screens/PaperSessionScreen';
@@ -40,48 +41,50 @@ export const App = () => {
   };
 
   return (
-    <div className="app">
-      {screen === 'home' && (
-        <HomeScreen
-          settings={settings}
-          onChange={setSettings}
-          onStart={() => setScreen('session')}
-          onOpenSettings={() => setScreen('settings')}
-          onOpenProgress={() => setScreen('progress')}
-          onOpenInfo={() => setScreen('info')}
-        />
-      )}
-      {screen === 'session' &&
-        (settings.answerMode === 'paper' ? (
-          <PaperSessionScreen settings={settings} onComplete={handleSessionComplete} />
-        ) : (
-          <SessionScreen settings={settings} onComplete={handleSessionComplete} />
-        ))}
-      {screen === 'results' && lastResult && (
-        <ResultsScreen
-          result={lastResult}
-          onReplay={() => setScreen('session')}
-          onHome={() => setScreen('home')}
-          onSave={handleSaveResult}
-        />
-      )}
-      {screen === 'settings' && (
-        <SettingsScreen
-          settings={settings}
-          onSave={setSettings}
-          onClearHistory={clearAll}
-          onBack={() => setScreen('home')}
-        />
-      )}
-      {screen === 'progress' && (
-        <ProgressScreen onBack={() => setScreen('home')} />
-      )}
-      {screen === 'info' && (
-        <InfoScreen
-          version={__APP_VERSION__}
-          onBack={() => setScreen('home')}
-        />
-      )}
-    </div>
+    <LanguageProvider lang={settings.language}>
+      <div className="app">
+        {screen === 'home' && (
+          <HomeScreen
+            settings={settings}
+            onChange={setSettings}
+            onStart={() => setScreen('session')}
+            onOpenSettings={() => setScreen('settings')}
+            onOpenProgress={() => setScreen('progress')}
+            onOpenInfo={() => setScreen('info')}
+          />
+        )}
+        {screen === 'session' &&
+          (settings.answerMode === 'paper' ? (
+            <PaperSessionScreen settings={settings} onComplete={handleSessionComplete} />
+          ) : (
+            <SessionScreen settings={settings} onComplete={handleSessionComplete} />
+          ))}
+        {screen === 'results' && lastResult && (
+          <ResultsScreen
+            result={lastResult}
+            onReplay={() => setScreen('session')}
+            onHome={() => setScreen('home')}
+            onSave={handleSaveResult}
+          />
+        )}
+        {screen === 'settings' && (
+          <SettingsScreen
+            settings={settings}
+            onSave={setSettings}
+            onClearHistory={clearAll}
+            onBack={() => setScreen('home')}
+          />
+        )}
+        {screen === 'progress' && (
+          <ProgressScreen onBack={() => setScreen('home')} />
+        )}
+        {screen === 'info' && (
+          <InfoScreen
+            version={__APP_VERSION__}
+            onBack={() => setScreen('home')}
+          />
+        )}
+      </div>
+    </LanguageProvider>
   );
 };
