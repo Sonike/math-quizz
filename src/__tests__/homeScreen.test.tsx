@@ -85,3 +85,24 @@ describe('HomeScreen — info entry', () => {
     expect(onOpenInfo).toHaveBeenCalledOnce();
   });
 });
+
+describe('HomeScreen — language selector', () => {
+  test('switching language emits settings with the new language', () => {
+    const onChange = vi.fn();
+    render(
+      <HomeScreen
+        settings={DEFAULT_SETTINGS}
+        onChange={onChange}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={noop}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Deutsch' }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ language: 'de' }),
+    );
+  });
+});

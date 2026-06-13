@@ -18,6 +18,13 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.7.0',
+    date: '2026-06-14',
+    changes: [
+      'Tu peux maintenant changer la langue (FR, DE, EN) directement en haut de l’écran d’accueil, sans passer par les Paramètres.',
+    ],
+  },
+  {
     version: '0.6.0',
     date: '2026-06-13',
     changes: [
