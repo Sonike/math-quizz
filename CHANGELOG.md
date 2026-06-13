@@ -5,6 +5,19 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-06-13
+
+### Added
+
+- **Progressive Web App** (roadmap item 1): the app is now installable on a
+  tablet or phone (`public/manifest.webmanifest` + a committed PNG icon set,
+  including an iOS `apple-touch-icon` and a maskable icon) and loads offline
+  after the first visit via a hand-rolled service worker (`public/sw.js`) —
+  no Workbox, no new dependencies. The worker is network-first for the HTML
+  shell (always current when online, last-good when offline) and cache-first
+  for content-hashed assets. `nginx.conf` serves `sw.js` and the manifest
+  with `no-cache` so updates always reach installed clients.
+
 ## [0.2.0] - 2026-06-13
 
 ### Added

@@ -10,7 +10,12 @@ area of code affected, and the condition that makes the work worthwhile.
 
 ## 1. PWA / service worker (offline + installable)
 
-**Status**: 📋 Planned
+**Status**: ✅ Done — shipped in v0.3.0. Hand-rolled service worker
+(`public/sw.js`): network-first for the HTML shell, cache-first for
+content-hashed assets; web manifest + committed PNG icon set
+(incl. maskable + iOS `apple-touch-icon`). No `vite-plugin-pwa`/Workbox —
+kept the zero-dependency rule. Routing logic is unit-tested via
+`src/sw/cacheStrategy.ts`.
 
 **Why**: V1 already works without a network once the page is loaded
 (everything is static + `localStorage`), but you have to reach the page a
