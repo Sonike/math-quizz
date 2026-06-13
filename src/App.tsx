@@ -3,6 +3,7 @@ import { LanguageProvider } from './i18n/I18nContext';
 import { HomeScreen } from './screens/HomeScreen';
 import { SessionScreen } from './screens/SessionScreen';
 import { PaperSessionScreen } from './screens/PaperSessionScreen';
+import { TrainingScreen } from './screens/TrainingScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
@@ -12,6 +13,7 @@ import {
   loadSettings,
   saveSettings,
   recordSession,
+  recordTrainingSession,
   clearAll,
 } from './storage/profileStore';
 
@@ -27,8 +29,11 @@ export const App = () => {
   }, [settings]);
 
   const handleSessionComplete = (result: SessionResult) => {
-    // Paper sessions are recorded later, once the child has self-marked.
-    if (result.answerMode !== 'paper') {
+    if (result.answerMode === 'paper') {
+      // Paper sessions are recorded later, once the child has self-marked.
+    } else if (result.answerMode === 'training') {
+      recordTrainingSession(result);
+    } else {
       recordSession(result);
     }
     setLastResult(result);
@@ -55,9 +60,23 @@ export const App = () => {
         )}
         {screen === 'session' &&
           (settings.answerMode === 'paper' ? (
-            <PaperSessionScreen settings={settings} onComplete={handleSessionComplete} />
+            <PaperSessionScreen
+              settings={settings}
+              onComplete={handleSessionComplete}
+              onCancel={() => setScreen('home')}
+            />
+          ) : settings.answerMode === 'training' ? (
+            <TrainingScreen
+              settings={settings}
+              onComplete={handleSessionComplete}
+              onCancel={() => setScreen('home')}
+            />
           ) : (
-            <SessionScreen settings={settings} onComplete={handleSessionComplete} />
+            <SessionScreen
+              settings={settings}
+              onComplete={handleSessionComplete}
+              onCancel={() => setScreen('home')}
+            />
           ))}
         {screen === 'results' && lastResult && (
           <ResultsScreen

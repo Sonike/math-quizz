@@ -18,6 +18,14 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.6.0',
+    date: '2026-06-13',
+    changes: [
+      'Nouveau mode « Entraînement » : pas de chrono. Après chaque réponse, tu vois tout de suite si c’est juste et la bonne réponse, puis tu passes à la suivante.',
+      'Tes entraînements ont leur propre page de résultats : ouvre « Mes résultats » et choisis « Entraînement ».',
+    ],
+  },
+  {
     version: '0.5.1',
     date: '2026-06-13',
     changes: [

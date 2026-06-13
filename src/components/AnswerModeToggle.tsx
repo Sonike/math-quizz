@@ -12,10 +12,11 @@ export const AnswerModeToggle = ({ value, onChange }: Props) => {
   const OPTIONS: { id: AnswerMode; label: string }[] = [
     { id: 'screen', label: t('answerMode.screen') },
     { id: 'paper', label: t('answerMode.paper') },
+    { id: 'training', label: t('answerMode.training') },
   ];
   const active = value ?? 'screen';
   return (
-    <div className="mode-toggle mode-toggle--two" role="radiogroup" aria-label={t('answerMode.aria')}>
+    <div className="mode-toggle" role="radiogroup" aria-label={t('answerMode.aria')}>
       {OPTIONS.map((opt) => (
         <button
           key={opt.id}

@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, fireEvent } from '@testing-library/react';
 import { PaperSessionScreen } from '../screens/PaperSessionScreen';
 import type { Settings, SessionResult } from '../domain/session';
 
@@ -72,6 +72,14 @@ describe('PaperSessionScreen', () => {
 
     advance(10000); // no double-complete
     expect(callCount).toBe(1);
+  });
+
+  test('cancel button (shown during questions) hands control back to the caller', () => {
+    const onCancel = vi.fn();
+    render(<PaperSessionScreen settings={settings} onComplete={() => {}} onCancel={onCancel} />);
+    advance(3000); // past the lead-in, into the question phase
+    fireEvent.click(screen.getByRole('button', { name: 'Arrêter' }));
+    expect(onCancel).toHaveBeenCalledOnce();
   });
 
   test('shows the operation without an answer (a × b = ?)', () => {

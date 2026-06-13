@@ -4,12 +4,15 @@ import type { Question } from '../domain/question';
 import type { AnswerRecord, Settings, SessionResult } from '../domain/session';
 import { QuestionCard } from '../components/QuestionCard';
 import { Countdown } from '../components/Countdown';
+import { CancelButton } from '../components/CancelButton';
 import { useI18n } from '../i18n/I18nContext';
 import './PaperSessionScreen.css';
 
 type Props = {
   settings: Settings;
   onComplete: (result: SessionResult) => void;
+  /** Abandon the session and return to the caller (e.g. home). */
+  onCancel?: () => void;
 };
 
 type Phase = { kind: 'leadin' } | { kind: 'question'; index: number };
@@ -40,7 +43,7 @@ const LeadIn = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
-export const PaperSessionScreen = ({ settings, onComplete }: Props) => {
+export const PaperSessionScreen = ({ settings, onComplete, onCancel }: Props) => {
   const { t } = useI18n();
   const questions = useMemo<Question[]>(() => generateQuestions(settings), [settings]);
   const [phase, setPhase] = useState<Phase>({ kind: 'leadin' });
@@ -92,6 +95,7 @@ export const PaperSessionScreen = ({ settings, onComplete }: Props) => {
         resetKey={phase.index}
         onElapsed={() => advance(phase.index)}
       />
+      {onCancel && <CancelButton onCancel={onCancel} />}
     </div>
   );
 };

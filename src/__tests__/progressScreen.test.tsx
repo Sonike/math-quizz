@@ -49,3 +49,44 @@ describe('ProgressScreen', () => {
     expect(onBack).toHaveBeenCalledOnce();
   });
 });
+
+describe('ProgressScreen — training view', () => {
+  test('switching to Entraînement reads training history and hides the score chart', () => {
+    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([session()]));
+    localStorage.setItem(
+      STORAGE_KEYS.trainingHistory,
+      JSON.stringify([
+        session({
+          answerMode: 'training',
+          answers: [
+            { question: { a: 6, b: 9, op: 'mul', expected: 54 }, given: 50, elapsedMs: 0, selfMarkedCorrect: false },
+            { question: { a: 6, b: 9, op: 'mul', expected: 54 }, given: 49, elapsedMs: 0, selfMarkedCorrect: false },
+            { question: { a: 6, b: 9, op: 'mul', expected: 54 }, given: 54, elapsedMs: 0, selfMarkedCorrect: true },
+          ],
+        }),
+      ]),
+    );
+    render(<ProgressScreen onBack={() => {}} />);
+
+    // Test view (default) shows the score chart
+    expect(
+      screen.getByRole('img', { name: /Score sur les dernières sessions/i }),
+    ).toBeInTheDocument();
+
+    // Switch to training
+    fireEvent.click(screen.getByRole('radio', { name: 'Entraînement' }));
+
+    // Chart is gone; the training-only weak pair (6 × 9) is shown
+    expect(
+      screen.queryByRole('img', { name: /Score sur les dernières sessions/i }),
+    ).toBeNull();
+    expect(screen.getByText('6 × 9')).toBeInTheDocument();
+  });
+
+  test('training view shows its own empty state when there is no training history', () => {
+    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([session()]));
+    render(<ProgressScreen onBack={() => {}} />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Entraînement' }));
+    expect(screen.getByText(/Entraîne-toi pour voir/i)).toBeInTheDocument();
+  });
+});

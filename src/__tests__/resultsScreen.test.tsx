@@ -29,6 +29,16 @@ const screenResult: SessionResult = {
   ],
 };
 
+const trainingResult: SessionResult = {
+  ...paperResult,
+  answerMode: 'training',
+  answers: [
+    // Correct but slow (elapsed > target): an untimed mode must NOT penalise this.
+    { question: q(7, 8), given: 56, elapsedMs: 9000, selfMarkedCorrect: true },
+    { question: q(6, 9), given: 50, elapsedMs: 1300, selfMarkedCorrect: false },
+  ],
+};
+
 const noop = () => {};
 
 describe('ResultsScreen — paper self-marking', () => {
@@ -59,6 +69,18 @@ describe('ResultsScreen — paper self-marking', () => {
     expect(saved.answerMode).toBe('paper');
 
     expect(screen.queryByRole('button', { name: /Enregistrer/ })).toBeNull();
+  });
+});
+
+describe('ResultsScreen — training summary', () => {
+  test('scores from selfMarkedCorrect, shows the correct facts, no Enregistrer', () => {
+    render(<ResultsScreen result={trainingResult} onReplay={noop} onHome={noop} />);
+    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    expect(screen.getByText('7 × 8 = 56')).toBeInTheDocument();
+    expect(screen.getByText('6 × 9 = 54')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Enregistrer/ })).toBeNull();
+    // Untimed: the correct-but-slow answer is not flagged as "trop lent".
+    expect(screen.queryByText(/trop lent/)).toBeNull();
   });
 });
 

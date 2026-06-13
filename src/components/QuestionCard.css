@@ -37,6 +37,11 @@
   font-weight: 400;
 }
 
+.question-card__answer--correct {
+  color: var(--color-success);
+  background: rgba(34, 197, 94, 0.16);
+}
+
 @media (max-width: 480px) {
   .question-card__operation,
   .question-card__answer {

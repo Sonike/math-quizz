@@ -8,10 +8,18 @@ describe('AnswerModeToggle', () => {
     render(<AnswerModeToggle value="screen" onChange={onChange} />);
 
     expect(
-      screen.getByRole('radio', { name: "📱 Sur l'écran" }),
+      screen.getByRole('radio', { name: '📱 Test écran' }),
     ).toHaveAttribute('aria-checked', 'true');
 
-    fireEvent.click(screen.getByRole('radio', { name: '✏️ Sur papier' }));
+    fireEvent.click(screen.getByRole('radio', { name: '✏️ Test papier' }));
     expect(onChange).toHaveBeenCalledWith('paper');
+  });
+
+  test('renders the training option and emits "training" on click', () => {
+    const onChange = vi.fn();
+    render(<AnswerModeToggle value="screen" onChange={onChange} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: '🎓 Entraînement' }));
+    expect(onChange).toHaveBeenCalledWith('training');
   });
 });

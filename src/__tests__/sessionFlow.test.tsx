@@ -111,6 +111,13 @@ describe('SessionScreen flow', () => {
     expect(result!.answers[0].given).toBe(56);
   });
 
+  test('cancel button hands control back to the caller', () => {
+    const onCancel = vi.fn();
+    render(<SessionScreen settings={settings} onComplete={() => {}} onCancel={onCancel} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Arrêter' }));
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
   test('empty answer + Enter is ignored (no advance)', () => {
     let result: SessionResult | null = null;
     render(<SessionScreen settings={settings} onComplete={(r) => (result = r)} />);

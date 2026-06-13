@@ -19,10 +19,32 @@ describe('HomeScreen — Saisie toggle', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('radio', { name: '✏️ Sur papier' }));
+    fireEvent.click(screen.getByRole('radio', { name: '✏️ Test papier' }));
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ answerMode: 'paper' }),
     );
+  });
+});
+
+describe('HomeScreen — training mode', () => {
+  test('shows the training summary and start label when answerMode is training', () => {
+    render(
+      <HomeScreen
+        settings={{ ...DEFAULT_SETTINGS, answerMode: 'training' }}
+        onChange={noop}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={noop}
+      />,
+    );
+
+    expect(
+      screen.getByText(/correction après chaque réponse/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /S'entraîner/ }),
+    ).toBeInTheDocument();
   });
 });
 
