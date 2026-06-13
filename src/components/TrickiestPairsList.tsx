@@ -1,13 +1,15 @@
 import type { PairStat } from '../domain/progress';
 import { rateBucket } from './rateColor';
+import { useI18n } from '../i18n/I18nContext';
 
 type Props = { pairs: PairStat[] };
 
 export const TrickiestPairsList = ({ pairs }: Props) => {
+  const { t } = useI18n();
   if (pairs.length === 0) {
     return (
       <p className="pairs__empty">
-        Aucune paire à revoir pour l'instant.
+        {t('pairs.empty')}
       </p>
     );
   }
