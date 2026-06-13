@@ -15,6 +15,7 @@ describe('HomeScreen — Saisie toggle', () => {
         onStart={noop}
         onOpenSettings={noop}
         onOpenProgress={noop}
+        onOpenInfo={noop}
       />,
     );
 
@@ -35,10 +36,30 @@ describe('HomeScreen — progress entry', () => {
         onStart={noop}
         onOpenSettings={noop}
         onOpenProgress={onOpenProgress}
+        onOpenInfo={noop}
       />,
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'mes résultats' }));
     expect(onOpenProgress).toHaveBeenCalledOnce();
+  });
+});
+
+describe('HomeScreen — info entry', () => {
+  test('clicking the info button calls onOpenInfo', () => {
+    const onOpenInfo = vi.fn();
+    render(
+      <HomeScreen
+        settings={DEFAULT_SETTINGS}
+        onChange={noop}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={onOpenInfo}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'à propos' }));
+    expect(onOpenInfo).toHaveBeenCalledOnce();
   });
 });

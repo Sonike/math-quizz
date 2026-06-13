@@ -5,6 +5,21 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-06-13
+
+### Added
+
+- **"À propos" info page** (reachable from an ℹ️ button on the home screen):
+  shows the app version, a French user-oriented changelog, and a paragraph
+  explaining that all data (settings, results) stays in this browser's
+  `localStorage` — nothing is sent to a server. The displayed version is
+  injected from `package.json` at build time (`vite.config.ts` →
+  `__APP_VERSION__`); the user-facing notes live in `src/domain/releaseNotes.ts`.
+- Contributor `CLAUDE.md` documenting the release ritual that keeps
+  `package.json`, `CHANGELOG.md`, and the in-app notes in sync, with a
+  drift-guard test (`src/__tests__/releaseNotes.test.ts`) asserting the top
+  release note matches the package version.
+
 ## [0.3.0] - 2026-06-13
 
 ### Added

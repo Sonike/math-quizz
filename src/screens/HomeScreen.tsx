@@ -10,6 +10,7 @@ type Props = {
   onStart: () => void;
   onOpenSettings: () => void;
   onOpenProgress: () => void;
+  onOpenInfo: () => void;
 };
 
 export const HomeScreen = ({
@@ -18,6 +19,7 @@ export const HomeScreen = ({
   onStart,
   onOpenSettings,
   onOpenProgress,
+  onOpenInfo,
 }: Props) => {
   const seconds = (settings.durationPerQuestionMs / 1000)
     .toFixed(1)
@@ -29,6 +31,14 @@ export const HomeScreen = ({
       <header className="home__header">
         <h1>Math Quizz</h1>
         <div className="home__header-actions">
+          <button
+            type="button"
+            className="home__info-btn"
+            onClick={onOpenInfo}
+            aria-label="à propos"
+          >
+            ℹ️
+          </button>
           <button
             type="button"
             className="home__progress-btn"

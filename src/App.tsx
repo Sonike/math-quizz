@@ -5,6 +5,7 @@ import { PaperSessionScreen } from './screens/PaperSessionScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
+import { InfoScreen } from './screens/InfoScreen';
 import type { SessionResult, Settings } from './domain/session';
 import {
   loadSettings,
@@ -13,7 +14,7 @@ import {
   clearAll,
 } from './storage/profileStore';
 
-type Screen = 'home' | 'session' | 'results' | 'settings' | 'progress';
+type Screen = 'home' | 'session' | 'results' | 'settings' | 'progress' | 'info';
 
 export const App = () => {
   const [screen, setScreen] = useState<Screen>('home');
@@ -47,6 +48,7 @@ export const App = () => {
           onStart={() => setScreen('session')}
           onOpenSettings={() => setScreen('settings')}
           onOpenProgress={() => setScreen('progress')}
+          onOpenInfo={() => setScreen('info')}
         />
       )}
       {screen === 'session' &&
@@ -73,6 +75,12 @@ export const App = () => {
       )}
       {screen === 'progress' && (
         <ProgressScreen onBack={() => setScreen('home')} />
+      )}
+      {screen === 'info' && (
+        <InfoScreen
+          version={__APP_VERSION__}
+          onBack={() => setScreen('home')}
+        />
       )}
     </div>
   );
