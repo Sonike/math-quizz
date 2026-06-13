@@ -23,17 +23,20 @@ export const ErrorHeatmap = ({ grid }: Props) => (
             <th className="heatmap__rowhead" scope="row">
               {row[0].a}
             </th>
-            {row.map((cell) => (
-              <td
-                key={`${cell.a}x${cell.b}`}
-                className={`heatmap__cell heat--${rateBucket(cell.errorRate)}`}
-                title={
-                  cell.errorRate === null
-                    ? `${cell.a}×${cell.b} — pas encore joué`
-                    : `${cell.a}×${cell.b} — ${Math.round(cell.errorRate * 100)}%`
-                }
-              />
-            ))}
+            {row.map((cell) => {
+              const label =
+                cell.errorRate === null
+                  ? `${cell.a}×${cell.b} — pas encore joué`
+                  : `${cell.a}×${cell.b} — ${Math.round(cell.errorRate * 100)}%`;
+              return (
+                <td
+                  key={`${cell.a}x${cell.b}`}
+                  className={`heatmap__cell heat--${rateBucket(cell.errorRate)}`}
+                  title={label}
+                  aria-label={label}
+                />
+              );
+            })}
           </tr>
         ))}
       </tbody>
