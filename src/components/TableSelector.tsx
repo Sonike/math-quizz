@@ -1,4 +1,5 @@
 import { MULTIPLICANDS } from '../domain/tables';
+import { useI18n } from '../i18n/I18nContext';
 import './TableSelector.css';
 
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
 };
 
 export const TableSelector = ({ selected, onChange }: Props) => {
+  const { t } = useI18n();
   const toggle = (n: number) => {
     if (selected.includes(n)) {
       onChange(selected.filter((x) => x !== n));
@@ -20,7 +22,7 @@ export const TableSelector = ({ selected, onChange }: Props) => {
   return (
     <div className="table-selector">
       <div className="table-selector__header">
-        <span>Tables</span>
+        <span>{t('tables.title')}</span>
         <button
           type="button"
           className="table-selector__toggle-all"
@@ -28,7 +30,7 @@ export const TableSelector = ({ selected, onChange }: Props) => {
             onChange(allSelected ? [] : (MULTIPLICANDS as readonly number[]).slice())
           }
         >
-          {allSelected ? 'Tout décocher' : 'Tout cocher'}
+          {allSelected ? t('tables.deselectAll') : t('tables.selectAll')}
         </button>
       </div>
       <div className="table-selector__grid">

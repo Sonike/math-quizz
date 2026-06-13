@@ -1,4 +1,5 @@
 import type { AnswerMode } from '../domain/session';
+import { useI18n } from '../i18n/I18nContext';
 import './ModeToggle.css';
 
 type Props = {
@@ -6,15 +7,15 @@ type Props = {
   onChange: (next: AnswerMode) => void;
 };
 
-const OPTIONS: { id: AnswerMode; label: string }[] = [
-  { id: 'screen', label: "📱 Sur l'écran" },
-  { id: 'paper', label: '✏️ Sur papier' },
-];
-
 export const AnswerModeToggle = ({ value, onChange }: Props) => {
+  const { t } = useI18n();
+  const OPTIONS: { id: AnswerMode; label: string }[] = [
+    { id: 'screen', label: t('answerMode.screen') },
+    { id: 'paper', label: t('answerMode.paper') },
+  ];
   const active = value ?? 'screen';
   return (
-    <div className="mode-toggle mode-toggle--two" role="radiogroup" aria-label="saisie">
+    <div className="mode-toggle mode-toggle--two" role="radiogroup" aria-label={t('answerMode.aria')}>
       {OPTIONS.map((opt) => (
         <button
           key={opt.id}
