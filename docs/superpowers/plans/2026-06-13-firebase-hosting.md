@@ -167,23 +167,23 @@ git commit -m "build(hosting): add Firebase Hosting config (static dist, SPA fal
 
 **Goal:** prove the build serves correctly from Hosting *before* touching DNS.
 
-- [ ] **Step 1: Build fresh** **[repo]**
+- [x] **Step 1: Build fresh** **[repo]**
 
 Run: `pnpm build`
 Expected: `dist/` regenerated.
 
-- [ ] **Step 2: Deploy** **[you]**
+- [x] **Step 2: Deploy** **[you]**
 
 Run: `firebase deploy --only hosting`
 Expected: "Deploy complete!" and a Hosting URL, e.g.
 `https://modern-ally-102412.web.app`.
 
-- [ ] **Step 3: Verify the app loads and SPA fallback works** **[you]**
+- [x] **Step 3: Verify the app loads and SPA fallback works** **[you]**
 
 Open `https://modern-ally-102412.web.app` — the home screen renders. Hard-refresh
 (Ctrl-Shift-R); it must not 404 (the `**` → `/index.html` rewrite handles it).
 
-- [ ] **Step 4: Verify cache headers match the nginx intent** **[you]**
+- [x] **Step 4: Verify cache headers match the nginx intent** **[you]**
 
 ```bash
 curl -sI https://modern-ally-102412.web.app/sw.js | grep -i cache-control
@@ -192,7 +192,7 @@ curl -sI "https://modern-ally-102412.web.app/$(curl -s https://modern-ally-10241
 Expected: `sw.js` → `cache-control: no-cache`; the `/assets/…` file →
 `cache-control: public, max-age=31536000, immutable`.
 
-- [ ] **Step 5: Verify the PWA still installs** **[you]**
+- [x] **Step 5: Verify the PWA still installs** **[you]**
 
 In Chrome devtools → Application: the service worker registers and the manifest
 loads on the `.web.app` origin. (A fresh origin = a fresh SW install, expected.)
@@ -204,7 +204,7 @@ loads on the `.web.app` origin. (A fresh origin = a fresh SW install, expected.)
 > **[you] — all console + registrar.** Firebase shows the **exact** records to
 > add; use those verbatim rather than any IPs guessed here (they can change).
 
-- [ ] **Step 1: Add the custom domain**
+- [x] **Step 1: Add the custom domain**
 
 Firebase console → Hosting → **Add custom domain** → enter
 `math-quizz.mrpia.ch` → continue.
