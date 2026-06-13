@@ -193,7 +193,7 @@
   font-size: 0.75rem;
   color: var(--color-fg-muted);
 }
-.heatmap__legend span {
+.heatmap__legend span:empty {
   width: 14px;
   height: 14px;
   border-radius: 3px;
