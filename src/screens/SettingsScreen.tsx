@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { Settings } from '../domain/session';
+import { useI18n } from '../i18n/I18nContext';
+import { LANGUAGES } from '../i18n';
 import './SettingsScreen.css';
 
 type Props = {
@@ -17,6 +19,7 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
   const [count, setCount] = useState(settings.questionCount);
   const [partial, setPartial] = useState(settings.partialCreditFactor);
   const [confirming, setConfirming] = useState(false);
+  const { t } = useI18n();
 
   const submit = () => {
     onSave({
@@ -31,14 +34,14 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
   return (
     <div className="settings">
       <header className="settings__header">
-        <button type="button" onClick={onBack} className="settings__back" aria-label="retour">
+        <button type="button" onClick={onBack} className="settings__back" aria-label={t('settings.backAria')}>
           ←
         </button>
-        <h2>Paramètres</h2>
+        <h2>{t('settings.title')}</h2>
       </header>
 
       <label className="settings__field">
-        <span className="settings__label">Temps cible par question (s)</span>
+        <span className="settings__label">{t('settings.targetTime')}</span>
         <input
           type="number"
           step={0.5}
@@ -48,12 +51,12 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
           onChange={(e) => setSeconds(Number(e.target.value))}
         />
         <span className="settings__hint">
-          Réponse plus rapide : 1 point. Plus lente : crédit partiel.
+          {t('settings.targetTimeHint')}
         </span>
       </label>
 
       <label className="settings__field">
-        <span className="settings__label">Nombre de questions</span>
+        <span className="settings__label">{t('settings.questionCount')}</span>
         <input
           type="number"
           step={1}
@@ -66,7 +69,7 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
 
       <label className="settings__field">
         <span className="settings__label">
-          Crédit pour réponse correcte mais lente (0–1)
+          {t('settings.partialCredit')}
         </span>
         <input
           type="number"
@@ -76,11 +79,31 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
           value={partial}
           onChange={(e) => setPartial(Number(e.target.value))}
         />
-        <span className="settings__hint">0 = pas de crédit · 0.5 = demi-point · 1 = autant qu'une réponse rapide</span>
+        <span className="settings__hint">{t('settings.partialCreditHint')}</span>
       </label>
 
+      <div className="settings__field">
+        <span className="settings__label">{t('settings.language')}</span>
+        <div className="mode-toggle mode-toggle--two" role="radiogroup" aria-label={t('settings.language')}>
+          {LANGUAGES.map((l) => (
+            <button
+              key={l.code}
+              type="button"
+              role="radio"
+              aria-checked={settings.language === l.code}
+              className={`mode-toggle__option${
+                settings.language === l.code ? ' mode-toggle__option--on' : ''
+              }`}
+              onClick={() => onSave({ ...settings, language: l.code })}
+            >
+              {l.nativeLabel}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <button type="button" className="settings__primary" onClick={submit}>
-        Enregistrer
+        {t('settings.save')}
       </button>
 
       <hr className="settings__divider" />
@@ -91,11 +114,11 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
           className="settings__danger"
           onClick={() => setConfirming(true)}
         >
-          🧹 Effacer l'historique
+          {`🧹 ${t('settings.clearHistory')}`}
         </button>
       ) : (
         <div className="settings__confirm">
-          <p>Effacer l'historique et les statistiques ?</p>
+          <p>{t('settings.clearConfirm')}</p>
           <div className="settings__confirm-row">
             <button
               type="button"
@@ -105,14 +128,14 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
                 setConfirming(false);
               }}
             >
-              Oui, effacer
+              {t('settings.clearYes')}
             </button>
             <button
               type="button"
               className="settings__secondary"
               onClick={() => setConfirming(false)}
             >
-              Annuler
+              {t('settings.cancel')}
             </button>
           </div>
         </div>
