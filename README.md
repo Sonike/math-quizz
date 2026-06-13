@@ -77,8 +77,12 @@ Build from source and roll out a new revision in one step — Cloud Build
 builds the `Dockerfile`, then Cloud Run shifts traffic:
 
 ```bash
-gcloud run deploy math-quizz --source . --region us-central1
+gcloud run deploy math-quizz --source . --region europe-west6
 ```
+
+The service runs in `europe-west6` (Zürich). On a brand-new service, add
+`--allow-unauthenticated` to make it publicly reachable; redeploys preserve
+the existing access setting.
 
 `.gcloudignore` keeps `node_modules`, the build output, and local-only files
 out of the upload. No environment variables or runtime config are required —
