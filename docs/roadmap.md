@@ -1,12 +1,16 @@
-# Roadmap V1.5+
+# Roadmap
 
 Direct follow-up to the shipped V1. Each entry states: the motivation, the
 area of code affected, and the condition that makes the work worthwhile.
 **Unprioritized** list — we'll choose based on real usage.
 
+**Status legend**: ✅ done · 📋 planned.
+
 ---
 
 ## 1. PWA / service worker (offline + installable)
+
+**Status**: 📋 Planned
 
 **Why**: V1 already works without a network once the page is loaded
 (everything is static + `localStorage`), but you have to reach the page a
@@ -29,6 +33,8 @@ opening a tab each time. Low cost (< 1h), big UX gain.
 ---
 
 ## 2. Adaptive weighting of draws
+
+**Status**: 📋 Planned — blocked on history density (see prerequisite)
 
 **Why**: today every pair `(a, b)` has the same probability of appearing.
 The child replays easy pairs as often as the ones that give them trouble.
@@ -53,6 +59,11 @@ the appearance frequency of the problematic pair increases.
 
 ## 3. "My results" page (progress chart)
 
+**Status**: ✅ Done — shipped in v0.2.0. Built as `ProgressScreen` with two
+score curves (correct/total + partial-credit), a "trickiest pairs" list, and
+a 14×11 error heat-map; reachable from a 📈 button on the home screen. Pure
+derivations live in `src/domain/progress.ts`; rendering is inline SVG.
+
 **Why**: motivation. The child sees their score improve session after
 session, and spots the most fragile tables.
 
@@ -72,6 +83,8 @@ session, and spots the most fragile tables.
 ---
 
 ## 4. Multi-profile
+
+**Status**: 📋 Planned
 
 **Why**: let several children (or contexts: practice, test) share the app
 without mixing their histories.
@@ -97,6 +110,8 @@ the active profile prominently on every screen.
 
 ## 5. Fill-in-the-blank division (`a × ? = a×b`)
 
+**Status**: 📋 Planned
+
 **Why**: a pedagogical variant that asks for the missing factor instead of
 the result. Reinforces memorization in both directions.
 
@@ -114,6 +129,8 @@ so that mul / div / div-hole feed the same counter.
 
 ## 6. Sounds and animations at the end of a session
 
+**Status**: 📋 Planned
+
 **Why**: reward perseverance without breaking the "no feedback during the
 session" rule.
 
@@ -130,6 +147,8 @@ that's deliberate, to avoid disturbing concentration.
 ---
 
 ## 7. Language choice: FR, DE, EN
+
+**Status**: 📋 Planned
 
 **Why**: potentially multilingual home or classroom, future use outside
 France.
@@ -161,6 +180,8 @@ universal.
 ---
 
 ## 8. Voice mode (audio reading of the question)
+
+**Status**: 📋 Planned — depends on item 7 (language choice)
 
 **Why**: trains oral mental arithmetic — that's the real modality of the
 school test ("how much is seven times eight?"). Also useful for a younger

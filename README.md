@@ -66,6 +66,24 @@ pnpm dlx serve dist
 
 Either approach mirrors what GitHub Pages / Netlify / Vercel will serve.
 
+## Deploy
+
+The app ships as a static bundle served by nginx in a container, hosted on
+**Google Cloud Run**. The image is built by the multi-stage `Dockerfile`
+(`pnpm build` → `nginx:alpine` serving `dist/` on port 8080); `nginx.conf`
+handles the SPA fallback and long-caches the content-hashed `/assets/`.
+
+Build from source and roll out a new revision in one step — Cloud Build
+builds the `Dockerfile`, then Cloud Run shifts traffic:
+
+```bash
+gcloud run deploy <service-name> --source . --region <region>
+```
+
+`.gcloudignore` keeps `node_modules`, the build output, and local-only files
+out of the upload. No environment variables or runtime config are required —
+the bundle is fully self-contained.
+
 ## Project layout
 
 ```
@@ -103,7 +121,20 @@ migration.
 Use the in-app **Settings → Effacer l'historique** button to reset history
 and error stats; the user-facing `Settings` object is preserved.
 
+## Contributing
+
+1. Branch off `main`: `git switch -c feat/<short-name>`.
+2. Work test-first. Anything in `src/domain/` or a new component ships with a
+   Vitest case; run `pnpm test` and `pnpm build` (the build also type-checks)
+   before pushing.
+3. Keep the zero-runtime-dependency rule — no chart or UI libraries. An
+   inline SVG or a few lines of CSS almost always do the job.
+4. Follow the existing shape: pure logic in `src/domain/`, presentational
+   components in `src/components/`, screens orchestrate. UI strings stay in
+   French until the i18n item lands.
+5. Keep commits small and focused, then open a pull request against `main`.
+
 ## What's next
 
-See [`docs/v1.5-roadmap.md`](docs/v1.5-roadmap.md) for the V1.5+ backlog
+See [`docs/roadmap.md`](docs/roadmap.md) for the V1.5+ backlog
 (PWA, adaptive weighting, progress charts, multi-profile, etc.).
