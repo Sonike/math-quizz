@@ -99,6 +99,20 @@ src/
 └── __tests__/              Vitest suite
 ```
 
+## Icons
+
+The favicon and PWA icons derive from `public/icon.svg` (rounded, for the
+`"any"` purpose) and `public/icon-maskable.svg` (full-bleed, for the
+`maskable` purpose and the iOS `apple-touch-icon`). The committed PNGs are
+regenerated with:
+
+```bash
+npx -y sharp-cli --density 576 -i public/icon.svg          -o public/icon-192.png          resize 192 192
+npx -y sharp-cli --density 576 -i public/icon.svg          -o public/icon-512.png          resize 512 512
+npx -y sharp-cli --density 576 -i public/icon-maskable.svg -o public/icon-maskable-512.png resize 512 512
+npx -y sharp-cli --density 576 -i public/icon-maskable.svg -o public/apple-touch-icon.png  resize 180 180
+```
+
 ## Stack
 
 - [Vite 5](https://vitejs.dev/) + [React 18](https://react.dev/) + TypeScript
