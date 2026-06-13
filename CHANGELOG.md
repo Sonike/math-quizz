@@ -5,6 +5,19 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.7.0] - 2026-06-14
+
+### Added
+- **Language selector on the home page**: a 3-way segmented toggle showing the
+  language code (FR / DE / EN) above the native name, placed as the first widget
+  under the title — the UI language is now changeable without opening Settings.
+  New reusable `src/components/LanguageToggle.tsx`; the code badge is
+  `aria-hidden` so each option's accessible name stays the native label.
+
+### Changed
+- The Settings language selector now renders the same `LanguageToggle`
+  component (a single source of truth) and gains the matching FR/DE/EN badges.
+
 ## [0.6.0] - 2026-06-13
 
 ### Added
