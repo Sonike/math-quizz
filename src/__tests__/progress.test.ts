@@ -138,6 +138,17 @@ describe('trickiestPairs', () => {
     expect(p).toMatchObject({ a: 3, b: 4, attempts: 3, timeouts: 1 });
     expect(p.errorRate).toBeCloseTo(1 / 3);
   });
+
+  test('excludes mastered pairs (no misses) even past the attempts threshold', () => {
+    const h = [
+      mkSession([
+        rec(mkQ(5, 5), 25, 1000),
+        rec(mkQ(5, 5), 25, 1000),
+        rec(mkQ(5, 5), 25, 1000),
+      ]),
+    ];
+    expect(trickiestPairs(h)).toHaveLength(0);
+  });
 });
 
 describe('errorGrid', () => {

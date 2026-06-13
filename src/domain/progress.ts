@@ -68,7 +68,7 @@ export const trickiestPairs = (
         errorRate: (stat.errors + stat.timeouts) / stat.attempts,
       };
     })
-    .filter((row) => row.attempts >= minAttempts)
+    .filter((row) => row.attempts >= minAttempts && row.errorRate > 0)
     .sort(
       (x, y) =>
         y.errorRate - x.errorRate ||

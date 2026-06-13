@@ -7,7 +7,7 @@ export const TrickiestPairsList = ({ pairs }: Props) => {
   if (pairs.length === 0) {
     return (
       <p className="pairs__empty">
-        Pas encore assez de données pour repérer les paires difficiles.
+        Aucune paire à revoir pour l'instant.
       </p>
     );
   }
