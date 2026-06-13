@@ -209,25 +209,25 @@ loads on the `.web.app` origin. (A fresh origin = a fresh SW install, expected.)
 Firebase console → Hosting → **Add custom domain** → enter
 `math-quizz.mrpia.ch` → continue.
 
-- [ ] **Step 2: Verify ownership (if prompted)**
+- [x] **Step 2: Verify ownership (if prompted)**
 
 If Firebase asks to verify domain ownership, it gives a **TXT** record. Add it at
 `mrpia.ch`'s DNS exactly as shown, then continue once it propagates
 (`dig +short TXT mrpia.ch` shows it).
 
-- [ ] **Step 3: Add the A records for the subdomain**
+- [x] **Step 3: Add the A records for the subdomain**
 
 Firebase then shows two **A** records for `math-quizz` (the subdomain host). Add
 both at `mrpia.ch`'s DNS, host = `math-quizz`, exactly as shown.
 
-- [ ] **Step 4: Wait for SSL provisioning**
+- [x] **Step 4: Wait for SSL provisioning**
 
 The console moves from "Needs setup" → "Pending" → "Connected". Google issues the
 managed certificate automatically; this can take minutes up to ~24h. If it
 stalls, re-check Task 1 Step 3 (CAA) and that the A records resolve:
 `dig +short A math-quizz.mrpia.ch`.
 
-- [ ] **Step 5: Verify the live domain**
+- [x] **Step 5: Verify the live domain**
 
 Open `https://math-quizz.mrpia.ch` — app loads over a valid (Google-managed)
 certificate; hard-refresh doesn't 404. Confirm cert validity:
@@ -247,7 +247,7 @@ curl -sI https://math-quizz.mrpia.ch | head -1   # expect: HTTP/2 200
 **Goal:** the repo must stop claiming Cloud Run is the deploy target. Do this
 **after** Task 4 succeeds, so the docs are never false in either direction.
 
-- [ ] **Step 1: Rewrite the README Deploy section** **[repo]**
+- [x] **Step 1: Rewrite the README Deploy section** **[repo]**
 
 In `README.md`, replace the entire **## Deploy** section (currently the Cloud
 Run / Docker / nginx description and the `gcloud run deploy` command) with:
@@ -277,7 +277,7 @@ compression is automatic. `.firebaserc` pins the default project.
 > console → Hosting). The Google-managed certificate renews automatically.
 ```
 
-- [ ] **Step 2: Update the CLAUDE.md Deploy section** **[repo]**
+- [x] **Step 2: Update the CLAUDE.md Deploy section** **[repo]**
 
 In `CLAUDE.md`, replace the **## Deploy** section:
 
@@ -289,7 +289,7 @@ Static bundle on **Firebase Hosting** (GCP project `modern-ally-102412`), live a
 hosting`. See `README.md` and `docs/superpowers/specs/2026-06-13-firebase-hosting-design.md`.
 ```
 
-- [ ] **Step 3: Confirm no app-version churn is needed** **[repo]**
+- [x] **Step 3: Confirm no app-version churn is needed** **[repo]**
 
 This change does not alter app behaviour, so **do not** bump `package.json`
 version. The `releaseNotes`/CHANGELOG drift guard only triggers on a version
@@ -297,12 +297,12 @@ change, so leaving them untouched keeps `pnpm test` green. (Optionally add a
 `### Changed` line under an `## [Unreleased]` heading in `CHANGELOG.md` — no
 version bump.)
 
-- [ ] **Step 4: Verify the suite is still green** **[repo]**
+- [x] **Step 4: Verify the suite is still green** **[repo]**
 
 Run: `pnpm test`
 Expected: PASS (no version/notes drift; no code changed).
 
-- [ ] **Step 5: Commit the docs** **[repo]**
+- [x] **Step 5: Commit the docs** **[repo]**
 
 ```bash
 git add README.md CLAUDE.md
@@ -355,11 +355,11 @@ Skip this if you want to keep the container as a documented fallback.
 
 ### Task 7: Final verification
 
-- [ ] **Step 1: Live domain healthy** — `curl -sI https://math-quizz.mrpia.ch | head -1` → `HTTP/2 200`, valid cert.
-- [ ] **Step 2: SPA fallback** — a hard refresh on the domain does not 404.
-- [ ] **Step 3: Cache headers** — `/assets/*` immutable, `sw.js`/`manifest.webmanifest` `no-cache` (rerun Task 3 Step 4 against the custom domain).
-- [ ] **Step 4: Repo green** — `pnpm test` and `pnpm build` both pass.
-- [ ] **Step 5: Docs truthful** — README/CLAUDE.md describe Firebase Hosting, not Cloud Run.
+- [x] **Step 1: Live domain healthy** — `curl -sI https://math-quizz.mrpia.ch | head -1` → `HTTP/2 200`, valid cert.
+- [x] **Step 2: SPA fallback** — a hard refresh on the domain does not 404.
+- [x] **Step 3: Cache headers** — `/assets/*` immutable, `sw.js`/`manifest.webmanifest` `no-cache` (rerun Task 3 Step 4 against the custom domain).
+- [x] **Step 4: Repo green** — `pnpm test` and `pnpm build` both pass.
+- [x] **Step 5: Docs truthful** — README/CLAUDE.md describe Firebase Hosting, not Cloud Run.
 
 ---
 
