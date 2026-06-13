@@ -83,8 +83,7 @@ firebase deploy --only hosting
 `firebase.json` reproduces the old nginx behaviour: a `**` → `/index.html`
 rewrite for the SPA fallback, a 1-year immutable cache on the content-hashed
 `/assets/`, and `no-cache` on `sw.js` and `manifest.webmanifest`. Gzip/brotli
-compression is automatic. `.firebaserc` pins the default project. The
-`Dockerfile`/`nginx.conf` stay in-repo as a Cloud Run fallback.
+compression is automatic. `.firebaserc` pins the default project.
 
 > Custom domain DNS lives at the `mrpia.ch` registrar: the `math-quizz` host
 > points at Firebase Hosting via the record shown in the Firebase console →

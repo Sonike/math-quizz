@@ -319,7 +319,7 @@ git commit -m "docs: point deploy docs at Firebase Hosting + math-quizz.mrpia.ch
 > Registry image-storage cost. Keep the `Dockerfile`/`nginx.conf` in-repo if you
 > want a re-deploy path; delete them only if you're sure.
 
-- [ ] **Step 1: Snapshot what exists** **[you]**
+- [x] **Step 1: Snapshot what exists** **[you]**
 
 ```bash
 gcloud run services describe math-quizz --region europe-west6 --format='value(status.url)'
@@ -327,7 +327,7 @@ gcloud artifacts repositories list --location europe-west6
 ```
 Record the URL and the `cloud-run-source-deploy` repo name.
 
-- [ ] **Step 2: Delete the Cloud Run service** **[you]**
+- [x] **Step 2: Delete the Cloud Run service** **[you]**
 
 ```bash
 gcloud run services delete math-quizz --region europe-west6
@@ -335,7 +335,7 @@ gcloud run services delete math-quizz --region europe-west6
 Expected: confirmation prompt → deleted. `https://math-quizz-…europe-west6.run.app`
 now 404s; `math-quizz.mrpia.ch` is unaffected (it's served by Hosting).
 
-- [ ] **Step 3: (Optional) Remove the now-orphaned container images** **[you]**
+- [x] **Step 3: (Optional) Remove the now-orphaned container images** **[you]**
 
 ```bash
 gcloud artifacts repositories delete cloud-run-source-deploy --location europe-west6
@@ -343,7 +343,7 @@ gcloud artifacts repositories delete cloud-run-source-deploy --location europe-w
 Only do this if no other service uses that repo. This stops the small ongoing
 image-storage charge.
 
-- [ ] **Step 4: (Optional) Remove the container build files from the repo** **[repo]**
+- [x] **Step 4: (Optional) Remove the container build files from the repo** **[repo]**
 
 ```bash
 git rm Dockerfile nginx.conf .dockerignore .gcloudignore
