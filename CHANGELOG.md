@@ -5,6 +5,26 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] - 2026-06-13
+
+### Added
+- **Training mode** ("Entraînement"): a third play option on the home screen
+  (`📱 Test écran` / `✏️ Test papier` / `🎓 Entraînement`). Untimed — after each
+  submitted answer the child immediately sees correct/incorrect and the right
+  answer, then taps **Suivant**. Answers are auto-marked (correct = 1 point,
+  time ignored) by setting `selfMarkedCorrect` on each record, so the existing
+  scoring (`pointsFor`) and stats (`stats.classify`, `progress.isCorrect`)
+  reuse it unchanged. New `src/screens/TrainingScreen.tsx`.
+- **Separate training tracking + dashboard view**: training sessions persist to
+  a new `trainingHistory` localStorage key (independent 50-session cap) and are
+  shown via a `Test | Entraînement` toggle on the "Mes résultats" page. The
+  training view shows trickiest pairs + the table heat-map only (no
+  score-over-time chart). `clearAll` now clears training history too.
+
+### Changed
+- The home play-mode toggle is now three-way and its options are relabelled
+  `Test écran` / `Test papier` to distinguish them from `Entraînement`.
+
 ## [0.5.1] - 2026-06-13
 
 ### Fixed
