@@ -5,6 +5,16 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.7.1] - 2026-06-14
+
+### Added
+- "Buy me a coffee" link (☕ → https://buymeacoffee.com/mrpia, opens in a new
+  tab) in the About page's credit panel. New `info.coffee` key in fr/de/en.
+
+### Changed
+- About page tidied: sections reordered and the credit line simplified
+  (now "Made with 💖 in Zürich").
+
 ## [0.7.0] - 2026-06-14
 
 ### Added
