@@ -80,6 +80,13 @@ describe('TrainingScreen', () => {
     ).toBeInTheDocument();
   });
 
+  test('cancel button hands control back to the caller', () => {
+    const onCancel = vi.fn();
+    render(<TrainingScreen settings={settings} onComplete={() => {}} onCancel={onCancel} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Arrêter' }));
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
   test('empty answer + Enter does not advance to feedback', () => {
     render(<TrainingScreen settings={settings} onComplete={() => {}} />);
     fireEvent.keyDown(window, { key: 'Enter' });

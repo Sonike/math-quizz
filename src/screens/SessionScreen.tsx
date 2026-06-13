@@ -5,6 +5,7 @@ import type { AnswerRecord, Settings, SessionResult } from '../domain/session';
 import { NumPad } from '../components/NumPad';
 import { Timer } from '../components/Timer';
 import { QuestionCard } from '../components/QuestionCard';
+import { CancelButton } from '../components/CancelButton';
 import { useNumericKeyboard } from '../hooks/useNumericKeyboard';
 import { useI18n } from '../i18n/I18nContext';
 import './SessionScreen.css';
@@ -12,9 +13,11 @@ import './SessionScreen.css';
 type Props = {
   settings: Settings;
   onComplete: (result: SessionResult) => void;
+  /** Abandon the session and return to the caller (e.g. home). */
+  onCancel?: () => void;
 };
 
-export const SessionScreen = ({ settings, onComplete }: Props) => {
+export const SessionScreen = ({ settings, onComplete, onCancel }: Props) => {
   const { t } = useI18n();
   const questions = useMemo<Question[]>(() => generateQuestions(settings), [settings]);
   const [index, setIndex] = useState(0);
@@ -97,6 +100,7 @@ export const SessionScreen = ({ settings, onComplete }: Props) => {
         onErase={handleErase}
         onValidate={handleValidate}
       />
+      {onCancel && <CancelButton onCancel={onCancel} />}
     </div>
   );
 };

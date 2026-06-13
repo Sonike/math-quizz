@@ -25,6 +25,7 @@ export const en: Record<TranslationKey, string> = {
   'answerMode.training': '🎓 Practice',
   'session.counter': 'Question {n} / {total}',
   'session.ready': 'Ready?',
+  'session.cancel': 'Stop',
   'training.correct': 'Well done!',
   'training.wrong': 'Almost!',
   'training.yourAnswer': 'You answered {given} · the correct answer is {expected}',

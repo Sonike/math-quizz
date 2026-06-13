@@ -60,11 +60,23 @@ export const App = () => {
         )}
         {screen === 'session' &&
           (settings.answerMode === 'paper' ? (
-            <PaperSessionScreen settings={settings} onComplete={handleSessionComplete} />
+            <PaperSessionScreen
+              settings={settings}
+              onComplete={handleSessionComplete}
+              onCancel={() => setScreen('home')}
+            />
           ) : settings.answerMode === 'training' ? (
-            <TrainingScreen settings={settings} onComplete={handleSessionComplete} />
+            <TrainingScreen
+              settings={settings}
+              onComplete={handleSessionComplete}
+              onCancel={() => setScreen('home')}
+            />
           ) : (
-            <SessionScreen settings={settings} onComplete={handleSessionComplete} />
+            <SessionScreen
+              settings={settings}
+              onComplete={handleSessionComplete}
+              onCancel={() => setScreen('home')}
+            />
           ))}
         {screen === 'results' && lastResult && (
           <ResultsScreen

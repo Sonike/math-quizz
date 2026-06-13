@@ -4,6 +4,7 @@ import type { Question } from '../domain/question';
 import type { AnswerRecord, Settings, SessionResult } from '../domain/session';
 import { NumPad } from '../components/NumPad';
 import { QuestionCard } from '../components/QuestionCard';
+import { CancelButton } from '../components/CancelButton';
 import { useNumericKeyboard } from '../hooks/useNumericKeyboard';
 import { useI18n } from '../i18n/I18nContext';
 import './TrainingScreen.css';
@@ -11,12 +12,14 @@ import './TrainingScreen.css';
 type Props = {
   settings: Settings;
   onComplete: (result: SessionResult) => void;
+  /** Abandon the session and return to the caller (e.g. home). */
+  onCancel?: () => void;
 };
 
 type Phase = 'answering' | 'feedback';
 type Feedback = { correct: boolean; given: number; expected: number };
 
-export const TrainingScreen = ({ settings, onComplete }: Props) => {
+export const TrainingScreen = ({ settings, onComplete, onCancel }: Props) => {
   const { t } = useI18n();
   const questions = useMemo<Question[]>(() => generateQuestions(settings), [settings]);
   const [index, setIndex] = useState(0);
@@ -127,6 +130,7 @@ export const TrainingScreen = ({ settings, onComplete }: Props) => {
           </>
         )
       )}
+      {onCancel && <CancelButton onCancel={onCancel} />}
     </div>
   );
 };

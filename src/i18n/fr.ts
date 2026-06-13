@@ -23,6 +23,7 @@ export const fr = {
   'answerMode.training': '🎓 Entraînement',
   'session.counter': 'Question {n} / {total}',
   'session.ready': 'Prêt ?',
+  'session.cancel': 'Arrêter',
   'training.correct': 'Bravo !',
   'training.wrong': 'Presque !',
   'training.yourAnswer': 'Tu as répondu {given} · la bonne réponse est {expected}',
