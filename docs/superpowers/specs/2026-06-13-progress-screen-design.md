@@ -2,7 +2,7 @@
 
 **Status:** approved design, ready for implementation
 **Date:** 2026-06-13
-**Roadmap ref:** `docs/v1.5-roadmap.md` §3
+**Roadmap ref:** `docs/roadmap.md` §3
 
 ## Goal
 

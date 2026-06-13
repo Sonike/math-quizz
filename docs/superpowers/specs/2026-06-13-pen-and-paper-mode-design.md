@@ -104,7 +104,7 @@ if (record.selfMarkedCorrect !== undefined) {
 A paper miss counts as an **error**, never a **timeout**. This keeps the
 `timeouts` stat meaning strictly "ran out of time on screen", and feeds the
 `errors` bucket that the planned adaptive-weighting feature
-(`docs/v1.5-roadmap.md` §2) relies on. `accumulate` already increments
+(`docs/roadmap.md` §2) relies on. `accumulate` already increments
 `attempts` for every record, so a correct paper mark needs no extra handling
 beyond returning `'attempts'`.
 
