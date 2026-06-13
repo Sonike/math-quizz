@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   settings: `${PREFIX}settings`,
   history: `${PREFIX}history`,
   errors: `${PREFIX}errors`,
+  trainingHistory: `${PREFIX}training-history`,
 } as const;
 
 export const HISTORY_LIMIT = 50;
@@ -54,7 +55,16 @@ export const recordSession = (session: SessionResult): void => {
   saveErrors(mergeIntoErrors(loadErrors(), session));
 };
 
+export const loadTrainingHistory = (): SessionResult[] =>
+  safeParse(localStorage.getItem(STORAGE_KEYS.trainingHistory), [] as SessionResult[]);
+
+export const recordTrainingSession = (session: SessionResult): void => {
+  const next = [...loadTrainingHistory(), session].slice(-HISTORY_LIMIT);
+  localStorage.setItem(STORAGE_KEYS.trainingHistory, JSON.stringify(next));
+};
+
 export const clearAll = (): void => {
   localStorage.removeItem(STORAGE_KEYS.history);
   localStorage.removeItem(STORAGE_KEYS.errors);
+  localStorage.removeItem(STORAGE_KEYS.trainingHistory);
 };

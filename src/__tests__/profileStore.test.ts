@@ -6,6 +6,8 @@ import {
   appendSession,
   loadErrors,
   recordSession,
+  loadTrainingHistory,
+  recordTrainingSession,
   clearAll,
   HISTORY_LIMIT,
   STORAGE_KEYS,
@@ -134,6 +136,38 @@ describe('clearAll', () => {
     expect(loadHistory()).toEqual([]);
     expect(loadErrors()).toEqual({});
     expect(loadSettings().questionCount).toBe(11);
+  });
+});
+
+describe('training history', () => {
+  test('loadTrainingHistory returns [] when empty', () => {
+    expect(loadTrainingHistory()).toEqual([]);
+  });
+
+  test('recordTrainingSession appends to training history, not the test history', () => {
+    const s: SessionResult = { ...mkSession(0), answerMode: 'training' };
+    recordTrainingSession(s);
+    expect(loadTrainingHistory()).toEqual([s]);
+    expect(loadHistory()).toEqual([]);
+  });
+
+  test('training history is capped at HISTORY_LIMIT', () => {
+    for (let i = 0; i < HISTORY_LIMIT + 3; i++) {
+      recordTrainingSession({ ...mkSession(i), answerMode: 'training' });
+    }
+    expect(loadTrainingHistory()).toHaveLength(HISTORY_LIMIT);
+  });
+
+  test('clearAll also wipes training history', () => {
+    recordTrainingSession({ ...mkSession(1), answerMode: 'training' });
+    clearAll();
+    expect(loadTrainingHistory()).toEqual([]);
+  });
+
+  test('training history key uses the profile prefix', () => {
+    expect(STORAGE_KEYS.trainingHistory).toBe(
+      'mathquizz:profile:default:training-history',
+    );
   });
 });
 

@@ -1,7 +1,7 @@
 import type { Question, Mode } from './question';
 import type { Language } from '../i18n/types';
 
-export type AnswerMode = 'screen' | 'paper';
+export type AnswerMode = 'screen' | 'paper' | 'training';
 
 export type AnswerRecord = {
   question: Question;
