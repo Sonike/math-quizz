@@ -19,7 +19,7 @@ describe('HomeScreen — Saisie toggle', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('radio', { name: '✏️ Sur papier' }));
+    fireEvent.click(screen.getByRole('radio', { name: '✏️ Test papier' }));
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ answerMode: 'paper' }),
     );

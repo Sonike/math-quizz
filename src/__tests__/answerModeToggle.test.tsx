@@ -8,10 +8,10 @@ describe('AnswerModeToggle', () => {
     render(<AnswerModeToggle value="screen" onChange={onChange} />);
 
     expect(
-      screen.getByRole('radio', { name: "📱 Sur l'écran" }),
+      screen.getByRole('radio', { name: '📱 Test écran' }),
     ).toHaveAttribute('aria-checked', 'true');
 
-    fireEvent.click(screen.getByRole('radio', { name: '✏️ Sur papier' }));
+    fireEvent.click(screen.getByRole('radio', { name: '✏️ Test papier' }));
     expect(onChange).toHaveBeenCalledWith('paper');
   });
 });
