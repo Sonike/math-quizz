@@ -10,6 +10,7 @@ const settings: Settings = {
   mode: 'mul',
   partialCreditFactor: 0.5,
   answerMode: 'paper',
+  language: 'fr',
 };
 
 beforeEach(() => {
