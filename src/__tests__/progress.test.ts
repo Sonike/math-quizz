@@ -1,0 +1,175 @@
+import { describe, expect, test } from 'vitest';
+import {
+  isCorrect,
+  sessionScores,
+  trickiestPairs,
+  errorGrid,
+} from '../domain/progress';
+import { MULTIPLICANDS, MULTIPLIERS } from '../domain/tables';
+import type { SessionResult, AnswerRecord } from '../domain/session';
+import type { Question } from '../domain/question';
+
+const mkQ = (a: number, b: number, op: 'mul' | 'div' = 'mul'): Question => ({
+  a,
+  b,
+  op,
+  expected: op === 'mul' ? a * b : b,
+});
+
+const rec = (
+  question: Question,
+  given: number | null,
+  elapsedMs: number,
+  selfMarkedCorrect?: boolean,
+): AnswerRecord => ({
+  question,
+  given,
+  elapsedMs,
+  ...(selfMarkedCorrect !== undefined ? { selfMarkedCorrect } : {}),
+});
+
+const mkSession = (
+  answers: AnswerRecord[],
+  over: Partial<SessionResult> = {},
+): SessionResult => ({
+  startedAt: '2026-01-01T00:00:00.000Z',
+  durationPerQuestionMs: 4000,
+  partialCreditFactor: 0.5,
+  questionCount: answers.length,
+  selectedTables: [7],
+  mode: 'mul',
+  answers,
+  ...over,
+});
+
+describe('isCorrect', () => {
+  test('slow-but-correct still counts as correct', () => {
+    expect(isCorrect(rec(mkQ(7, 8), 56, 9999))).toBe(true);
+  });
+  test('wrong answer is not correct', () => {
+    expect(isCorrect(rec(mkQ(7, 8), 50, 1000))).toBe(false);
+  });
+  test('timeout (given null) is not correct', () => {
+    expect(isCorrect(rec(mkQ(7, 8), null, 4000))).toBe(false);
+  });
+  test('paper self-marked overrides given value', () => {
+    expect(isCorrect(rec(mkQ(7, 8), null, 0, true))).toBe(true);
+    expect(isCorrect(rec(mkQ(7, 8), 56, 0, false))).toBe(false);
+  });
+});
+
+describe('sessionScores', () => {
+  test('correctRatio counts slow-correct; creditRatio applies partial credit', () => {
+    const s = mkSession([
+      rec(mkQ(2, 3), 6, 1000), // fast correct -> 1 pt
+      rec(mkQ(2, 4), 8, 5000), // slow correct -> 0.5 pt
+      rec(mkQ(2, 5), 9, 1000), // wrong -> 0 pt
+    ]);
+    const [p] = sessionScores([s]);
+    expect(p.total).toBe(3);
+    expect(p.correctRatio).toBeCloseTo(2 / 3);
+    expect(p.creditRatio).toBeCloseTo(1.5 / 3);
+    expect(p.startedAt).toBe('2026-01-01T00:00:00.000Z');
+  });
+
+  test('uses each session own partialCreditFactor', () => {
+    const s = mkSession([rec(mkQ(2, 4), 8, 5000)], {
+      partialCreditFactor: 0.25,
+    });
+    const [p] = sessionScores([s]);
+    expect(p.correctRatio).toBe(1);
+    expect(p.creditRatio).toBeCloseTo(0.25);
+  });
+
+  test('preserves order and guards empty answers', () => {
+    const a = mkSession([rec(mkQ(2, 3), 6, 1000)], { startedAt: 'A' });
+    const b = mkSession([], { startedAt: 'B' });
+    const pts = sessionScores([a, b]);
+    expect(pts.map((p) => p.startedAt)).toEqual(['A', 'B']);
+    expect(pts[1]).toMatchObject({ total: 0, correctRatio: 0, creditRatio: 0 });
+  });
+});
+
+describe('trickiestPairs', () => {
+  const history = [
+    mkSession([
+      // 7x8: 5 attempts, 3 misses (merges 7x8 and 8x7) -> rate 0.6
+      rec(mkQ(7, 8), 56, 1000),
+      rec(mkQ(7, 8), 50, 1000),
+      rec(mkQ(7, 8), 51, 1000),
+      rec(mkQ(8, 7), 56, 1000),
+      rec(mkQ(8, 7), 50, 1000),
+      // 2x3: 4 attempts, 1 miss -> rate 0.25
+      rec(mkQ(2, 3), 6, 1000),
+      rec(mkQ(2, 3), 6, 1000),
+      rec(mkQ(2, 3), 6, 1000),
+      rec(mkQ(2, 3), 5, 1000),
+      // 6x9: 2 attempts, 2 misses -> rate 1.0 but below default threshold
+      rec(mkQ(6, 9), 50, 1000),
+      rec(mkQ(6, 9), 51, 1000),
+    ]),
+  ];
+
+  test('ranks by error rate, excludes pairs below minAttempts (default 3)', () => {
+    const top = trickiestPairs(history);
+    expect(top).toHaveLength(2);
+    expect(top[0]).toMatchObject({ a: 7, b: 8, attempts: 5, errors: 3 });
+    expect(top[0].errorRate).toBeCloseTo(0.6);
+    expect(top[1]).toMatchObject({ a: 2, b: 3, attempts: 4 });
+    expect(top[1].errorRate).toBeCloseTo(0.25);
+  });
+
+  test('minAttempts and limit are configurable', () => {
+    const top = trickiestPairs(history, { minAttempts: 1, limit: 1 });
+    expect(top).toHaveLength(1);
+    expect(top[0]).toMatchObject({ a: 6, b: 9 });
+    expect(top[0].errorRate).toBeCloseTo(1);
+  });
+
+  test('timeouts count toward the error rate', () => {
+    const h = [
+      mkSession([
+        rec(mkQ(3, 4), 12, 1000),
+        rec(mkQ(3, 4), 12, 1000),
+        rec(mkQ(3, 4), null, 4000), // timeout
+      ]),
+    ];
+    const [p] = trickiestPairs(h, { minAttempts: 3 });
+    expect(p).toMatchObject({ a: 3, b: 4, attempts: 3, timeouts: 1 });
+    expect(p.errorRate).toBeCloseTo(1 / 3);
+  });
+});
+
+describe('errorGrid', () => {
+  const history = [
+    mkSession([
+      rec(mkQ(7, 8), 50, 1000),
+      rec(mkQ(7, 8), 51, 1000),
+      rec(mkQ(8, 7), 56, 1000),
+    ]),
+  ];
+
+  test('has MULTIPLICANDS rows x MULTIPLIERS cols', () => {
+    const grid = errorGrid(history);
+    expect(grid).toHaveLength(MULTIPLICANDS.length);
+    expect(grid[0]).toHaveLength(MULTIPLIERS.length);
+  });
+
+  test('computes rate and is symmetric via canonical key', () => {
+    const grid = errorGrid(history);
+    const r7 = MULTIPLICANDS.indexOf(7);
+    const c8 = MULTIPLIERS.indexOf(8);
+    const r8 = MULTIPLICANDS.indexOf(8);
+    const c7 = MULTIPLIERS.indexOf(7);
+    expect(grid[r7][c8].errorRate).toBeCloseTo(2 / 3);
+    expect(grid[r8][c7].errorRate).toBeCloseTo(2 / 3);
+  });
+
+  test('never-practised cell has null errorRate', () => {
+    const grid = errorGrid(history);
+    const r15 = MULTIPLICANDS.indexOf(15);
+    const c11 = MULTIPLIERS.indexOf(11);
+    expect(grid[r15][c11].errorRate).toBeNull();
+    expect(grid[r15][c11].attempts).toBe(0);
+  });
+});
