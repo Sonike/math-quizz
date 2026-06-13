@@ -45,19 +45,19 @@ build. Project `modern-ally-102412`. No app code changes.
 
 **Goal:** confirm the ground truth before touching anything.
 
-- [ ] **Step 1: Confirm the build still produces `dist/`** **[repo]**
+- [x] **Step 1: Confirm the build still produces `dist/`** **[repo]**
 
 Run: `pnpm build`
 Expected: `tsc --noEmit` clean, Vite writes `dist/index.html`, `dist/assets/…`,
 `dist/sw.js`, `dist/manifest.webmanifest`.
 
-- [ ] **Step 2: Confirm the active gcloud account + project** **[you]**
+- [x] **Step 2: Confirm the active gcloud account + project** **[you]**
 
-Run: `gcloud config list account project`
+Run: `gcloud config list`
 Expected: the account that owns the project, `project = modern-ally-102412`.
 (If wrong: `gcloud config set project modern-ally-102412`.)
 
-- [ ] **Step 3: Check for a CAA record that could block the managed cert** **[you]**
+- [x] **Step 3: Check for a CAA record that could block the managed cert** **[you]**
 
 Run: `dig +short CAA mrpia.ch`
 Expected: **empty** (no CAA = any CA may issue, including Google). If it returns
@@ -65,7 +65,7 @@ records, confirm they permit `pki.goog` / `letsencrypt.org`; otherwise the
 Firebase managed certificate will hang at "provisioning" and you must add an
 allowing CAA entry. Note the result here before proceeding.
 
-- [ ] **Step 4: Confirm you can edit DNS for `mrpia.ch`** **[you]**
+- [x] **Step 4: Confirm you can edit DNS for `mrpia.ch`** **[you]**
 
 Identify where `mrpia.ch`'s nameservers point (`dig +short NS mrpia.ch`) and that
 you have login access to add A/TXT records there. No change yet — just confirm
@@ -75,17 +75,17 @@ access, because Task 4 is blocked without it.
 
 ### Task 2: Add Firebase to the project and write Hosting config
 
-- [ ] **Step 1: Install the Firebase CLI** **[you]**
+- [x] **Step 1: Install the Firebase CLI** **[you]**
 
 Run: `pnpm add -g firebase-tools` (or `npm i -g firebase-tools`)
 Verify: `firebase --version` (expect 13.x+).
 
-- [ ] **Step 2: Log in** **[you]**
+- [x] **Step 2: Log in** **[you]**
 
 Run: `firebase login --no-localhost`
 Follow the paste-code flow. Verify: `firebase projects:list` lists projects.
 
-- [ ] **Step 3: Enable Firebase on the existing GCP project** **[you]**
+- [x] **Step 3: Enable Firebase on the existing GCP project** **[you]**
 
 If `modern-ally-102412` is **not** already in `firebase projects:list`, add
 Firebase to it (this does not create a new project — it attaches Firebase to the
@@ -96,7 +96,7 @@ Expected: success, or a message that Firebase resources already exist (also
 fine). (Equivalent UI path: Firebase console → Add project → "Add Firebase to
 an existing Google Cloud project" → select `modern-ally-102412`.)
 
-- [ ] **Step 4: Create `.firebaserc`** **[repo]**
+- [x] **Step 4: Create `.firebaserc`** **[repo]**
 
 Create `.firebaserc` at the repo root (do **not** run interactive `firebase
 init` — it can clobber config and ask for a SPA rewrite we're setting by hand):
@@ -109,7 +109,7 @@ init` — it can clobber config and ask for a SPA rewrite we're setting by hand)
 }
 ```
 
-- [ ] **Step 5: Create `firebase.json`** **[repo]**
+- [x] **Step 5: Create `firebase.json`** **[repo]**
 
 Create `firebase.json` at the repo root. This reproduces `nginx.conf`:
 `public: dist` (the Vite output), the SPA fallback as a rewrite, and the three
@@ -144,7 +144,7 @@ no equivalent.
 }
 ```
 
-- [ ] **Step 6: Ignore CLI cruft** **[repo]**
+- [x] **Step 6: Ignore CLI cruft** **[repo]**
 
 Append to `.gitignore`:
 
@@ -154,7 +154,7 @@ Append to `.gitignore`:
 *-debug.log
 ```
 
-- [ ] **Step 7: Commit the config** **[repo]**
+- [x] **Step 7: Commit the config** **[repo]**
 
 ```bash
 git add firebase.json .firebaserc .gitignore
