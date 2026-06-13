@@ -4,6 +4,7 @@ import type { Question } from '../domain/question';
 import type { AnswerRecord, Settings, SessionResult } from '../domain/session';
 import { QuestionCard } from '../components/QuestionCard';
 import { Countdown } from '../components/Countdown';
+import { useI18n } from '../i18n/I18nContext';
 import './PaperSessionScreen.css';
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
 type Phase = { kind: 'leadin' } | { kind: 'question'; index: number };
 
 const LeadIn = ({ onDone }: { onDone: () => void }) => {
+  const { t } = useI18n();
   const [n, setN] = useState(3);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
@@ -32,13 +34,14 @@ const LeadIn = ({ onDone }: { onDone: () => void }) => {
 
   return (
     <div className="paper-session paper-session--leadin">
-      <p className="paper-session__ready">Prêt ?</p>
+      <p className="paper-session__ready">{t('session.ready')}</p>
       <p className="paper-session__leadin-number">{n}</p>
     </div>
   );
 };
 
 export const PaperSessionScreen = ({ settings, onComplete }: Props) => {
+  const { t } = useI18n();
   const questions = useMemo<Question[]>(() => generateQuestions(settings), [settings]);
   const [phase, setPhase] = useState<Phase>({ kind: 'leadin' });
   const startedAtRef = useRef<string>(new Date().toISOString());
@@ -81,7 +84,7 @@ export const PaperSessionScreen = ({ settings, onComplete }: Props) => {
   return (
     <div className="paper-session">
       <div className="paper-session__counter">
-        Question {phase.index + 1} / {questions.length}
+        {t('session.counter', { n: phase.index + 1, total: questions.length })}
       </div>
       <QuestionCard question={current} given="" />
       <Countdown

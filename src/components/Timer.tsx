@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../i18n/I18nContext';
 import './Timer.css';
 
 type Props = {
@@ -22,6 +23,7 @@ export const Timer = ({ targetMs, resetKey }: Props) => {
     return () => cancelAnimationFrame(raf);
   }, [resetKey]);
 
+  const { t } = useI18n();
   const overTarget = elapsedMs > targetMs;
   const seconds = (elapsedMs / 1000).toFixed(1);
 
@@ -29,10 +31,10 @@ export const Timer = ({ targetMs, resetKey }: Props) => {
     <div
       className={`timer${overTarget ? ' timer--over' : ''}`}
       role="status"
-      aria-label={overTarget ? 'temps dépassé' : 'temps en cours'}
+      aria-label={overTarget ? t('timer.over') : t('timer.running')}
     >
       <span className="timer__value">{seconds}s</span>
-      <span className="timer__target"> / cible {(targetMs / 1000).toFixed(0)}s</span>
+      <span className="timer__target"> {t('timer.target', { target: (targetMs / 1000).toFixed(0) })}</span>
     </div>
   );
 };
