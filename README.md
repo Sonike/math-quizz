@@ -77,7 +77,7 @@ Build from source and roll out a new revision in one step — Cloud Build
 builds the `Dockerfile`, then Cloud Run shifts traffic:
 
 ```bash
-gcloud run deploy <service-name> --source . --region <region>
+gcloud run deploy math-quizz --source . --region us-central1
 ```
 
 `.gcloudignore` keeps `node_modules`, the build output, and local-only files
