@@ -112,9 +112,34 @@ const PaperResults = ({
   );
 };
 
+const TrainingResults = ({ result }: { result: SessionResult }) => {
+  const { t } = useI18n();
+  return (
+    <ul className="results__list">
+      {result.answers.map((record, i) => {
+        const ok = record.selfMarkedCorrect === true;
+        return (
+          <li key={i} className={`results__row results__row--${ok ? 'ok' : 'wrong'}`}>
+            <span className="results__icon" aria-hidden>
+              {ok ? '✅' : '❌'}
+            </span>
+            <span className="results__operation">{renderOperation(record)}</span>
+            {!ok && (
+              <span className="results__detail">
+                {t('results.wrongAnswer', { given: record.given ?? '' })}
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
 export const ResultsScreen = ({ result, onReplay, onHome, onSave }: Props) => {
   const { t } = useI18n();
   const isPaper = result.answerMode === 'paper';
+  const isTraining = result.answerMode === 'training';
   const [marks, setMarks] = useState<boolean[]>(() => result.answers.map(() => true));
   const [saved, setSaved] = useState(false);
 
@@ -150,6 +175,8 @@ export const ResultsScreen = ({ result, onReplay, onHome, onSave }: Props) => {
             setMarks((m) => m.map((v, j) => (j === i ? !v : v)))
           }
         />
+      ) : isTraining ? (
+        <TrainingResults result={result} />
       ) : (
         <ScreenResults result={result} />
       )}
