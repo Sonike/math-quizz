@@ -26,6 +26,28 @@ describe('HomeScreen — Saisie toggle', () => {
   });
 });
 
+describe('HomeScreen — training mode', () => {
+  test('shows the training summary and start label when answerMode is training', () => {
+    render(
+      <HomeScreen
+        settings={{ ...DEFAULT_SETTINGS, answerMode: 'training' }}
+        onChange={noop}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={noop}
+      />,
+    );
+
+    expect(
+      screen.getByText(/correction après chaque réponse/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /S'entraîner/ }),
+    ).toBeInTheDocument();
+  });
+});
+
 describe('HomeScreen — progress entry', () => {
   test('clicking the results button calls onOpenProgress', () => {
     const onOpenProgress = vi.fn();

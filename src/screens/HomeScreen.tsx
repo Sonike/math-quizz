@@ -27,6 +27,7 @@ export const HomeScreen = ({
     .toFixed(1)
     .replace('.0', '');
   const canStart = settings.selectedTables.length > 0;
+  const isTraining = (settings.answerMode ?? 'screen') === 'training';
 
   return (
     <div className="home">
@@ -79,14 +80,18 @@ export const HomeScreen = ({
           onChange={(answerMode) => onChange({ ...settings, answerMode })}
         />
       </section>
-      <p className="home__info">{t('home.summary', { count: settings.questionCount, seconds })}</p>
+      <p className="home__info">
+        {isTraining
+          ? t('home.summaryTraining', { count: settings.questionCount })
+          : t('home.summary', { count: settings.questionCount, seconds })}
+      </p>
       <button
         type="button"
         className="home__start-btn"
         onClick={onStart}
         disabled={!canStart}
       >
-        {`🚀 ${t('home.start')}`}
+        {isTraining ? `🎓 ${t('home.startTraining')}` : `🚀 ${t('home.start')}`}
       </button>
     </div>
   );
