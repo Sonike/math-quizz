@@ -1,0 +1,22 @@
+.language-toggle__option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.language-toggle__badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.08rem 0.4rem;
+  border-radius: 6px;
+  background: var(--color-chip-border);
+  color: var(--color-fg-muted);
+}
+
+/* On the selected (accent) segment, keep the badge readable on the accent fill. */
+.mode-toggle__option--on .language-toggle__badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}

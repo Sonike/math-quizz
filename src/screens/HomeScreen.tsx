@@ -1,6 +1,7 @@
 import { TableSelector } from '../components/TableSelector';
 import { ModeToggle } from '../components/ModeToggle';
 import { AnswerModeToggle } from '../components/AnswerModeToggle';
+import { LanguageToggle } from '../components/LanguageToggle';
 import type { Settings } from '../domain/session';
 import { useI18n } from '../i18n/I18nContext';
 import './HomeScreen.css';
@@ -60,6 +61,10 @@ export const HomeScreen = ({
           </button>
         </div>
       </header>
+      <LanguageToggle
+        value={settings.language}
+        onChange={(language) => onChange({ ...settings, language })}
+      />
       <section className="home__panel">
         <TableSelector
           selected={settings.selectedTables}

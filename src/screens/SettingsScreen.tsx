@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Settings } from '../domain/session';
 import { useI18n } from '../i18n/I18nContext';
-import { LANGUAGES } from '../i18n';
+import { LanguageToggle } from '../components/LanguageToggle';
 import './SettingsScreen.css';
 
 type Props = {
@@ -84,22 +84,10 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
 
       <div className="settings__field">
         <span className="settings__label">{t('settings.language')}</span>
-        <div className="mode-toggle" role="radiogroup" aria-label={t('settings.language')}>
-          {LANGUAGES.map((l) => (
-            <button
-              key={l.code}
-              type="button"
-              role="radio"
-              aria-checked={settings.language === l.code}
-              className={`mode-toggle__option${
-                settings.language === l.code ? ' mode-toggle__option--on' : ''
-              }`}
-              onClick={() => onSave({ ...settings, language: l.code })}
-            >
-              {l.nativeLabel}
-            </button>
-          ))}
-        </div>
+        <LanguageToggle
+          value={settings.language}
+          onChange={(language) => onSave({ ...settings, language })}
+        />
       </div>
 
       <button type="button" className="settings__primary" onClick={submit}>
