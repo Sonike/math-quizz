@@ -23,6 +23,7 @@ export const en: Record<TranslationKey, string> = {
   'answerMode.screen': '📱 Screen test',
   'answerMode.paper': '✏️ Paper test',
   'answerMode.training': '🎓 Practice',
+  'answerMode.list': '📋 List',
   'session.counter': 'Question {n} / {total}',
   'session.ready': 'Ready?',
   'session.cancel': 'Stop',

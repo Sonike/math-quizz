@@ -22,4 +22,12 @@ describe('AnswerModeToggle', () => {
     fireEvent.click(screen.getByRole('radio', { name: '🎓 Entraînement' }));
     expect(onChange).toHaveBeenCalledWith('training');
   });
+
+  test('renders the list option and emits "list" on click', () => {
+    const onChange = vi.fn();
+    render(<AnswerModeToggle value="screen" onChange={onChange} />);
+
+    fireEvent.click(screen.getByRole('radio', { name: '📋 Liste' }));
+    expect(onChange).toHaveBeenCalledWith('list');
+  });
 });

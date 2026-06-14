@@ -21,6 +21,7 @@ export const fr = {
   'answerMode.screen': '📱 Test écran',
   'answerMode.paper': '✏️ Test papier',
   'answerMode.training': '🎓 Entraînement',
+  'answerMode.list': '📋 Liste',
   'session.counter': 'Question {n} / {total}',
   'session.ready': 'Prêt ?',
   'session.cancel': 'Arrêter',

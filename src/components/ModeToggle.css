@@ -39,3 +39,7 @@
 .mode-toggle--two {
   grid-template-columns: repeat(2, 1fr);
 }
+
+.mode-toggle--four {
+  grid-template-columns: repeat(2, 1fr);
+}

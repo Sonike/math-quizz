@@ -1,7 +1,7 @@
 import type { Question, Mode } from './question';
 import type { Language } from '../i18n/types';
 
-export type AnswerMode = 'screen' | 'paper' | 'training';
+export type AnswerMode = 'screen' | 'paper' | 'training' | 'list';
 
 export type AnswerRecord = {
   question: Question;
@@ -19,7 +19,10 @@ export type SessionResult = {
   selectedTables: number[];
   mode: Mode;
   answers: AnswerRecord[];
-  /** Missing on legacy history entries; treat absent as 'screen'. */
+  /**
+   * Missing on legacy history entries; treat absent as 'screen'. Never 'list' —
+   * the list mode is a view and does not record a session.
+   */
   answerMode?: AnswerMode;
 };
 
