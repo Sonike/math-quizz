@@ -12,6 +12,8 @@ export const en: Record<TranslationKey, string> = {
   'home.summaryTraining': '{count} questions · feedback after each answer',
   'home.start': 'Start',
   'home.startTraining': 'Practice',
+  'home.startList': 'View the list',
+  'home.summaryList': '{count} operations to review',
   'tables.title': 'Tables',
   'tables.selectAll': 'Select all',
   'tables.deselectAll': 'Deselect all',

@@ -10,6 +10,8 @@ export const fr = {
   'home.summaryTraining': '{count} questions · correction après chaque réponse',
   'home.start': 'Lancer',
   'home.startTraining': "S'entraîner",
+  'home.startList': 'Voir la liste',
+  'home.summaryList': '{count} opérations à réviser',
   'tables.title': 'Tables',
   'tables.selectAll': 'Tout cocher',
   'tables.deselectAll': 'Tout décocher',

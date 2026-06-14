@@ -12,6 +12,8 @@ export const de: Record<TranslationKey, string> = {
   'home.summaryTraining': '{count} Fragen · Korrektur nach jeder Antwort',
   'home.start': 'Starten',
   'home.startTraining': 'Üben',
+  'home.startList': 'Liste ansehen',
+  'home.summaryList': '{count} Aufgaben zum Üben',
   'tables.title': 'Reihen',
   'tables.selectAll': 'Alle auswählen',
   'tables.deselectAll': 'Alle abwählen',

@@ -29,6 +29,7 @@ export const HomeScreen = ({
     .replace('.0', '');
   const canStart = settings.selectedTables.length > 0;
   const isTraining = (settings.answerMode ?? 'screen') === 'training';
+  const isList = (settings.answerMode ?? 'screen') === 'list';
 
   return (
     <div className="home">
@@ -86,9 +87,11 @@ export const HomeScreen = ({
         />
       </section>
       <p className="home__info">
-        {isTraining
-          ? t('home.summaryTraining', { count: settings.questionCount })
-          : t('home.summary', { count: settings.questionCount, seconds })}
+        {isList
+          ? t('home.summaryList', { count: settings.questionCount })
+          : isTraining
+            ? t('home.summaryTraining', { count: settings.questionCount })
+            : t('home.summary', { count: settings.questionCount, seconds })}
       </p>
       <button
         type="button"
@@ -96,7 +99,11 @@ export const HomeScreen = ({
         onClick={onStart}
         disabled={!canStart}
       >
-        {isTraining ? `🎓 ${t('home.startTraining')}` : `🚀 ${t('home.start')}`}
+        {isList
+          ? `📋 ${t('home.startList')}`
+          : isTraining
+            ? `🎓 ${t('home.startTraining')}`
+            : `🚀 ${t('home.start')}`}
       </button>
     </div>
   );
