@@ -18,6 +18,13 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.8.0',
+    date: '2026-06-14',
+    changes: [
+      'Nouveau mode « Liste » : fais défiler une liste d’opérations avec leurs réponses cachées. Montre-les toutes d’un coup, ou tape une ligne pour voir une seule réponse. Le bouton « Nouvelle liste » en génère d’autres.',
+    ],
+  },
+  {
     version: '0.7.1',
     date: '2026-06-14',
     changes: [

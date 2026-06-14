@@ -5,6 +5,18 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.8.0] - 2026-06-14
+
+### Added
+- **"Liste" play mode**: a fourth option in the "How to play" toggle that shows
+  a scrollable list of `questionCount` operations using the same content
+  generation as the drills. Answers are hidden by default; a button reveals or
+  hides them all at once, tapping a single row flips just that answer, and a
+  "Nouvelle liste" button reshuffles in place. The list is a view — it records
+  no session. New `ExerciseListScreen`; `formatOperation` extracted from
+  `QuestionCard` for shared operation rendering. New i18n keys (`answerMode.list`,
+  `home.startList`, `home.summaryList`, `list.*`) in fr/de/en.
+
 ## [0.7.1] - 2026-06-14
 
 ### Added

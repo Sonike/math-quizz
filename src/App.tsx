@@ -4,6 +4,7 @@ import { HomeScreen } from './screens/HomeScreen';
 import { SessionScreen } from './screens/SessionScreen';
 import { PaperSessionScreen } from './screens/PaperSessionScreen';
 import { TrainingScreen } from './screens/TrainingScreen';
+import { ExerciseListScreen } from './screens/ExerciseListScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
@@ -59,7 +60,12 @@ export const App = () => {
           />
         )}
         {screen === 'session' &&
-          (settings.answerMode === 'paper' ? (
+          (settings.answerMode === 'list' ? (
+            <ExerciseListScreen
+              settings={settings}
+              onCancel={() => setScreen('home')}
+            />
+          ) : settings.answerMode === 'paper' ? (
             <PaperSessionScreen
               settings={settings}
               onComplete={handleSessionComplete}

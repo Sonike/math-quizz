@@ -48,6 +48,26 @@ describe('HomeScreen — training mode', () => {
   });
 });
 
+describe('HomeScreen — list mode', () => {
+  test('shows the list summary and start label when answerMode is list', () => {
+    render(
+      <HomeScreen
+        settings={{ ...DEFAULT_SETTINGS, answerMode: 'list' }}
+        onChange={noop}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={noop}
+      />,
+    );
+
+    expect(screen.getByText(/opérations à réviser/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Voir la liste/ }),
+    ).toBeInTheDocument();
+  });
+});
+
 describe('HomeScreen — progress entry', () => {
   test('clicking the results button calls onOpenProgress', () => {
     const onOpenProgress = vi.fn();
