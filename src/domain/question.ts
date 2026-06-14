@@ -27,6 +27,9 @@ const buildQuestion = (a: number, b: number, op: Operator): Question => ({
   expected: op === 'mul' ? a * b : b,
 });
 
+export const formatOperation = (q: Question): string =>
+  q.op === 'mul' ? `${q.a} × ${q.b}` : `${q.a * q.b} ÷ ${q.a}`;
+
 const pickOp = (mode: Mode): Operator =>
   mode === 'mix' ? (Math.random() < 0.5 ? 'mul' : 'div') : mode;
 

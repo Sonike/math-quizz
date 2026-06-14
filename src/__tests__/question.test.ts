@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { generateQuestions } from '../domain/question';
+import { generateQuestions, formatOperation } from '../domain/question';
 import { MULTIPLIERS } from '../domain/tables';
 import type { Settings } from '../domain/session';
 
@@ -81,5 +81,15 @@ describe('generateQuestions', () => {
     expect(() =>
       generateQuestions(baseSettings({ questionCount: 0 })),
     ).toThrow();
+  });
+});
+
+describe('formatOperation', () => {
+  test('renders multiplication as "a × b"', () => {
+    expect(formatOperation({ a: 7, b: 8, op: 'mul', expected: 56 })).toBe('7 × 8');
+  });
+
+  test('renders division as "(a*b) ÷ a"', () => {
+    expect(formatOperation({ a: 7, b: 8, op: 'div', expected: 8 })).toBe('56 ÷ 7');
   });
 });
