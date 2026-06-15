@@ -77,7 +77,6 @@ export const fr = {
   'heatmap.rare': 'rare',
   'heatmap.frequent': 'fréquent',
   'heatmap.noData': 'pas joué',
-  'settings.backAria': 'retour',
   'settings.title': 'Paramètres',
   'settings.targetTime': 'Temps cible par question (s)',
   'settings.targetTimeHint': 'Réponse plus rapide : 1 point. Plus lente : crédit partiel.',
@@ -94,12 +93,13 @@ export const fr = {
   'info.title': 'À propos',
   'info.version': 'version {version}',
   'info.whatsNew': 'Nouveautés',
-  'info.notesInFrench': 'Ces notes sont en français.',
   'info.dataTitle': 'Tes données',
   'info.dataP1':
     "Tes réglages, tes réponses et tes scores restent uniquement dans ce navigateur, sur cet appareil. Rien n'est envoyé sur Internet : pas de compte, pas de pistage. Tes données ne te suivent donc pas sur un autre appareil ou un autre navigateur.",
   'info.dataP2':
     "Tu peux tout effacer quand tu veux avec le bouton « Effacer l'historique » dans les Paramètres, ou en vidant les données de ton navigateur.",
-  'info.credit': 'Conçu avec 💖 à Zürich, Suisse 🇨🇭',
-  'info.coffee': 'Offre-moi un café',
+  'info.credit': 'Conçu avec 💖 à Zürich, Suisse par {link}',
+  'info.supportTitle': "Soutenir l'appli",
+  'info.coffee': "Si l'appli te plaît, dis-le à tes parents : ils pourront choisir de {link}.",
+  'info.coffeeLink': "m'offrir un café ☕",
 };

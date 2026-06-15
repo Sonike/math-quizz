@@ -80,7 +80,6 @@ export const de: Record<TranslationKey, string> = {
   'heatmap.rare': 'selten',
   'heatmap.frequent': 'häufig',
   'heatmap.noData': 'nicht gespielt',
-  'settings.backAria': 'zurück',
   'settings.title': 'Einstellungen',
   'settings.targetTime': 'Zielzeit pro Frage (s)',
   'settings.targetTimeHint': 'Schnellere Antwort: 1 Punkt. Langsamere: Teilpunkte.',
@@ -97,12 +96,13 @@ export const de: Record<TranslationKey, string> = {
   'info.title': 'Über',
   'info.version': 'Version {version}',
   'info.whatsNew': 'Neuigkeiten',
-  'info.notesInFrench': 'Diese Hinweise sind auf Französisch.',
   'info.dataTitle': 'Deine Daten',
   'info.dataP1':
     'Deine Einstellungen, deine Antworten und deine Punkte bleiben nur in diesem Browser, auf diesem Gerät. Nichts wird ins Internet gesendet: kein Konto, kein Tracking. Deine Daten folgen dir also nicht auf ein anderes Gerät oder einen anderen Browser.',
   'info.dataP2':
     'Du kannst alles jederzeit über die Schaltfläche « Verlauf löschen » in den Einstellungen entfernen, oder indem du die Browserdaten löschst.',
-  'info.credit': 'Mit 💖 in Zürich, Schweiz 🇨🇭 erstellt',
-  'info.coffee': 'Spendier mir einen Kaffee',
+  'info.credit': 'Mit 💖 in Zürich, Schweiz erstellt von {link}',
+  'info.supportTitle': 'Die App unterstützen',
+  'info.coffee': 'Wenn dir die App gefällt, sag es deinen Eltern: Sie können {link}.',
+  'info.coffeeLink': 'mir einen Kaffee spendieren ☕',
 };

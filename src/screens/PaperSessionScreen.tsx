@@ -3,7 +3,6 @@ import { generateQuestions } from '../domain/question';
 import type { Question } from '../domain/question';
 import type { AnswerRecord, Settings, SessionResult } from '../domain/session';
 import { QuestionCard } from '../components/QuestionCard';
-import { Countdown } from '../components/Countdown';
 import { CancelButton } from '../components/CancelButton';
 import { useI18n } from '../i18n/I18nContext';
 import './PaperSessionScreen.css';
@@ -79,6 +78,18 @@ export const PaperSessionScreen = ({ settings, onComplete, onCancel }: Props) =>
     }
   };
 
+  // Auto-advance to the next question after the configured time. Paper mode
+  // keeps this pacing but shows no countdown bar — the time still runs, the
+  // child just isn't watching it drain (less on-screen pressure).
+  useEffect(() => {
+    if (phase.kind !== 'question') return;
+    const id = setTimeout(() => advance(phase.index), settings.durationPerQuestionMs);
+    return () => clearTimeout(id);
+    // `advance` is intentionally omitted: it reads only refs/stable values, and
+    // we want exactly one timer per question (keyed on phase), not per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, settings.durationPerQuestionMs]);
+
   if (phase.kind === 'leadin') {
     return <LeadIn onDone={() => setPhase({ kind: 'question', index: 0 })} />;
   }
@@ -90,11 +101,6 @@ export const PaperSessionScreen = ({ settings, onComplete, onCancel }: Props) =>
         {t('session.counter', { n: phase.index + 1, total: questions.length })}
       </div>
       <QuestionCard question={current} given="" />
-      <Countdown
-        durationMs={settings.durationPerQuestionMs}
-        resetKey={phase.index}
-        onElapsed={() => advance(phase.index)}
-      />
       {onCancel && <CancelButton onCancel={onCancel} />}
     </div>
   );

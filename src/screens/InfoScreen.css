@@ -27,11 +27,12 @@
   background: var(--color-card-bg);
   border-radius: 50%;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .info__back-btn:hover {
-  transform: translateY(-2px);
+  background: var(--color-chip-bg);
+  border-color: var(--color-fg-muted);
 }
 
 .info__panel {
@@ -52,23 +53,16 @@
   text-align: center;
 }
 
-.info__app {
+.info__identity {
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--color-fg);
-}
-
-.info__version {
-  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
   color: var(--color-fg-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.info__notes-lang {
-  margin: 0 0 0.6rem;
-  font-size: 0.78rem;
-  color: var(--color-fg-muted);
+.info__app {
+  font-weight: 700;
+  color: var(--color-fg);
 }
 
 .info__notes {
@@ -119,27 +113,34 @@
   margin-bottom: 0;
 }
 
-.info__credit {
-  text-align: center;
-}
-
 .info__credit-line {
-  margin: 0;
+  margin: 0.5rem 0 0;
   color: var(--color-fg-muted);
   font-size: 0.92rem;
 }
 
-.info__contact {
-  margin: 0.4rem 0 0;
-  font-size: 0.92rem;
-}
-
-.info__contact a {
+.info__credit-line a {
   color: var(--color-accent);
   text-decoration: none;
 }
 
-.info__contact a:hover {
+.info__credit-line a:hover {
+  text-decoration: underline;
+}
+
+.info__coffee {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-fg-muted);
+  line-height: 1.45;
+}
+
+.info__coffee a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.info__coffee a:hover {
   text-decoration: underline;
 }
 

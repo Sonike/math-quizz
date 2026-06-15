@@ -5,6 +5,42 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] - 2026-06-15
+
+### Changed
+- Release notes (the "Nouveautés" list on the À propos screen) are now localized
+  to all three supported languages (FR, DE, EN) and follow the selected
+  language. `ReleaseNote.changes` is now `Record<Language, string[]>`; all 9
+  historical entries were backfilled with DE + EN.
+- App support is reframed for a child audience. The "Buy me a coffee" copy no
+  longer asks the child to pay: it invites the child to tell their parents, who
+  can choose to support the app (or not), with the support action as an inline
+  link in the sentence (new `info.coffeeLink` key; `info.coffee` is the full
+  sentence with a `{link}` placeholder). It now lives in a dedicated "Soutenir
+  l'appli" panel near the top of the À propos screen (new `info.supportTitle`
+  key), and the historical 0.7.1 note is reworded to match the same
+  parent-routed framing.
+- The À propos screen is tightened to four sections. The app name, version, and
+  credit + contact email now share one header block (the credit line reads e.g.
+  "Conçu avec 💖 à Zürich, Suisse par info@mrpia.ch", with the email as an inline
+  link), followed by Soutenir l'appli, Tes données, and Nouveautés.
+- The round 🏠 back buttons (À propos, Mes résultats, Liste) now use the home
+  screen's icon-button hover (background + border tint) instead of a lift
+  animation, for a consistent feel across screens.
+- Settings now uses the same top-right 🏠 home button as every other non-home
+  screen (previously a left-corner ← back button), and drops the now-unused
+  `settings.backAria` string.
+- Paper test mode no longer shows the on-screen countdown bar, to remove a
+  visible time-pressure cue. Questions still auto-advance after the configured
+  per-question time (the timer is unchanged) — only the draining bar is gone.
+  The `Countdown` component (used only here) was removed and its timer inlined
+  into `PaperSessionScreen`.
+
+### Removed
+- The "these notes are in French" disclaimer, its `info.notesInFrench` i18n key
+  (fr/de/en), and the `.info__notes-lang` CSS rule — obsolete now that notes are
+  localized.
+
 ## [0.8.0] - 2026-06-14
 
 ### Added

@@ -28,12 +28,14 @@ describe('releaseNotes', () => {
     }
   });
 
-  it('every entry has a date and at least one non-empty change note', () => {
+  it('every entry has a date and non-empty notes in all three languages', () => {
     for (const note of releaseNotes) {
       expect(note.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(note.changes.length).toBeGreaterThan(0);
-      for (const change of note.changes) {
-        expect(change.trim().length).toBeGreaterThan(0);
+      for (const lang of ['fr', 'de', 'en'] as const) {
+        expect(note.changes[lang].length).toBeGreaterThan(0);
+        for (const change of note.changes[lang]) {
+          expect(change.trim().length).toBeGreaterThan(0);
+        }
       }
     }
   });

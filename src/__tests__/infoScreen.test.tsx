@@ -1,7 +1,8 @@
 import { describe, expect, test, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { InfoScreen } from '../screens/InfoScreen';
 import { releaseNotes } from '../domain/releaseNotes';
+import { renderWithLanguage } from './renderWithLanguage';
 
 describe('InfoScreen', () => {
   test('shows the app version it is given', () => {
@@ -12,7 +13,7 @@ describe('InfoScreen', () => {
   test('lists the latest release note (version + change text)', () => {
     render(<InfoScreen version="9.9.9" onBack={() => {}} />);
     const latest = releaseNotes[0];
-    expect(screen.getByText(latest.changes[0])).toBeInTheDocument();
+    expect(screen.getByText(latest.changes.fr[0])).toBeInTheDocument();
     expect(
       screen.getAllByText(new RegExp(latest.version.replace(/\./g, '\\.'))).length,
     ).toBeGreaterThan(0);
@@ -25,11 +26,13 @@ describe('InfoScreen', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows the Zürich credit line and a contact email link', () => {
+  test('shows the Zürich credit line with the contact email as an inline link', () => {
     render(<InfoScreen version="9.9.9" onBack={() => {}} />);
     expect(screen.getByText(/Conçu avec.*à Zürich, Suisse/i)).toBeInTheDocument();
     const mail = screen.getByRole('link', { name: /info@mrpia\.ch/i });
     expect(mail).toHaveAttribute('href', 'mailto:info@mrpia.ch');
+    // The {link} placeholder must be rendered as the link, never shown literally.
+    expect(screen.queryByText(/\{link\}/)).toBeNull();
   });
 
   test('shows a Buy Me a Coffee link (coffee emoji, opens in a new tab)', () => {
@@ -39,10 +42,40 @@ describe('InfoScreen', () => {
     expect(coffee).toHaveAttribute('target', '_blank');
   });
 
+  test('routes the coffee support through the parents (child is the messenger)', () => {
+    render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    // Scope to the support panel — the same parent-routed wording also appears
+    // in the 0.7.1 release note further down the page.
+    const panel = screen.getByRole('heading', { name: /Soutenir l'appli/i }).closest('section');
+    expect(panel).not.toBeNull();
+    const support = within(panel as HTMLElement);
+    // The child is told to talk to their parents, who then decide.
+    expect(support.getByText(/dis-le à tes parents/i)).toBeInTheDocument();
+    // The clickable phrase is the support action itself, inline in the sentence.
+    const coffee = support.getByRole('link', { name: /m'offrir un café/i });
+    expect(coffee).toHaveAttribute('href', 'https://buymeacoffee.com/mrpia');
+  });
+
+  test('surfaces support in a dedicated section', () => {
+    render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    expect(
+      screen.getByRole('heading', { name: /Soutenir l'appli/i }),
+    ).toBeInTheDocument();
+  });
+
   test('back button calls onBack', () => {
     const onBack = vi.fn();
     render(<InfoScreen version="9.9.9" onBack={onBack} />);
     fireEvent.click(screen.getByRole('button', { name: /retour/i }));
     expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  test('shows notes in the selected language and drops the French disclaimer', () => {
+    renderWithLanguage(<InfoScreen version="9.9.9" onBack={() => {}} />, 'de');
+    const latest = releaseNotes[0];
+    expect(screen.getByText(latest.changes.de[0])).toBeInTheDocument();
+    expect(
+      screen.queryByText('Diese Hinweise sind auf Französisch.'),
+    ).not.toBeInTheDocument();
   });
 });

@@ -74,6 +74,16 @@ describe('PaperSessionScreen', () => {
     expect(callCount).toBe(1);
   });
 
+  test('shows no visual countdown bar (time-pressure cue removed)', () => {
+    const { container } = render(
+      <PaperSessionScreen settings={settings} onComplete={() => {}} />,
+    );
+    advance(3000); // past the lead-in, into the first question
+    expect(screen.getByText('Question 1 / 2')).toBeInTheDocument();
+    // The auto-advance timer stays (covered above); only the visual bar is gone.
+    expect(container.querySelector('.countdown')).toBeNull();
+  });
+
   test('cancel button (shown during questions) hands control back to the caller', () => {
     const onCancel = vi.fn();
     render(<PaperSessionScreen settings={settings} onComplete={() => {}} onCancel={onCancel} />);

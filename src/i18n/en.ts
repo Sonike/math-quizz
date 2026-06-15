@@ -79,7 +79,6 @@ export const en: Record<TranslationKey, string> = {
   'heatmap.rare': 'rare',
   'heatmap.frequent': 'frequent',
   'heatmap.noData': 'not played',
-  'settings.backAria': 'back',
   'settings.title': 'Settings',
   'settings.targetTime': 'Target time per question (s)',
   'settings.targetTimeHint': 'Faster answer: 1 point. Slower: partial credit.',
@@ -95,12 +94,13 @@ export const en: Record<TranslationKey, string> = {
   'info.title': 'About',
   'info.version': 'version {version}',
   'info.whatsNew': "What's new",
-  'info.notesInFrench': 'These notes are in French.',
   'info.dataTitle': 'Your data',
   'info.dataP1':
     'Your settings, your answers and your scores stay only in this browser, on this device. Nothing is sent to the internet: no account, no tracking. So your data doesn\'t follow you to another device or browser.',
   'info.dataP2':
     'You can erase everything whenever you want with the "Clear history" button in Settings, or by clearing your browser\'s data.',
-  'info.credit': 'Made with 💖 in Zürich, Switzerland 🇨🇭',
-  'info.coffee': 'Buy me a coffee',
+  'info.credit': 'Made with 💖 in Zürich, Switzerland by {link}',
+  'info.supportTitle': 'Support the app',
+  'info.coffee': 'If you like the app, tell your parents: they can choose to {link}.',
+  'info.coffeeLink': 'buy me a coffee ☕',
 };
