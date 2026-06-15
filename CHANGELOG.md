@@ -30,6 +30,11 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - Settings now uses the same top-right 🏠 home button as every other non-home
   screen (previously a left-corner ← back button), and drops the now-unused
   `settings.backAria` string.
+- Paper test mode no longer shows the on-screen countdown bar, to remove a
+  visible time-pressure cue. Questions still auto-advance after the configured
+  per-question time (the timer is unchanged) — only the draining bar is gone.
+  The `Countdown` component (used only here) was removed and its timer inlined
+  into `PaperSessionScreen`.
 
 ### Removed
 - The "these notes are in French" disclaimer, its `info.notesInFrench` i18n key

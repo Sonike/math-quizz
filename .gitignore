@@ -11,6 +11,7 @@ dist-ssr
 *.tsbuildinfo
 coverage
 .superpowers/
+.playwright-mcp/
 
 # Firebase CLI
 .firebase/
