@@ -19,21 +19,6 @@
   color: var(--color-fg);
 }
 
-.home__settings-btn {
-  width: 3rem;
-  height: 3rem;
-  font-size: 1.4rem;
-  border: 2px solid var(--color-chip-border);
-  background: var(--color-card-bg);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.home__settings-btn:hover {
-  transform: rotate(35deg);
-}
-
 .home__panel {
   background: var(--color-card-bg);
   border-radius: 18px;
@@ -56,6 +41,17 @@
   font-size: 0.9rem;
   color: var(--color-fg-muted);
   margin: 0.2rem 0;
+}
+
+.home__hint {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-answer-bg);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  margin: 0;
 }
 
 .home__start-btn {
@@ -88,7 +84,8 @@
 }
 
 .home__info-btn,
-.home__progress-btn {
+.home__progress-btn,
+.home__settings-btn {
   width: 3rem;
   height: 3rem;
   font-size: 1.4rem;
@@ -96,10 +93,12 @@
   background: var(--color-card-bg);
   border-radius: 50%;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .home__info-btn:hover,
-.home__progress-btn:hover {
-  transform: translateY(-2px);
+.home__progress-btn:hover,
+.home__settings-btn:hover {
+  background: var(--color-chip-bg);
+  border-color: var(--color-fg-muted);
 }

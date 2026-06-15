@@ -12,6 +12,7 @@ export const fr = {
   'home.startTraining': "S'entraîner",
   'home.startList': 'Voir la liste',
   'home.summaryList': '{count} opérations à réviser',
+  'home.selectTableHint': 'Choisis au moins une table pour commencer 👆',
   'tables.title': 'Tables',
   'tables.selectAll': 'Tout cocher',
   'tables.deselectAll': 'Tout décocher',

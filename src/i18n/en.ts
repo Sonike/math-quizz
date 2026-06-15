@@ -14,6 +14,7 @@ export const en: Record<TranslationKey, string> = {
   'home.startTraining': 'Practice',
   'home.startList': 'View the list',
   'home.summaryList': '{count} operations to review',
+  'home.selectTableHint': 'Pick at least one table to start 👆',
   'tables.title': 'Tables',
   'tables.selectAll': 'Select all',
   'tables.deselectAll': 'Deselect all',

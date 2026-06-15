@@ -68,6 +68,38 @@ describe('HomeScreen — list mode', () => {
   });
 });
 
+describe('HomeScreen — table selection hint', () => {
+  test('shows a hint to pick a table when none are selected', () => {
+    render(
+      <HomeScreen
+        settings={{ ...DEFAULT_SETTINGS, selectedTables: [] }}
+        onChange={noop}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={noop}
+      />,
+    );
+
+    expect(screen.getByText(/au moins une table/i)).toBeInTheDocument();
+  });
+
+  test('hides the hint once at least one table is selected', () => {
+    render(
+      <HomeScreen
+        settings={{ ...DEFAULT_SETTINGS, selectedTables: [2] }}
+        onChange={noop}
+        onStart={noop}
+        onOpenSettings={noop}
+        onOpenProgress={noop}
+        onOpenInfo={noop}
+      />,
+    );
+
+    expect(screen.queryByText(/au moins une table/i)).not.toBeInTheDocument();
+  });
+});
+
 describe('HomeScreen — progress entry', () => {
   test('clicking the results button calls onOpenProgress', () => {
     const onOpenProgress = vi.fn();

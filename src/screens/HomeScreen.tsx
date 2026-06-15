@@ -58,7 +58,7 @@ export const HomeScreen = ({
             onClick={onOpenSettings}
             aria-label={t('home.settingsAria')}
           >
-            ⚙
+            ⚙️
           </button>
         </div>
       </header>
@@ -93,6 +93,11 @@ export const HomeScreen = ({
             ? t('home.summaryTraining', { count: settings.questionCount })
             : t('home.summary', { count: settings.questionCount, seconds })}
       </p>
+      {!canStart && (
+        <p className="home__hint" role="status">
+          {t('home.selectTableHint')}
+        </p>
+      )}
       <button
         type="button"
         className="home__start-btn"
