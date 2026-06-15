@@ -16,6 +16,8 @@ and the project uses [Semantic Versioning](https://semver.org/).
   invited to tell their parents, who can choose to support the app (or not). The
   link is embedded inline in that sentence (new `info.coffeeLink` key; `info.coffee`
   is now the full sentence with a `{link}` placeholder).
+- The À propos 🏠 back button now uses the home screen's icon-button hover
+  (background + border tint) instead of a lift animation, for a consistent feel.
 
 ### Removed
 - The "these notes are in French" disclaimer, its `info.notesInFrench` i18n key
