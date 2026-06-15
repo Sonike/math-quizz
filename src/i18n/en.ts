@@ -79,7 +79,6 @@ export const en: Record<TranslationKey, string> = {
   'heatmap.rare': 'rare',
   'heatmap.frequent': 'frequent',
   'heatmap.noData': 'not played',
-  'settings.backAria': 'back',
   'settings.title': 'Settings',
   'settings.targetTime': 'Target time per question (s)',
   'settings.targetTimeHint': 'Faster answer: 1 point. Slower: partial credit.',

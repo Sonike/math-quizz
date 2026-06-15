@@ -80,7 +80,6 @@ export const de: Record<TranslationKey, string> = {
   'heatmap.rare': 'selten',
   'heatmap.frequent': 'häufig',
   'heatmap.noData': 'nicht gespielt',
-  'settings.backAria': 'zurück',
   'settings.title': 'Einstellungen',
   'settings.targetTime': 'Zielzeit pro Frage (s)',
   'settings.targetTimeHint': 'Schnellere Antwort: 1 Punkt. Langsamere: Teilpunkte.',

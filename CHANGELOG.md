@@ -27,6 +27,9 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - The round 🏠 back buttons (À propos, Mes résultats, Liste) now use the home
   screen's icon-button hover (background + border tint) instead of a lift
   animation, for a consistent feel across screens.
+- Settings now uses the same top-right 🏠 home button as every other non-home
+  screen (previously a left-corner ← back button), and drops the now-unused
+  `settings.backAria` string.
 
 ### Removed
 - The "these notes are in French" disclaimer, its `info.notesInFrench` i18n key

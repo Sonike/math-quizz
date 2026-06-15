@@ -34,10 +34,15 @@ export const SettingsScreen = ({ settings, onSave, onClearHistory, onBack }: Pro
   return (
     <div className="settings">
       <header className="settings__header">
-        <button type="button" onClick={onBack} className="settings__back" aria-label={t('settings.backAria')}>
-          ←
-        </button>
         <h2>{t('settings.title')}</h2>
+        <button
+          type="button"
+          className="settings__back-btn"
+          onClick={onBack}
+          aria-label={t('common.backToHomeAria')}
+        >
+          🏠
+        </button>
       </header>
 
       <label className="settings__field">

@@ -34,4 +34,19 @@ describe('SettingsScreen language selector', () => {
     );
     expect(screen.getByRole('heading', { name: 'Settings' })).toBeInTheDocument();
   });
+
+  it('has a home (🏠) button that calls onBack, like the other screens', () => {
+    const onBack = vi.fn();
+    renderWithLanguage(
+      <SettingsScreen
+        settings={DEFAULT_SETTINGS}
+        onSave={() => {}}
+        onClearHistory={() => {}}
+        onBack={onBack}
+      />,
+      'fr',
+    );
+    fireEvent.click(screen.getByRole('button', { name: /retour à l'accueil/i }));
+    expect(onBack).toHaveBeenCalledOnce();
+  });
 });

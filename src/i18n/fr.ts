@@ -77,7 +77,6 @@ export const fr = {
   'heatmap.rare': 'rare',
   'heatmap.frequent': 'fréquent',
   'heatmap.noData': 'pas joué',
-  'settings.backAria': 'retour',
   'settings.title': 'Paramètres',
   'settings.targetTime': 'Temps cible par question (s)',
   'settings.targetTimeHint': 'Réponse plus rapide : 1 point. Plus lente : crédit partiel.',
