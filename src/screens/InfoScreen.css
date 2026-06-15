@@ -53,17 +53,16 @@
   text-align: center;
 }
 
-.info__app {
+.info__identity {
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--color-fg);
-}
-
-.info__version {
-  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
   color: var(--color-fg-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.info__app {
+  font-weight: 700;
+  color: var(--color-fg);
 }
 
 .info__notes {

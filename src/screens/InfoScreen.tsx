@@ -26,8 +26,10 @@ export const InfoScreen = ({ version, onBack }: Props) => {
       </header>
 
       <section className="info__panel info__panel--version">
-        <p className="info__app">Math Quizz</p>
-        <p className="info__version">{t('info.version', { version })}</p>
+        <p className="info__identity">
+          <span className="info__app">Math Quizz</span>{' '}
+          {t('info.version', { version })}
+        </p>
         <p className="info__credit-line">
           {creditBefore}
           <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
