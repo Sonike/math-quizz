@@ -101,6 +101,6 @@ export const en: Record<TranslationKey, string> = {
     'You can erase everything whenever you want with the "Clear history" button in Settings, or by clearing your browser\'s data.',
   'info.credit': 'Made with 💖 in Zürich, Switzerland by {link}',
   'info.supportTitle': 'Support the app',
-  'info.coffee': 'If you like the app, tell your parents: they can choose to {link}, or not.',
+  'info.coffee': 'If you like the app, tell your parents: they can choose to {link}.',
   'info.coffeeLink': 'buy me a coffee ☕',
 };
