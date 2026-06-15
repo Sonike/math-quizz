@@ -20,6 +20,10 @@ and the project uses [Semantic Versioning](https://semver.org/).
   l'appli" panel near the top of the À propos screen (new `info.supportTitle`
   key), and the historical 0.7.1 note is reworded to match the same
   parent-routed framing.
+- The À propos screen is tightened to four sections. The app name, version, and
+  credit + contact email now share one header block (the credit line reads e.g.
+  "Conçu avec 💖 à Zürich, Suisse par info@mrpia.ch", with the email as an inline
+  link), followed by Soutenir l'appli, Tes données, and Nouveautés.
 - The round 🏠 back buttons (À propos, Mes résultats, Liste) now use the home
   screen's icon-button hover (background + border tint) instead of a lift
   animation, for a consistent feel across screens.

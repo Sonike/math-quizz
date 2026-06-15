@@ -102,7 +102,7 @@ export const de: Record<TranslationKey, string> = {
     'Deine Einstellungen, deine Antworten und deine Punkte bleiben nur in diesem Browser, auf diesem Gerät. Nichts wird ins Internet gesendet: kein Konto, kein Tracking. Deine Daten folgen dir also nicht auf ein anderes Gerät oder einen anderen Browser.',
   'info.dataP2':
     'Du kannst alles jederzeit über die Schaltfläche « Verlauf löschen » in den Einstellungen entfernen, oder indem du die Browserdaten löschst.',
-  'info.credit': 'Mit 💖 in Zürich, Schweiz 🇨🇭 erstellt',
+  'info.credit': 'Mit 💖 in Zürich, Schweiz erstellt von {link}',
   'info.supportTitle': 'Die App unterstützen',
   'info.coffee': 'Wenn dir die App gefällt, sag es deinen Eltern: Sie können {link}, oder nicht.',
   'info.coffeeLink': 'mir einen Kaffee spendieren ☕',

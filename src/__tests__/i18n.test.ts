@@ -29,9 +29,10 @@ describe('dictionaries', () => {
     expect(Object.keys(dictionaries.en).sort()).toEqual(frKeys);
   });
 
-  it('every coffee sentence keeps the {link} placeholder for the inline link', () => {
+  it('every inline-link sentence keeps its {link} placeholder', () => {
     for (const lang of ['fr', 'de', 'en'] as const) {
       expect(dictionaries[lang]['info.coffee']).toContain('{link}');
+      expect(dictionaries[lang]['info.credit']).toContain('{link}');
     }
   });
 });

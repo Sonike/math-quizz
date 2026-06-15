@@ -114,27 +114,18 @@
   margin-bottom: 0;
 }
 
-.info__credit {
-  text-align: center;
-}
-
 .info__credit-line {
-  margin: 0;
+  margin: 0.5rem 0 0;
   color: var(--color-fg-muted);
   font-size: 0.92rem;
 }
 
-.info__contact {
-  margin: 0.4rem 0 0;
-  font-size: 0.92rem;
-}
-
-.info__contact a {
+.info__credit-line a {
   color: var(--color-accent);
   text-decoration: none;
 }
 
-.info__contact a:hover {
+.info__credit-line a:hover {
   text-decoration: underline;
 }
 

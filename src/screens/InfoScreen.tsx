@@ -10,6 +10,7 @@ type Props = {
 export const InfoScreen = ({ version, onBack }: Props) => {
   const { t, lang } = useI18n();
   const [coffeeBefore, coffeeAfter] = t('info.coffee').split('{link}');
+  const [creditBefore, creditAfter] = t('info.credit').split('{link}');
   return (
     <div className="info">
       <header className="info__header">
@@ -27,6 +28,11 @@ export const InfoScreen = ({ version, onBack }: Props) => {
       <section className="info__panel info__panel--version">
         <p className="info__app">Math Quizz</p>
         <p className="info__version">{t('info.version', { version })}</p>
+        <p className="info__credit-line">
+          {creditBefore}
+          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
+          {creditAfter}
+        </p>
       </section>
 
       <section className="info__panel">
@@ -41,15 +47,6 @@ export const InfoScreen = ({ version, onBack }: Props) => {
             {t('info.coffeeLink')}
           </a>
           {coffeeAfter}
-        </p>
-      </section>
-
-      <section className="info__panel info__credit">
-        <p className="info__credit-line">
-          {t('info.credit')}
-        </p>
-        <p className="info__contact">
-          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
         </p>
       </section>
 

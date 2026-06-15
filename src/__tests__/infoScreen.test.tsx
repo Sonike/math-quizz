@@ -26,11 +26,13 @@ describe('InfoScreen', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows the Zürich credit line and a contact email link', () => {
+  test('shows the Zürich credit line with the contact email as an inline link', () => {
     render(<InfoScreen version="9.9.9" onBack={() => {}} />);
     expect(screen.getByText(/Conçu avec.*à Zürich, Suisse/i)).toBeInTheDocument();
     const mail = screen.getByRole('link', { name: /info@mrpia\.ch/i });
     expect(mail).toHaveAttribute('href', 'mailto:info@mrpia.ch');
+    // The {link} placeholder must be rendered as the link, never shown literally.
+    expect(screen.queryByText(/\{link\}/)).toBeNull();
   });
 
   test('shows a Buy Me a Coffee link (coffee emoji, opens in a new tab)', () => {
