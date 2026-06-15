@@ -100,6 +100,7 @@ export const fr = {
   'info.dataP2':
     "Tu peux tout effacer quand tu veux avec le bouton « Effacer l'historique » dans les Paramètres, ou en vidant les données de ton navigateur.",
   'info.credit': 'Conçu avec 💖 à Zürich, Suisse 🇨🇭',
+  'info.supportTitle': "Soutenir l'appli",
   'info.coffee': "Si l'appli te plaît, dis-le à tes parents : ils pourront choisir de {link}, ou non.",
   'info.coffeeLink': "m'offrir un café ☕",
 };

@@ -139,7 +139,7 @@
 }
 
 .info__coffee {
-  margin: 0.6rem 0 0;
+  margin: 0;
   font-size: 0.9rem;
   color: var(--color-fg-muted);
   line-height: 1.45;

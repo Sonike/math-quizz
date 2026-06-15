@@ -12,10 +12,14 @@ and the project uses [Semantic Versioning](https://semver.org/).
   to all three supported languages (FR, DE, EN) and follow the selected
   language. `ReleaseNote.changes` is now `Record<Language, string[]>`; all 9
   historical entries were backfilled with DE + EN.
-- The "Buy me a coffee" support link now routes through a parent: the child is
-  invited to tell their parents, who can choose to support the app (or not). The
-  link is embedded inline in that sentence (new `info.coffeeLink` key; `info.coffee`
-  is now the full sentence with a `{link}` placeholder).
+- App support is reframed for a child audience. The "Buy me a coffee" copy no
+  longer asks the child to pay: it invites the child to tell their parents, who
+  can choose to support the app (or not), with the support action as an inline
+  link in the sentence (new `info.coffeeLink` key; `info.coffee` is the full
+  sentence with a `{link}` placeholder). It now lives in a dedicated "Soutenir
+  l'appli" panel near the top of the À propos screen (new `info.supportTitle`
+  key), and the historical 0.7.1 note is reworded to match the same
+  parent-routed framing.
 - The round 🏠 back buttons (À propos, Mes résultats, Liste) now use the home
   screen's icon-button hover (background + border tint) instead of a lift
   animation, for a consistent feel across screens.

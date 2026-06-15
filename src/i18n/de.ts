@@ -103,6 +103,7 @@ export const de: Record<TranslationKey, string> = {
   'info.dataP2':
     'Du kannst alles jederzeit über die Schaltfläche « Verlauf löschen » in den Einstellungen entfernen, oder indem du die Browserdaten löschst.',
   'info.credit': 'Mit 💖 in Zürich, Schweiz 🇨🇭 erstellt',
+  'info.supportTitle': 'Die App unterstützen',
   'info.coffee': 'Wenn dir die App gefällt, sag es deinen Eltern: Sie können {link}, oder nicht.',
   'info.coffeeLink': 'mir einen Kaffee spendieren ☕',
 };

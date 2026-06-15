@@ -55,13 +55,13 @@ export const releaseNotes: ReleaseNote[] = [
     date: '2026-06-14',
     changes: {
       fr: [
-        'Tu peux maintenant m’offrir un café ☕ depuis la page « À propos » pour soutenir l’appli.',
+        'Si l’appli te plaît, dis-le à tes parents : depuis la page « À propos », ils peuvent la soutenir en m’offrant un café ☕.',
       ],
       de: [
-        'Du kannst mir jetzt von der Seite « Über » aus einen Kaffee ☕ spendieren, um die App zu unterstützen.',
+        'Wenn dir die App gefällt, sag es deinen Eltern: Auf der Seite « Über » können sie die App mit einem Kaffee ☕ unterstützen.',
       ],
       en: [
-        'You can now buy me a coffee ☕ from the "About" page to support the app.',
+        'If you like the app, tell your parents: on the "About" page they can support it with a coffee ☕.',
       ],
     },
   },

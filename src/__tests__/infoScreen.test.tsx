@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { InfoScreen } from '../screens/InfoScreen';
 import { releaseNotes } from '../domain/releaseNotes';
 import { renderWithLanguage } from './renderWithLanguage';
@@ -42,11 +42,23 @@ describe('InfoScreen', () => {
 
   test('routes the coffee support through the parents (child is the messenger)', () => {
     render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    // Scope to the support panel — the same parent-routed wording also appears
+    // in the 0.7.1 release note further down the page.
+    const panel = screen.getByRole('heading', { name: /Soutenir l'appli/i }).closest('section');
+    expect(panel).not.toBeNull();
+    const support = within(panel as HTMLElement);
     // The child is told to talk to their parents, who then decide.
-    expect(screen.getByText(/dis-le à tes parents/i)).toBeInTheDocument();
+    expect(support.getByText(/dis-le à tes parents/i)).toBeInTheDocument();
     // The clickable phrase is the support action itself, inline in the sentence.
-    const coffee = screen.getByRole('link', { name: /m'offrir un café/i });
+    const coffee = support.getByRole('link', { name: /m'offrir un café/i });
     expect(coffee).toHaveAttribute('href', 'https://buymeacoffee.com/mrpia');
+  });
+
+  test('surfaces support in a dedicated section', () => {
+    render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    expect(
+      screen.getByRole('heading', { name: /Soutenir l'appli/i }),
+    ).toBeInTheDocument();
   });
 
   test('back button calls onBack', () => {

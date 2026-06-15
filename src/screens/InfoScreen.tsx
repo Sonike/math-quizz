@@ -29,13 +29,8 @@ export const InfoScreen = ({ version, onBack }: Props) => {
         <p className="info__version">{t('info.version', { version })}</p>
       </section>
 
-      <section className="info__panel info__credit">
-        <p className="info__credit-line">
-          {t('info.credit')}
-        </p>
-        <p className="info__contact">
-          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
-        </p>
+      <section className="info__panel">
+        <h3 className="info__panel-title">{t('info.supportTitle')}</h3>
         <p className="info__coffee">
           {coffeeBefore}
           <a
@@ -46,6 +41,15 @@ export const InfoScreen = ({ version, onBack }: Props) => {
             {t('info.coffeeLink')}
           </a>
           {coffeeAfter}
+        </p>
+      </section>
+
+      <section className="info__panel info__credit">
+        <p className="info__credit-line">
+          {t('info.credit')}
+        </p>
+        <p className="info__contact">
+          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
         </p>
       </section>
 
