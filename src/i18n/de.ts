@@ -97,7 +97,6 @@ export const de: Record<TranslationKey, string> = {
   'info.title': 'Über',
   'info.version': 'Version {version}',
   'info.whatsNew': 'Neuigkeiten',
-  'info.notesInFrench': 'Diese Hinweise sind auf Französisch.',
   'info.dataTitle': 'Deine Daten',
   'info.dataP1':
     'Deine Einstellungen, deine Antworten und deine Punkte bleiben nur in diesem Browser, auf diesem Gerät. Nichts wird ins Internet gesendet: kein Konto, kein Tracking. Deine Daten folgen dir also nicht auf ein anderes Gerät oder einen anderen Browser.',

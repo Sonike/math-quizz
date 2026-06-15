@@ -58,7 +58,6 @@ export const InfoScreen = ({ version, onBack }: Props) => {
 
       <section className="info__panel">
         <h3 className="info__panel-title">{t('info.whatsNew')}</h3>
-        {lang !== 'fr' && <p className="info__notes-lang">{t('info.notesInFrench')}</p>}
         <ul className="info__notes">
           {releaseNotes.map((note) => (
             <li key={note.version} className="info__note">
@@ -67,7 +66,7 @@ export const InfoScreen = ({ version, onBack }: Props) => {
                 <span className="info__note-date">{note.date}</span>
               </p>
               <ul className="info__note-changes">
-                {note.changes.map((change, i) => (
+                {(note.changes[lang] ?? note.changes.fr).map((change, i) => (
                   <li key={i}>{change}</li>
                 ))}
               </ul>

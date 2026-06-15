@@ -5,6 +5,19 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] - 2026-06-15
+
+### Changed
+- Release notes (the "Nouveautés" list on the À propos screen) are now localized
+  to all three supported languages (FR, DE, EN) and follow the selected
+  language. `ReleaseNote.changes` is now `Record<Language, string[]>`; all 9
+  historical entries were backfilled with DE + EN.
+
+### Removed
+- The "these notes are in French" disclaimer, its `info.notesInFrench` i18n key
+  (fr/de/en), and the `.info__notes-lang` CSS rule — obsolete now that notes are
+  localized.
+
 ## [0.8.0] - 2026-06-14
 
 ### Added

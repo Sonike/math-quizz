@@ -94,7 +94,6 @@ export const fr = {
   'info.title': 'À propos',
   'info.version': 'version {version}',
   'info.whatsNew': 'Nouveautés',
-  'info.notesInFrench': 'Ces notes sont en français.',
   'info.dataTitle': 'Tes données',
   'info.dataP1':
     "Tes réglages, tes réponses et tes scores restent uniquement dans ce navigateur, sur cet appareil. Rien n'est envoyé sur Internet : pas de compte, pas de pistage. Tes données ne te suivent donc pas sur un autre appareil ou un autre navigateur.",

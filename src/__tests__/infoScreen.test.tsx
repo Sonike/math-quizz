@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { InfoScreen } from '../screens/InfoScreen';
 import { releaseNotes } from '../domain/releaseNotes';
+import { renderWithLanguage } from './renderWithLanguage';
 
 describe('InfoScreen', () => {
   test('shows the app version it is given', () => {
@@ -12,7 +13,7 @@ describe('InfoScreen', () => {
   test('lists the latest release note (version + change text)', () => {
     render(<InfoScreen version="9.9.9" onBack={() => {}} />);
     const latest = releaseNotes[0];
-    expect(screen.getByText(latest.changes[0])).toBeInTheDocument();
+    expect(screen.getByText(latest.changes.fr[0])).toBeInTheDocument();
     expect(
       screen.getAllByText(new RegExp(latest.version.replace(/\./g, '\\.'))).length,
     ).toBeGreaterThan(0);
@@ -44,5 +45,14 @@ describe('InfoScreen', () => {
     render(<InfoScreen version="9.9.9" onBack={onBack} />);
     fireEvent.click(screen.getByRole('button', { name: /retour/i }));
     expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  test('shows notes in the selected language and drops the French disclaimer', () => {
+    renderWithLanguage(<InfoScreen version="9.9.9" onBack={() => {}} />, 'de');
+    const latest = releaseNotes[0];
+    expect(screen.getByText(latest.changes.de[0])).toBeInTheDocument();
+    expect(
+      screen.queryByText('Diese Hinweise sind auf Französisch.'),
+    ).not.toBeInTheDocument();
   });
 });
