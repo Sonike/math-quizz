@@ -12,6 +12,10 @@ and the project uses [Semantic Versioning](https://semver.org/).
   to all three supported languages (FR, DE, EN) and follow the selected
   language. `ReleaseNote.changes` is now `Record<Language, string[]>`; all 9
   historical entries were backfilled with DE + EN.
+- The "Buy me a coffee" support link now routes through a parent: the child is
+  invited to tell their parents, who can choose to support the app (or not). The
+  link is embedded inline in that sentence (new `info.coffeeLink` key; `info.coffee`
+  is now the full sentence with a `{link}` placeholder).
 
 ### Removed
 - The "these notes are in French" disclaimer, its `info.notesInFrench` i18n key

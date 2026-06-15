@@ -137,6 +137,22 @@
   text-decoration: underline;
 }
 
+.info__coffee {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-fg-muted);
+  line-height: 1.45;
+}
+
+.info__coffee a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.info__coffee a:hover {
+  text-decoration: underline;
+}
+
 @media (prefers-color-scheme: dark) {
   .info__panel {
     box-shadow: none;

@@ -28,4 +28,10 @@ describe('dictionaries', () => {
     expect(Object.keys(dictionaries.de).sort()).toEqual(frKeys);
     expect(Object.keys(dictionaries.en).sort()).toEqual(frKeys);
   });
+
+  it('every coffee sentence keeps the {link} placeholder for the inline link', () => {
+    for (const lang of ['fr', 'de', 'en'] as const) {
+      expect(dictionaries[lang]['info.coffee']).toContain('{link}');
+    }
+  });
 });

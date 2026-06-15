@@ -9,6 +9,7 @@ type Props = {
 
 export const InfoScreen = ({ version, onBack }: Props) => {
   const { t, lang } = useI18n();
+  const [coffeeBefore, coffeeAfter] = t('info.coffee').split('{link}');
   return (
     <div className="info">
       <header className="info__header">
@@ -35,14 +36,16 @@ export const InfoScreen = ({ version, onBack }: Props) => {
         <p className="info__contact">
           <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
         </p>
-        <p className="info__contact">
+        <p className="info__coffee">
+          {coffeeBefore}
           <a
             href="https://buymeacoffee.com/mrpia"
             target="_blank"
             rel="noopener noreferrer"
           >
-            ☕ {t('info.coffee')}
+            {t('info.coffeeLink')}
           </a>
+          {coffeeAfter}
         </p>
       </section>
 

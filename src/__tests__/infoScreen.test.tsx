@@ -40,6 +40,15 @@ describe('InfoScreen', () => {
     expect(coffee).toHaveAttribute('target', '_blank');
   });
 
+  test('routes the coffee support through the parents (child is the messenger)', () => {
+    render(<InfoScreen version="9.9.9" onBack={() => {}} />);
+    // The child is told to talk to their parents, who then decide.
+    expect(screen.getByText(/dis-le à tes parents/i)).toBeInTheDocument();
+    // The clickable phrase is the support action itself, inline in the sentence.
+    const coffee = screen.getByRole('link', { name: /m'offrir un café/i });
+    expect(coffee).toHaveAttribute('href', 'https://buymeacoffee.com/mrpia');
+  });
+
   test('back button calls onBack', () => {
     const onBack = vi.fn();
     render(<InfoScreen version="9.9.9" onBack={onBack} />);
