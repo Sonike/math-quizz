@@ -1,8 +1,9 @@
 # math-quizz
 
 A small, fully client-side React + TypeScript app: timed multiplication and
-division drills for a child who already knows the tables. French UI. State
-(settings, session history) lives in `localStorage` — no backend, no account.
+division drills for a child who already knows the tables. Trilingual UI
+(FR/DE/EN) via `src/i18n/`. State (settings, session history) lives in
+`localStorage` — no backend, no account.
 
 ## Commands
 
@@ -26,19 +27,24 @@ three together in the same commit:
    (`## [x.y.z] - YYYY-MM-DD` with `### Added` / `### Changed` / `### Fixed`).
    Technical detail is welcome here.
 
-3. **`src/domain/releaseNotes.ts`** — user-facing, **French**, child-friendly
-   (tutoiement), shown in-app on the À propos screen. Prepend a new
-   `{ version, date, changes: [...] }` entry at the top (newest first). Keep
-   notes short and about what the *user* gains, not implementation detail.
+3. **`src/domain/releaseNotes.ts`** — user-facing, child-friendly, shown in-app
+   on the À propos screen. Prepend a new
+   `{ version, date, changes: { fr, de, en } }` entry at the top (newest first).
+   `changes` is `Record<Language, string[]>`: write the note in **all three
+   languages** (tutoiement FR / du-form DE / casual EN), each referencing the
+   same UI labels the child sees. Keep notes short and about what the *user*
+   gains, not implementation detail.
 
 The drift guard (`src/__tests__/releaseNotes.test.ts`) ties all three to the
 version in `package.json`:
 - `releaseNotes[0].version` must equal `package.json` version (step 1 ↔ 3).
 - `CHANGELOG.md` must contain a `## [<version>]` section for it (step 1 ↔ 2).
+- every entry must carry non-empty `fr`, `de` **and** `en` notes — a missing
+  translation fails `pnpm test`.
 
-So forgetting either the French note or the changelog entry on a bump makes
-`pnpm test` fail. The `CHANGELOG.md` check is intentionally loose — it only
-verifies the section header exists, not its contents.
+So forgetting the changelog entry, or any of the three language notes, on a bump
+makes `pnpm test` fail. The `CHANGELOG.md` check is intentionally loose — it
+only verifies the section header exists, not its contents.
 
 ## Deploy
 
@@ -54,4 +60,6 @@ Static bundle on **Firebase Hosting** (GCP project `modern-ally-102412`), live a
 - New screens follow the `App.tsx` screen-state-machine pattern and mirror an
   existing screen (e.g. `ProgressScreen` / `InfoScreen`): a header with a 🏠
   back button, then `*__panel` sections. Component CSS sits beside the `.tsx`.
-- French copy throughout the UI.
+- UI copy lives in `src/i18n/{fr,de,en}.ts`; every user-facing string is keyed
+  and translated into all three languages. `i18n.test.ts` enforces that the
+  three dictionaries share exactly the same keys.
