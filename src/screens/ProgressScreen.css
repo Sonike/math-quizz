@@ -27,11 +27,12 @@
   background: var(--color-card-bg);
   border-radius: 50%;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .progress__back-btn:hover {
-  transform: translateY(-2px);
+  background: var(--color-chip-bg);
+  border-color: var(--color-fg-muted);
 }
 
 .progress__empty {
