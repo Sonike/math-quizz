@@ -32,7 +32,7 @@ export const InfoScreen = ({ version, onBack }: Props) => {
         </p>
         <p className="info__credit-line">
           {creditBefore}
-          <a href="mailto:info@mrpia.ch">info@mrpia.ch</a>
+          <a href="https://mrpia.ch">mrpia.ch</a>
           {creditAfter}
         </p>
       </section>
