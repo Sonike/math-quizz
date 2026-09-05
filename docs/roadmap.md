@@ -59,8 +59,8 @@ The child replays easy pairs as often as the ones that give them trouble.
 **Prerequisite**: having real history density. Useless until the child has
 played around twenty sessions.
 
-**Tests to add**: on a large sample with a biased `errorStats`, verify that
-the appearance frequency of the problematic pair increases.
+**Tests to add**: on a large sample with a biased stats map, verify that the
+appearance frequency of the problematic pair increases.
 
 ---
 
@@ -80,7 +80,8 @@ session, and spots the most fragile tables.
 - read `history` (already in localStorage, capped at 50);
 - two visualizations:
   1. `correct/total` score over the last N sessions (simple line);
-  2. heat-map of errors per canonical pair (`stats.aggregateErrors`).
+  2. heat-map of errors per canonical pair (`stats.aggregateErrors` at the
+     time — `stats.aggregatePairs` since v0.11.0).
 - library: no need for Chart.js or Recharts for this — an inline SVG does
   the job nicely and stays true to the "zero superfluous dependency"
   philosophy.
@@ -168,7 +169,14 @@ that's deliberate, to avoid disturbing concentration.
 
 ## 7. Language choice: FR, DE, EN
 
-**Status**: 📋 Planned
+**Status**: ✅ Done — shipped in v0.5.0 (selector in Settings), extended in
+v0.7.0 (the same `LanguageToggle` on the home screen, so the language changes
+without opening Settings) and v0.9.0 (release notes localized too). Hand-rolled
+i18n as planned, no `react-i18next`: `src/i18n/{fr,de,en}.ts` plus `translate()`
+with `{placeholder}` interpolation. `LanguageProvider` sets
+`document.documentElement.lang`, and `i18n.test.ts` enforces that the three
+dictionaries share exactly the same keys — a missing translation fails
+`pnpm test`.
 
 **Why**: potentially multilingual home or classroom, future use outside
 France.
@@ -201,7 +209,7 @@ universal.
 
 ## 8. Voice mode (audio reading of the question)
 
-**Status**: 📋 Planned — depends on item 7 (language choice)
+**Status**: 📋 Planned — unblocked, item 7 (language choice) shipped in v0.5.0
 
 **Why**: trains oral mental arithmetic — that's the real modality of the
 school test ("how much is seven times eight?"). Also useful for a younger
@@ -224,8 +232,8 @@ child who reads more slowly than the 4-second target.
 - a "🔊 Replay" button in `SessionScreen` to replay the question, with no
   score cost (the child hears but doesn't cheat).
 
-**Prerequisite**: item **7. Language choice** — the TTS locale must follow
-the UI locale.
+**Prerequisite**: item **7. Language choice** — done, so this is ready to
+start. The TTS locale must follow `settings.language`.
 
 **Caveats**:
 
@@ -247,10 +255,13 @@ comment on the answer.
 
 **Status**: ✅ Done — shipped in v0.10.0. **Settings → Tes données** writes the
 whole profile to one JSON file and reads it back. The envelope is a published
-contract: `public/schemas/math-quizz-backup-v1.schema.json` is served next to the
-app and linked from the Settings screen, `docs/data-format.md` documents it in
-prose, and `src/__tests__/backup.test.ts` pins the schema to the constants in
-`src/domain/backup.ts` so the two cannot drift.
+contract: `public/schemas/math-quizz-backup-v1.schema.json` is live at
+<https://math-quizz.mrpia.ch/schemas/math-quizz-backup-v1.schema.json> and linked
+from the Settings screen, `docs/data-format.md` documents it in prose, and
+`src/__tests__/backup.test.ts` pins the schema to the constants in
+`src/domain/backup.ts` so the two cannot drift. (Firebase serves static files
+ahead of the `**` → `/index.html` SPA rewrite, so that path really returns the
+schema and not the app shell — worth re-checking if the rewrite rules change.)
 
 **Why**: `localStorage` is the only copy. Clearing browser data, switching
 device or reinstalling the PWA loses months of practice history, and nothing
@@ -271,29 +282,44 @@ story for an app that deliberately has no backend.
 
 ## 10. Merge on import
 
-**Status**: 📋 Planned — deliberately deferred out of item 9
+**Status**: 📋 Planned — deliberately deferred out of item 9, and **cheaper than
+it used to be** since v0.11.0
 
 **Why**: today importing replaces the profile. That covers backup / restore and
 moving to a new device, but not "the child practised on the tablet and on the
 laptop, and both histories should survive".
 
-**What makes it harder than it looks**: sessions carry no id — `startedAt` is
-the closest thing, and it is only unique by luck. Worse, `errors` cannot simply
-be added: the counters already include sessions that have aged out of the capped
-history, so summing two files double-counts every pair the two devices share,
-and recomputing from the merged history silently drops the older statistics
-instead.
+**What changed**: this entry used to say the error counters made merging
+intractable — they already included sessions aged out of the capped history, so
+summing two files double-counted every shared pair while recomputing from the
+merged history dropped the older statistics. Item 11 deleted that accumulator.
+Every statistic is now derived from the histories, so **merging the histories
+merges the statistics**. There is no second store to reconcile.
+
+**What is left**: sessions still carry no id. `startedAt` is the closest thing
+and is unique only by luck — two devices can stamp the same second, and a device
+with a wrong clock breaks ordering outright.
+
+**Two consequences of recency weighting to respect**:
+
+- weights come from a session's *position* in the list, so a merged history has
+  to be sorted chronologically before it means anything. Concatenating two files
+  in import order would silently mis-weight both;
+- the result is still trimmed to `HISTORY_LIMIT`, so merging two full histories
+  keeps the 50 most recent *overall*. That is the right answer, but it means a
+  merge can drop sessions from the file just imported — the confirmation dialog
+  should say so rather than implying everything was kept.
 
 **What's needed**:
 
-- a stable session id written at record time (a bump to `formatVersion`, or an
-  additive optional field that older files simply lack);
-- provenance on the error counters — enough to tell "already counted in a
-  session I have" from "counted in a session that aged out";
+- a stable session id written at record time. Additive, so `formatVersion` stays
+  1: older files simply lack it and fall back to matching on `startedAt` plus
+  answer count;
+- dedupe on that id when concatenating, then sort by `startedAt`, then trim;
 - a UI choice on import (replace / merge) rather than a silent behaviour.
 
 **When**: once a real second device is in play. Until then, replace is the
-honest behaviour and says so in the confirmation dialog.
+honest behaviour and the confirmation dialog says so.
 
 ---
 
