@@ -12,6 +12,13 @@ import { InfoScreen } from './screens/InfoScreen';
 import type { SessionResult, Settings } from './domain/session';
 import type { Backup } from './domain/backup';
 import {
+  loadRegistry,
+  saveRegistry,
+  setActiveProfile,
+  findProfile,
+} from './storage/profileRegistry';
+import type { ProfileRegistry } from './storage/profileRegistry';
+import {
   loadSettings,
   saveSettings,
   recordSession,
@@ -23,38 +30,91 @@ import {
 
 type Screen = 'home' | 'session' | 'results' | 'settings' | 'progress' | 'info';
 
+/**
+ * The registry and the settings of the profile it points at, held as **one**
+ * state value on purpose.
+ *
+ * Two `useState`s would let a render exist in which `registry.active` is the
+ * new profile while `settings` still belongs to the old one — and the effect
+ * that persists settings would then write one child's preferences into
+ * another child's storage key. Keeping them in a single object makes that
+ * render unrepresentable rather than merely unlikely.
+ */
+type ProfileState = { registry: ProfileRegistry; settings: Settings };
+
+const initialProfileState = (): ProfileState => {
+  const registry = loadRegistry();
+  return { registry, settings: loadSettings(registry.active) };
+};
+
 export const App = () => {
   const [screen, setScreen] = useState<Screen>('home');
-  const [settings, setSettings] = useState<Settings>(() => loadSettings());
+  const [{ registry, settings }, setProfileState] =
+    useState<ProfileState>(initialProfileState);
   const [lastResult, setLastResult] = useState<SessionResult | null>(null);
 
+  const activeId = registry.active;
+
+  // Also the moment a browser that predates profiles gets its registry written
+  // for the first time: `loadRegistry` synthesises it but never persists.
   useEffect(() => {
-    saveSettings(settings);
-  }, [settings]);
+    saveRegistry(registry);
+  }, [registry]);
+
+  useEffect(() => {
+    saveSettings(activeId, settings);
+  }, [activeId, settings]);
+
+  const setSettings = (next: Settings) =>
+    setProfileState((state) => ({ ...state, settings: next }));
+
+  const switchProfile = (id: string) =>
+    setProfileState((state) => {
+      const nextRegistry = setActiveProfile(state.registry, id);
+      if (nextRegistry === state.registry) return state;
+      return { registry: nextRegistry, settings: loadSettings(id) };
+    });
+
+  /**
+   * Settings may create, rename or delete profiles, so it hands the whole
+   * registry back. Deleting the active one moves `active`, which means the
+   * settings on screen have to follow.
+   */
+  const applyRegistry = (next: ProfileRegistry) =>
+    setProfileState((state) => ({
+      registry: next,
+      settings:
+        next.active === state.registry.active
+          ? state.settings
+          : loadSettings(next.active),
+    }));
 
   const handleSessionComplete = (result: SessionResult) => {
     if (result.answerMode === 'paper') {
       // Paper sessions are recorded later, once the child has self-marked.
     } else if (result.answerMode === 'training') {
-      recordTrainingSession(result);
+      recordTrainingSession(activeId, result);
     } else {
-      recordSession(result);
+      recordSession(activeId, result);
     }
     setLastResult(result);
     setScreen('results');
   };
 
-  const handleImport = (backup: Backup) => {
+  const handleImport = (targetId: string, backup: Backup) => {
     // Storage first: if the browser refuses the write, the screen reports it
     // and React state still matches what is actually stored.
-    importProfile(backup);
-    setSettings(backup.data.settings);
+    importProfile(targetId, backup);
+    // Importing into some *other* profile must not disturb the one in use.
+    if (targetId === activeId) setSettings(backup.data.settings);
   };
 
   const handleSaveResult = (final: SessionResult) => {
-    recordSession(final);
+    recordSession(activeId, final);
     setLastResult(final);
   };
+
+  const activeName = findProfile(registry, activeId)?.name ?? '';
 
   return (
     <LanguageProvider lang={settings.language}>
@@ -62,6 +122,9 @@ export const App = () => {
         {screen === 'home' && (
           <HomeScreen
             settings={settings}
+            profiles={registry.profiles}
+            activeProfileId={activeId}
+            onSwitchProfile={switchProfile}
             onChange={setSettings}
             onStart={() => setScreen('session')}
             onOpenSettings={() => setScreen('settings')}
@@ -103,17 +166,31 @@ export const App = () => {
           />
         )}
         {screen === 'settings' && (
+          // Keyed by profile: the three numeric inputs seed from props on first
+          // render only, so deleting the active profile (which moves `active`)
+          // has to hand the screen a fresh mount rather than stale numbers that
+          // the next "Enregistrer" would write into someone else's profile.
           <SettingsScreen
+            key={activeId}
             settings={settings}
+            registry={registry}
+            onRegistryChange={applyRegistry}
             onSave={setSettings}
-            onClearHistory={clearAll}
-            onExport={() => exportProfile(__APP_VERSION__)}
+            onClearHistory={() => clearAll(activeId)}
+            onExport={(profileId, profileName) =>
+              exportProfile(profileId, __APP_VERSION__, profileName)
+            }
             onImport={handleImport}
             onBack={() => setScreen('home')}
           />
         )}
         {screen === 'progress' && (
-          <ProgressScreen onBack={() => setScreen('home')} />
+          <ProgressScreen
+            profileId={activeId}
+            profileName={activeName}
+            showProfile={registry.profiles.length > 1}
+            onBack={() => setScreen('home')}
+          />
         )}
         {screen === 'info' && (
           <InfoScreen

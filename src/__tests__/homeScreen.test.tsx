@@ -2,14 +2,25 @@ import { describe, expect, test, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DEFAULT_SETTINGS } from '../domain/session';
+import type { ProfileEntry } from '../storage/profileRegistry';
 
 const noop = () => {};
+
+// A single profile, so the switcher stays hidden and these tests keep
+// exercising the home screen alone.
+const PROFILES: ProfileEntry[] = [{ id: 'default', name: '', createdAt: '' }];
+const profileProps = {
+  profiles: PROFILES,
+  activeProfileId: 'default',
+  onSwitchProfile: noop,
+};
 
 describe('HomeScreen — Saisie toggle', () => {
   test('selecting "Sur papier" emits settings with answerMode=paper', () => {
     const onChange = vi.fn();
     render(
       <HomeScreen
+        {...profileProps}
         settings={DEFAULT_SETTINGS}
         onChange={onChange}
         onStart={noop}
@@ -30,6 +41,7 @@ describe('HomeScreen — training mode', () => {
   test('shows the training summary and start label when answerMode is training', () => {
     render(
       <HomeScreen
+        {...profileProps}
         settings={{ ...DEFAULT_SETTINGS, answerMode: 'training' }}
         onChange={noop}
         onStart={noop}
@@ -52,6 +64,7 @@ describe('HomeScreen — list mode', () => {
   test('shows the list summary and start label when answerMode is list', () => {
     render(
       <HomeScreen
+        {...profileProps}
         settings={{ ...DEFAULT_SETTINGS, answerMode: 'list' }}
         onChange={noop}
         onStart={noop}
@@ -72,6 +85,7 @@ describe('HomeScreen — table selection hint', () => {
   test('shows a hint to pick a table when none are selected', () => {
     render(
       <HomeScreen
+        {...profileProps}
         settings={{ ...DEFAULT_SETTINGS, selectedTables: [] }}
         onChange={noop}
         onStart={noop}
@@ -87,6 +101,7 @@ describe('HomeScreen — table selection hint', () => {
   test('hides the hint once at least one table is selected', () => {
     render(
       <HomeScreen
+        {...profileProps}
         settings={{ ...DEFAULT_SETTINGS, selectedTables: [2] }}
         onChange={noop}
         onStart={noop}
@@ -105,6 +120,7 @@ describe('HomeScreen — progress entry', () => {
     const onOpenProgress = vi.fn();
     render(
       <HomeScreen
+        {...profileProps}
         settings={DEFAULT_SETTINGS}
         onChange={noop}
         onStart={noop}
@@ -124,6 +140,7 @@ describe('HomeScreen — info entry', () => {
     const onOpenInfo = vi.fn();
     render(
       <HomeScreen
+        {...profileProps}
         settings={DEFAULT_SETTINGS}
         onChange={noop}
         onStart={noop}
@@ -143,6 +160,7 @@ describe('HomeScreen — language selector', () => {
     const onChange = vi.fn();
     render(
       <HomeScreen
+        {...profileProps}
         settings={DEFAULT_SETTINGS}
         onChange={onChange}
         onStart={noop}

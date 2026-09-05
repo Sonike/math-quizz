@@ -11,6 +11,14 @@ import {
   serializeBackup,
 } from '../domain/backup';
 import type { Backup } from '../domain/backup';
+import type { ProfileRegistry } from '../storage/profileRegistry';
+
+// One nameless profile: no import-target picker, and the exported filename
+// carries no name — which is what the download assertion below expects.
+const REGISTRY: ProfileRegistry = {
+  active: 'default',
+  profiles: [{ id: 'default', name: '', createdAt: '' }],
+};
 
 const session: SessionResult = {
   startedAt: '2026-05-09T08:01:00.000Z',
@@ -32,12 +40,19 @@ const backup: Backup = createBackup(
     trainingHistory: [{ ...session, answerMode: 'training' }],
     errors: { '7x8': { attempts: 3, errors: 1, timeouts: 0 } },
   },
-  { appVersion: '0.10.0', exportedAt: '2026-09-05T10:11:12.000Z', profile: 'default' },
+  {
+    appVersion: '0.10.0',
+    exportedAt: '2026-09-05T10:11:12.000Z',
+    profile: 'default',
+    profileName: '',
+  },
 );
 
 const renderScreen = (over: Partial<Parameters<typeof SettingsScreen>[0]> = {}) => {
   const props = {
     settings: DEFAULT_SETTINGS,
+    registry: REGISTRY,
+    onRegistryChange: vi.fn(),
     onSave: vi.fn(),
     onClearHistory: vi.fn(),
     onExport: vi.fn(() => backup),
@@ -119,6 +134,7 @@ describe('SettingsScreen — import', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /oui, importer/i }));
     expect(props.onImport).toHaveBeenCalledWith(
+      'default',
       expect.objectContaining({ format: BACKUP_FORMAT }),
     );
     await screen.findByText(/données importées/i);
@@ -140,7 +156,12 @@ describe('SettingsScreen — import', () => {
         trainingHistory: [],
         errors: {},
       },
-      { appVersion: '0.10.0', exportedAt: '2026-09-05T10:11:12.000Z', profile: 'default' },
+      {
+        appVersion: '0.10.0',
+        exportedAt: '2026-09-05T10:11:12.000Z',
+        profile: 'default',
+        profileName: '',
+      },
     );
     uploadJson(serializeBackup(imported));
     await screen.findByText(/remplacer tes données/i);
@@ -207,5 +228,139 @@ describe('SettingsScreen — import', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/mémoire du navigateur/i);
     expect(screen.queryByText(/données importées/i)).not.toBeInTheDocument();
+  });
+});
+
+describe('SettingsScreen — choosing where an import lands', () => {
+  const TWO: ProfileRegistry = {
+    active: 'default',
+    profiles: [
+      { id: 'default', name: 'Léa', createdAt: '' },
+      { id: 'p2', name: 'Tom', createdAt: '' },
+    ],
+  };
+
+  it('offers no destination picker while there is nowhere else to put it', () => {
+    renderScreen();
+    uploadJson(serializeBackup(backup));
+
+    return waitFor(() => {
+      expect(screen.getByText(/remplacer tes données/i)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/importer dans le profil/i)).toBeNull();
+    });
+  });
+
+  it('defaults to the profile in use and names it in the warning', async () => {
+    renderScreen({ registry: TWO });
+    uploadJson(serializeBackup(backup));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(/importer dans le profil/i)).toHaveValue('default'),
+    );
+    expect(
+      screen.getByText(/Les réglages et les résultats de « Léa » seront remplacés/),
+    ).toBeInTheDocument();
+  });
+
+  it('says whose file this is when it carries a name', async () => {
+    const fromTom = createBackup(backup.data, {
+      appVersion: '0.12.0',
+      exportedAt: '2026-09-05T10:11:12.000Z',
+      profile: 'whatever-id-that-device-used',
+      profileName: 'Tom',
+    });
+    renderScreen({ registry: TWO });
+    uploadJson(serializeBackup(fromTom));
+
+    await waitFor(() =>
+      expect(screen.getByText(/Ce fichier vient du profil « Tom »/)).toBeInTheDocument(),
+    );
+  });
+
+  it('imports into the profile picked, not the one named inside the file', async () => {
+    const fromElsewhere = createBackup(backup.data, {
+      appVersion: '0.12.0',
+      exportedAt: '2026-09-05T10:11:12.000Z',
+      profile: 'default',
+      profileName: 'Léa',
+    });
+    const props = renderScreen({ registry: TWO });
+    uploadJson(serializeBackup(fromElsewhere));
+
+    const select = await screen.findByLabelText(/importer dans le profil/i);
+    fireEvent.change(select, { target: { value: 'p2' } });
+    expect(
+      screen.getByText(/Les réglages et les résultats de « Tom » seront remplacés/),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /oui, importer/i }));
+
+    expect(props.onImport).toHaveBeenCalledWith('p2', expect.objectContaining({
+      format: BACKUP_FORMAT,
+    }));
+  });
+
+  it('leaves the open form alone when the file lands in another profile', async () => {
+    // The imported file carries questionCount 11; the active profile is on 22.
+    renderScreen({ registry: TWO, settings: DEFAULT_SETTINGS });
+    uploadJson(serializeBackup(backup));
+
+    const select = await screen.findByLabelText(/importer dans le profil/i);
+    fireEvent.change(select, { target: { value: 'p2' } });
+    fireEvent.click(screen.getByRole('button', { name: /oui, importer/i }));
+
+    expect(screen.getByLabelText(/nombre de questions/i)).toHaveValue(
+      DEFAULT_SETTINGS.questionCount,
+    );
+  });
+
+  it('re-seeds the form when the file lands in the profile being edited', async () => {
+    renderScreen({ registry: TWO, settings: DEFAULT_SETTINGS });
+    uploadJson(serializeBackup(backup));
+
+    await screen.findByLabelText(/importer dans le profil/i);
+    fireEvent.click(screen.getByRole('button', { name: /oui, importer/i }));
+
+    expect(screen.getByLabelText(/nombre de questions/i)).toHaveValue(11);
+  });
+});
+
+describe('SettingsScreen — export names the profile', () => {
+  beforeEach(() => {
+    URL.createObjectURL = vi.fn(() => 'blob:mock');
+    URL.revokeObjectURL = vi.fn();
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it('asks for the active profile, by id and by name', () => {
+    const named: ProfileRegistry = {
+      active: 'p2',
+      profiles: [
+        { id: 'default', name: 'Léa', createdAt: '' },
+        { id: 'p2', name: 'Tom', createdAt: '' },
+      ],
+    };
+    const downloads: string[] = [];
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      downloads.push(this.download);
+    });
+
+    const props = renderScreen({
+      registry: named,
+      onExport: vi.fn((profileId: string, profileName: string) =>
+        createBackup(backup.data, {
+          appVersion: '0.12.0',
+          exportedAt: '2026-09-05T10:11:12.000Z',
+          profile: profileId,
+          profileName,
+        }),
+      ),
+    });
+    fireEvent.click(screen.getByRole('button', { name: /exporter mes données/i }));
+
+    expect(props.onExport).toHaveBeenCalledWith('p2', 'Tom');
+    expect(downloads).toEqual(['math-quizz-backup-tom-2026-09-05.json']);
   });
 });

@@ -5,6 +5,68 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.12.0] - 2026-09-05
+
+### Added
+- **Multiple named local profiles.** A device can now hold several people —
+  siblings sharing a tablet — each with their own settings and their own two
+  histories. Settings gains a **Profils** section (create / rename / delete,
+  capped at 6, names capped at 20 characters and refused case-insensitively if
+  already taken), and the home screen gains a switcher.
+- `src/storage/profileRegistry.ts`, owning the single key `mathquizz:profiles`
+  (`{ active, profiles: [{ id, name, createdAt }] }`) outside every profile
+  prefix. `loadRegistry()` never throws and never returns an unusable value:
+  a missing key, non-JSON, a wrong shape, an id that would produce a broken
+  storage prefix, duplicate ids, an `active` naming a profile that is gone, or
+  an empty list each degrade to the migrated single-profile registry. It is
+  clock-free and does not persist — `App` writes it in the effect that already
+  persists settings.
+- `purgeProfile(profileId)` in the store, and the delete flow that uses it.
+  Deleting also offers **⬇️ Exporter ses données d'abord** in the same dialog:
+  it is the only irreversible action in an app with no server.
+- `profileName` on the backup envelope, alongside the existing `profile` (now
+  documented as the profile *id*). Additive, so `formatVersion` stays 1. The
+  suggested filename folds the name in: `math-quizz-backup-lea-2026-09-05.json`.
+- The import confirmation gained a destination selector (shown only when there
+  is somewhere else to put the file), defaulting to the profile in use, and
+  names the source profile when the file carries one.
+
+### Changed
+- Every function in `src/storage/profileStore.ts` takes a profile id as its
+  first argument; `PROFILE_ID` and `STORAGE_KEYS` are replaced by
+  `storageKeys(profileId)`. There is deliberately **no default argument**: a
+  screen cannot read the wrong profile by forgetting to pass an id, it fails to
+  compile. The store knows nothing about which profile is active, so the
+  dependency runs one way (registry → store, for the purge) and there is no
+  cycle.
+- `App` holds the registry and the active profile's settings as a **single**
+  state value. Two `useState`s would allow a render where `registry.active` is
+  the new profile and `settings` is still the old one — the persist effect would
+  then write one child's preferences into another child's key. One object makes
+  that render unrepresentable rather than merely unlikely.
+- `SettingsScreen` is rendered with `key={activeProfileId}`. Its three numeric
+  inputs seed from props on first render only, so deleting the active profile
+  (which moves `active`) has to remount the screen rather than leave stale
+  numbers that the next "Enregistrer" would write into someone else's profile.
+- `ProgressScreen` takes `profileId` and keys its `useMemo` on it, so switching
+  re-reads instead of drawing the previous child's curve under the new name.
+- `settings.importWarning` now names the **destination** profile, which is the
+  honest statement once the destination is a choice.
+
+### Migration
+- On first open the existing data is registered as a profile with the id
+  `default` — the id its localStorage keys already use — so **nothing moves and
+  nothing is rewritten**. Its `name` is empty, because the app never asked for
+  one; the UI shows "Sans nom" and renaming starts from an empty field.
+
+### Notes
+- A profile is a name and a storage prefix, **not an identity**: no password, no
+  PIN, no recovery. Whoever holds the device can switch to, read or export any
+  profile on it. Deliberate — see `docs/superpowers/specs/2026-09-05-multiple-profiles-design.md`.
+- A backup is one profile. The registry is not part of the file, so importing
+  never creates, renames or removes a profile; it overwrites a destination the
+  user picked.
+
 ## [0.11.0] - 2026-09-05
 
 ### Changed

@@ -19,8 +19,9 @@ contract rather than an internal detail.
   "format": "math-quizz-backup",
   "formatVersion": 1,
   "exportedAt": "2026-09-05T10:11:12.000Z",
-  "appVersion": "0.10.0",
+  "appVersion": "0.12.0",
   "profile": "default",
+  "profileName": "Léa",
   "data": {
     "settings": { "…": "…" },
     "history": [],
@@ -33,6 +34,15 @@ contract rather than an internal detail.
 `formatVersion` versions **this envelope**, not the app; it moves only on a
 breaking change. `appVersion` is informational — compatibility is never decided
 from it.
+
+`profile` is the **id** of the profile the data came from — the segment in its
+localStorage prefix. The profile that predates multiple profiles keeps the id
+`default`; ones created since carry an opaque id. `profileName` is what the
+child sees (`""` for the never-named original). Both are informational: the app
+shows the name in the import confirmation and folds it into the suggested
+filename, but the **destination** of an import is always the profile the user
+picks in the dialog, never the one named in the file. An id minted on another
+device may mean someone else here, or nobody.
 
 Only `format`, `formatVersion` and `data` are required. A third party generating
 a file may omit everything else, and the importer fills in a default. Inside
@@ -47,7 +57,26 @@ a file may omit everything else, and the importer fills in a default. Inside
 | `trainingHistory` | `…:training-history` | Completed training sessions, same shape, same cap |
 | `errors` | — | **Deprecated.** Lifetime per-pair counters written by versions up to 0.10.0. Accepted on import, never exported |
 
-The live sections live under the prefix `mathquizz:profile:default:`.
+The live sections live under the prefix `mathquizz:profile:<id>:`.
+
+## One file is one profile
+
+Since 0.12.0 a device can hold several named profiles — siblings sharing a
+tablet. **A backup covers exactly one of them.** The list of who exists lives at
+`mathquizz:profiles`, outside every profile prefix, and is deliberately *not*
+part of the file:
+
+- importing never creates, renames or deletes a profile. It overwrites one
+  destination, chosen in the import dialog (default: the profile in use);
+- so a file from another device can never rearrange this device's profiles, and
+  a hand-edited file cannot conjure one into being;
+- to move a sibling's data onto a new device you create the profile first, then
+  import into it. Two steps, but no step where the app guesses who someone is.
+
+A profile is a name and a storage prefix, not an identity: no password, no PIN,
+no recovery. Whoever holds the device can read or export any profile on it. That
+is the design, not an oversight — the data is a child's practice history on a
+family tablet.
 
 **Everything the app knows is derived from the two histories.** There is no
 separate statistics store: per-pair figures — the heat-map, "Paires à revoir" —

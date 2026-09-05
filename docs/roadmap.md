@@ -92,7 +92,14 @@ session, and spots the most fragile tables.
 
 ## 4. Multiple named local profiles
 
-**Status**: 📋 Planned — next up
+**Status**: ✅ Done — shipped in v0.12.0. `storage/profileRegistry.ts` owns
+`mathquizz:profiles` (`{ active, profiles: [{ id, name, createdAt }] }`) outside
+every profile prefix; every function in `storage/profileStore.ts` now takes the
+profile id as its first argument, with **no default** — a screen cannot read the
+wrong profile by forgetting to pass one, it fails to compile. A switcher sits on
+the home screen (hidden while a single profile exists), create / rename / delete
+in Settings. Design notes:
+`docs/superpowers/specs/2026-09-05-multiple-profiles-design.md`.
 
 **Why**: siblings share one tablet. The app stores exactly one profile per
 browser, so a brother's timeouts land in his sister's heat-map and the score
@@ -123,9 +130,31 @@ a different conversation.
   profile. With several profiles, importing should ask *which* profile to write
   into, and the suggested filename should carry the profile name.
 
+**How it shipped, where it differs from the above**:
+
+- migration works as planned: the existing data is registered under the id
+  `default`, so nothing moves. Its `name` is empty — the app never asked for
+  one — and the UI renders "Sans nom" until it is renamed;
+- the envelope gained `profileName` alongside `profile` (additive, so
+  `formatVersion` stays 1). Both are informational: the import destination is
+  always the profile the user picks in the dialog, never the one named in the
+  file. **The registry is not part of a backup**, so importing can never create,
+  rename or remove a profile;
+- **the active profile is not shown on *every* screen.** The risk below is
+  *starting a session as the wrong person*, and that decision is made on the
+  home screen — which is exactly where the switcher lives, permanently. A badge
+  on the session screen would arrive after the choice is irreversible, on the one
+  screen deliberately kept free of everything but the question. So the profile
+  is shown where it changes a decision or interprets data: home, "Mes résultats",
+  and Settings;
+- creating a profile does **not** switch to it. Creation happens in Settings,
+  where the form above edits the current profile's numbers; switching there
+  would silently re-target the next "Enregistrer".
+
 **Minor risk**: if a parent and a child use the app alternately without properly
-selecting the profile, the stats become wrong. Solution: display the active
-profile prominently on every screen.
+selecting the profile, the stats become wrong. Mitigated by the always-visible
+switcher on the home screen (see above), not eliminated — nothing short of a
+login could eliminate it, and a login is explicitly out of scope.
 
 ---
 
@@ -276,7 +305,10 @@ story for an app that deliberately has no backend.
   the wild keep validating;
 - structure is rejected, settings are sanitised. See `domain/backup.ts` for why
   the two halves are treated differently;
-- import is a restore, not a merge (item 10).
+- import is a restore, not a merge (item 10);
+- since v0.12.0 (item 4) a restore has a *destination*: the import dialog asks
+  which profile to overwrite, defaulting to the one in use. The file names its
+  source profile but never picks the target.
 
 ---
 

@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgressScreen } from '../screens/ProgressScreen';
-import { STORAGE_KEYS } from '../storage/profileStore';
+import { storageKeys } from '../storage/profileStore';
 import type { SessionResult } from '../domain/session';
 
 const session = (over: Partial<SessionResult> = {}): SessionResult => ({
@@ -19,20 +19,23 @@ const session = (over: Partial<SessionResult> = {}): SessionResult => ({
   ...over,
 });
 
+// The only profile on the device: nameless, and so not announced on screen.
+const profileProps = { profileId: 'default', profileName: '', showProfile: false };
+
 beforeEach(() => {
   localStorage.clear();
 });
 
 describe('ProgressScreen', () => {
   test('shows empty state when there is no history', () => {
-    render(<ProgressScreen onBack={() => {}} />);
+    render(<ProgressScreen {...profileProps} onBack={() => {}} />);
     expect(screen.getByText(/Joue quelques sessions/i)).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   test('renders heading, chart and trickiest pair from history', () => {
-    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([session()]));
-    render(<ProgressScreen onBack={() => {}} />);
+    localStorage.setItem(storageKeys('default').history, JSON.stringify([session()]));
+    render(<ProgressScreen {...profileProps} onBack={() => {}} />);
     expect(
       screen.getByRole('heading', { name: 'Mes résultats' }),
     ).toBeInTheDocument();
@@ -44,7 +47,7 @@ describe('ProgressScreen', () => {
 
   test('back button calls onBack', () => {
     const onBack = vi.fn();
-    render(<ProgressScreen onBack={onBack} />);
+    render(<ProgressScreen {...profileProps} onBack={onBack} />);
     fireEvent.click(screen.getByRole('button', { name: /retour/i }));
     expect(onBack).toHaveBeenCalledOnce();
   });
@@ -52,9 +55,9 @@ describe('ProgressScreen', () => {
 
 describe('ProgressScreen — training view', () => {
   test('switching to Entraînement reads training history and hides the score chart', () => {
-    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([session()]));
+    localStorage.setItem(storageKeys('default').history, JSON.stringify([session()]));
     localStorage.setItem(
-      STORAGE_KEYS.trainingHistory,
+      storageKeys('default').trainingHistory,
       JSON.stringify([
         session({
           answerMode: 'training',
@@ -66,7 +69,7 @@ describe('ProgressScreen — training view', () => {
         }),
       ]),
     );
-    render(<ProgressScreen onBack={() => {}} />);
+    render(<ProgressScreen {...profileProps} onBack={() => {}} />);
 
     // Test view (default) shows the score chart
     expect(
@@ -84,8 +87,8 @@ describe('ProgressScreen — training view', () => {
   });
 
   test('training view shows its own empty state when there is no training history', () => {
-    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([session()]));
-    render(<ProgressScreen onBack={() => {}} />);
+    localStorage.setItem(storageKeys('default').history, JSON.stringify([session()]));
+    render(<ProgressScreen {...profileProps} onBack={() => {}} />);
     fireEvent.click(screen.getByRole('radio', { name: 'Entraînement' }));
     expect(screen.getByText(/Entraîne-toi pour voir/i)).toBeInTheDocument();
   });

@@ -9,16 +9,31 @@ import './ProgressScreen.css';
 import '../components/ModeToggle.css';
 
 type Props = {
+  profileId: string;
+  /** Empty for the migrated profile, which never got named. */
+  profileName: string;
+  /** False while a single profile exists — there is nothing to disambiguate. */
+  showProfile: boolean;
   onBack: () => void;
 };
 
 type View = 'test' | 'training';
 
-export const ProgressScreen = ({ onBack }: Props) => {
+export const ProgressScreen = ({
+  profileId,
+  profileName,
+  showProfile,
+  onBack,
+}: Props) => {
   const { t } = useI18n();
   const [view, setView] = useState<View>('test');
-  const testHistory = useMemo(() => loadHistory(), []);
-  const trainingHistory = useMemo(() => loadTrainingHistory(), []);
+  // Keyed by profile so switching re-reads instead of showing the last child's
+  // curve under the new name.
+  const testHistory = useMemo(() => loadHistory(profileId), [profileId]);
+  const trainingHistory = useMemo(
+    () => loadTrainingHistory(profileId),
+    [profileId],
+  );
   const history = view === 'test' ? testHistory : trainingHistory;
 
   const points = useMemo(() => sessionScores(history), [history]);
@@ -34,6 +49,12 @@ export const ProgressScreen = ({ onBack }: Props) => {
     <div className="progress">
       <header className="progress__header">
         <h2>{t('progress.title')}</h2>
+        {showProfile && (
+          <p className="progress__profile" aria-label={t('profiles.currentAria')}>
+            <span aria-hidden="true">👤 </span>
+            {profileName === '' ? t('profiles.unnamed') : profileName}
+          </p>
+        )}
         <button
           type="button"
           className="progress__back-btn"

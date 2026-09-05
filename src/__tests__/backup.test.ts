@@ -43,6 +43,7 @@ const meta = {
   appVersion: '0.10.0',
   exportedAt: '2026-09-05T10:11:12.000Z',
   profile: 'default',
+  profileName: '',
 };
 
 const ok = (result: ReturnType<typeof validateBackup>): Backup => {
@@ -305,5 +306,66 @@ describe('published JSON Schema (drift guard)', () => {
     }[]) {
       expect(prop.description ?? '').not.toBe('');
     }
+  });
+});
+
+describe('profileName on the envelope', () => {
+  it('survives a round-trip', () => {
+    const named = createBackup(data, { ...meta, profile: 'p2', profileName: 'Léa' });
+    const back = ok(parseBackup(serializeBackup(named)));
+    expect(back.profile).toBe('p2');
+    expect(back.profileName).toBe('Léa');
+  });
+
+  it('reads as empty when the file predates the field, or carries junk', () => {
+    const before = { ...createBackup(data, meta) } as Record<string, unknown>;
+    delete before.profileName;
+    expect(ok(validateBackup(before)).profileName).toBe('');
+    expect(ok(validateBackup({ ...before, profileName: 42 })).profileName).toBe('');
+  });
+});
+
+describe('backupFileName with a profile name', () => {
+  it('folds the name into the file so two children\'s exports are told apart', () => {
+    expect(backupFileName('2026-09-05T10:11:12.000Z', 'Léa')).toBe(
+      'math-quizz-backup-lea-2026-09-05.json',
+    );
+  });
+
+  it('is unchanged for a profile that never got a name', () => {
+    expect(backupFileName('2026-09-05T10:11:12.000Z', '')).toBe(
+      'math-quizz-backup-2026-09-05.json',
+    );
+  });
+
+  it('keeps the filename usable whatever the name contains', () => {
+    expect(backupFileName('2026-09-05T10:11:12.000Z', 'Jean-Luc / Marie')).toBe(
+      'math-quizz-backup-jean-luc-marie-2026-09-05.json',
+    );
+    // A name that folds away to nothing drops out rather than doubling a hyphen.
+    expect(backupFileName('2026-09-05T10:11:12.000Z', '小明')).toBe(
+      'math-quizz-backup-2026-09-05.json',
+    );
+    expect(backupFileName('', 'Léa')).toBe('math-quizz-backup-lea.json');
+  });
+});
+
+describe('the schema documents the profile fields', () => {
+  const schema = JSON.parse(schemaRaw) as {
+    properties: Record<string, { description?: string; type?: string }>;
+  };
+
+  it('declares profileName next to profile, both as strings', () => {
+    expect(schema.properties.profile.type).toBe('string');
+    expect(schema.properties.profileName.type).toBe('string');
+  });
+
+  it('no longer claims the profile is always "default"', () => {
+    expect(schema.properties.profile.description).not.toMatch(/always 'default'/i);
+  });
+
+  it('stays at formatVersion 1 — profileName is additive', () => {
+    expect(BACKUP_FORMAT_VERSION).toBe(1);
+    expect(BACKUP_SCHEMA_URL).toContain('-v1.schema.json');
   });
 });

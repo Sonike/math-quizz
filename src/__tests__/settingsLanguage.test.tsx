@@ -4,11 +4,22 @@ import { renderWithLanguage } from './renderWithLanguage';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { DEFAULT_SETTINGS } from '../domain/session';
 import { createBackup } from '../domain/backup';
+import type { ProfileRegistry } from '../storage/profileRegistry';
+
+const REGISTRY: ProfileRegistry = {
+  active: 'default',
+  profiles: [{ id: 'default', name: '', createdAt: '' }],
+};
 
 const exportStub = () =>
   createBackup(
     { settings: DEFAULT_SETTINGS, history: [], trainingHistory: [], errors: {} },
-    { appVersion: '0.0.0', exportedAt: '2026-01-01T00:00:00.000Z', profile: 'default' },
+    {
+      appVersion: '0.0.0',
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      profile: 'default',
+      profileName: '',
+    },
   );
 
 describe('SettingsScreen language selector', () => {
@@ -17,6 +28,8 @@ describe('SettingsScreen language selector', () => {
     const onBack = vi.fn();
     renderWithLanguage(
       <SettingsScreen
+        registry={REGISTRY}
+        onRegistryChange={() => {}}
         settings={DEFAULT_SETTINGS}
         onSave={onSave}
         onClearHistory={() => {}}
@@ -34,6 +47,8 @@ describe('SettingsScreen language selector', () => {
   it('renders settings labels in the active language', () => {
     renderWithLanguage(
       <SettingsScreen
+        registry={REGISTRY}
+        onRegistryChange={() => {}}
         settings={{ ...DEFAULT_SETTINGS, language: 'en' }}
         onSave={() => {}}
         onClearHistory={() => {}}
@@ -50,6 +65,8 @@ describe('SettingsScreen language selector', () => {
     const onBack = vi.fn();
     renderWithLanguage(
       <SettingsScreen
+        registry={REGISTRY}
+        onRegistryChange={() => {}}
         settings={DEFAULT_SETTINGS}
         onSave={() => {}}
         onClearHistory={() => {}}
