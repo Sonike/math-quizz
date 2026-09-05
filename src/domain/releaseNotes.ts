@@ -21,6 +21,21 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.11.0',
+    date: '2026-09-05',
+    changes: {
+      fr: [
+        'Dans « Mes résultats », tes erreurs récentes comptent maintenant plus que les anciennes. Une paire que tu as ratée il y a longtemps mais que tu réussis à nouveau redescend vite dans « Paires à revoir » : la liste montre ce qui te pose problème en ce moment.',
+      ],
+      de: [
+        'Unter « Meine Ergebnisse » zählen deine letzten Fehler jetzt mehr als ältere. Ein Paar, das du früher falsch hattest und jetzt wieder kannst, rutscht in « Paare zum Üben » schnell nach unten: Die Liste zeigt, was dir gerade Mühe macht.',
+      ],
+      en: [
+        'In "My results", recent mistakes now count more than old ones. A pair you got wrong long ago but keep getting right now drops quickly down "Pairs to review", so the list shows what is giving you trouble right now.',
+      ],
+    },
+  },
+  {
     version: '0.10.0',
     date: '2026-09-05',
     changes: {

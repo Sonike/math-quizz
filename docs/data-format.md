@@ -45,20 +45,26 @@ a file may omit everything else, and the importer fills in a default. Inside
 | `settings` | `…:settings` | Timer target, question count, selected tables, mode, answer mode, language |
 | `history` | `…:history` | Completed timed tests, oldest first, capped at 50 |
 | `trainingHistory` | `…:training-history` | Completed training sessions, same shape, same cap |
-| `errors` | `…:errors` | Lifetime per-pair counters (`attempts` / `errors` / `timeouts`), never evicted |
+| `errors` | — | **Deprecated.** Lifetime per-pair counters written by versions up to 0.10.0. Accepted on import, never exported |
 
-All four live under the prefix `mathquizz:profile:default:`.
+The live sections live under the prefix `mathquizz:profile:default:`.
 
-**`errors` is not derivable from `history`.** History keeps only the 50 most
-recent sessions; the counters accumulate for the life of the profile and are
-never evicted, so they are the sole record of everything that has aged out. Both
-travel for that reason.
+**Everything the app knows is derived from the two histories.** There is no
+separate statistics store: per-pair figures — the heat-map, "Paires à revoir" —
+are recomputed from `history` (or `trainingHistory`) on every render.
 
-Worth knowing if you process an export: the progress screen currently recomputes
-its heat-map and "trickiest pairs" from `history` alone, so the `errors`
-counters are *not* what is drawn on screen — they are the longer, unbounded
-record sitting behind it. Beyond 50 sessions the two diverge, and `errors` is
-the one that remembers.
+**About `errors`.** Versions up to 0.10.0 also kept a lifetime per-pair
+accumulator at `…:errors`, and exported it. No screen ever read it, and since
+0.11.0 statistics are recency-weighted, which a running total carrying no
+timestamps cannot express — so it is no longer written. The field stays in the
+schema, marked `"deprecated": true`: files in the wild still carry it, and they
+must keep validating against the URL they name. On import it is shape-checked
+and then dropped.
+
+If you are computing your own figures from an export, note that the app weights
+recent sessions more heavily: an attempt `n` sessions back counts
+`0.5 ^ (n / 10)`. History is stored oldest-first, so the last entry is the most
+recent one.
 
 ## Two conventions worth knowing
 

@@ -67,6 +67,8 @@ export const fr = {
   'progress.viewAria': 'type de résultats',
   'progress.viewTest': 'Test',
   'progress.viewTraining': 'Entraînement',
+  'progress.recencyNote':
+    'Tes erreurs récentes comptent plus que les anciennes : une paire que tu réussis à nouveau redescend vite dans la liste.',
   'progress.trainingEmpty': 'Entraîne-toi pour voir tes paires à revoir',
   'chart.aria': 'Score sur les dernières sessions',
   'chart.last': 'dernière',

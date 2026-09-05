@@ -82,6 +82,9 @@ export const ProgressScreen = ({ onBack }: Props) => {
           <section className="progress__panel">
             <h3 className="progress__panel-title">{t('progress.pairsTitle')}</h3>
             <TrickiestPairsList pairs={pairs} />
+            {pairs.length > 0 && (
+              <p className="progress__caption">{t('progress.recencyNote')}</p>
+            )}
           </section>
 
           <section className="progress__panel">

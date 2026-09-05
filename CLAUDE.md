@@ -71,6 +71,28 @@ fails the whole file, because a partial history that looks complete is worse tha
 a refusal), **settings are sanitised** (every setting has a safe default, and
 `selectedTables` must never end up empty — `generateQuestions` throws on empty).
 
+## Statistics are recency-weighted
+
+Per-pair figures come from `domain/stats.ts` → `aggregatePairs(history)`, which
+returns raw and weighted counters together. Keep the two uses apart:
+
+- **raw** (`attempts` / `errors` / `timeouts`) — confidence thresholds and any
+  number shown to the child;
+- **weighted** (`weightedAttempts` / `weightedFailures`, via
+  `weightedErrorRate`) — ranking and colour.
+
+Collapsing them would either flag pairs the child has already fixed or judge a
+pair on one recent lucky answer. Decay is per *session*, never wall-clock: it
+stays deterministic and does not blank the progress screen after a holiday.
+
+`HISTORY_LIMIT` is not arbitrary any more — it is sized to the half-life, and
+`stats.test.ts` asserts `HISTORY_LIMIT >= 5 * RECENCY_HALF_LIFE_SESSIONS`. Raise
+one and you must raise the other.
+
+There is **no stored statistics accumulator**. Versions up to 0.10.0 kept one
+that nothing read; don't reintroduce it, and don't "optimise" the render by
+caching derived stats into localStorage — a running total cannot be decayed.
+
 ## Deploy
 
 Static bundle on **Firebase Hosting** (GCP project `modern-ally-102412`), live at

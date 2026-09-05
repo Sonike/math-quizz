@@ -5,6 +5,50 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.11.0] - 2026-09-05
+
+### Changed
+- Per-pair statistics are now **recency-weighted**. "Paires à revoir" and the
+  table heat-map discount older sessions on an exponential curve with a
+  half-life of `RECENCY_HALF_LIFE_SESSIONS` (10 sessions), so a pair the child
+  has since mastered stops being flagged instead of carrying its old failures
+  forever. Decay is measured in sessions, not wall-clock time: deterministic,
+  testable without mocking a clock, and it never blanks the progress screen
+  after a school holiday.
+- Confidence and ranking now come from different numbers, deliberately: the
+  `minAttempts` threshold and the "3 / 5" counts shown on each row stay **raw**,
+  while ordering and colour use the **weighted** rate. A pair practised three
+  times long ago is still judged as having three attempts; it just ranks low.
+- `domain/stats.ts` is rebuilt around `aggregatePairs`, which folds a history
+  into raw and weighted counters in one pass, plus `recencyWeight` and
+  `weightedErrorRate`. It replaces `aggregateErrors` / `mergeIntoErrors`, and
+  `ErrorStat` / `ErrorStats` move to `domain/backup.ts` as `LegacyErrorStat` /
+  `LegacyErrorStats` — the live domain no longer computes that shape.
+- `HISTORY_LIMIT` gains a reason. It was an arbitrary storage guard (50 sessions
+  is 97 KB, ~2% of a 5 MB quota — it was never buying much); it is now the span
+  over which weighting is non-negligible. A test asserts
+  `HISTORY_LIMIT >= 5 * RECENCY_HALF_LIFE_SESSIONS`, so raising the half-life
+  without raising the cap fails the suite instead of silently truncating.
+- The progress screen states the rule (`progress.recencyNote`, FR/DE/EN) rather
+  than weighting silently.
+
+### Removed
+- The lifetime error accumulator. `recordSession` maintained
+  `mathquizz:profile:default:errors` on every session and **no screen ever read
+  it** — `ProgressScreen` recomputed from `history` throughout. It cannot be
+  decayed either, being a running total with no timestamps, so recency weighting
+  made it definitively redundant. `saveErrors` / `loadErrors` are gone, and the
+  key is removed on `clearAll` and on import so nothing stale is left behind.
+- No format bump was needed: `data.errors` was already optional in v1. Exports
+  simply stop emitting it, files that carry it still validate and still import
+  (the section is shape-checked, then dropped), and the schema now marks it
+  `"deprecated": true`.
+
+### Fixed
+- The import confirmation's "Paires" count came from the error accumulator.
+  It now counts distinct canonical pairs across the imported histories, so it
+  keeps meaning something.
+
 ## [0.10.0] - 2026-09-05
 
 ### Added

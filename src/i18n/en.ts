@@ -69,6 +69,8 @@ export const en: Record<TranslationKey, string> = {
   'progress.viewAria': 'results type',
   'progress.viewTest': 'Test',
   'progress.viewTraining': 'Practice',
+  'progress.recencyNote':
+    'Recent mistakes count more than old ones: a pair you are getting right again drops down the list quickly.',
   'progress.trainingEmpty': 'Practice to see your pairs to review',
   'chart.aria': 'Score over recent sessions',
   'chart.last': 'last',

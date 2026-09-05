@@ -49,7 +49,8 @@
           "items": { "$ref": "#/$defs/sessionResult" }
         },
         "errors": {
-          "description": "Lifetime per-pair counters from 'mathquizz:profile:default:errors', updated by every recorded session and never evicted. NOT derivable from `history`: history keeps only the 50 most recent sessions, so these counters are the sole record of everything before that. Note that the progress screen currently recomputes its heat-map from `history` rather than reading these, so they are not what is drawn on screen today.",
+          "deprecated": true,
+          "description": "DEPRECATED since 0.11.0, and no longer written. Lifetime per-pair counters from 'mathquizz:profile:default:errors', as produced by versions up to 0.10.0. The app now derives every per-pair statistic from the histories and weights recent sessions more heavily, which a running total carrying no timestamps cannot express. A file carrying this section still validates and still imports: it is checked for shape, then dropped.",
           "$ref": "#/$defs/errorStats"
         }
       }

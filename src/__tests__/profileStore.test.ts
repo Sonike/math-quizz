@@ -4,7 +4,6 @@ import {
   saveSettings,
   loadHistory,
   appendSession,
-  loadErrors,
   recordSession,
   loadTrainingHistory,
   recordTrainingSession,
@@ -101,13 +100,13 @@ describe('history', () => {
   });
 });
 
-describe('errors', () => {
-  test('loadErrors returns {} when empty', () => {
-    expect(loadErrors()).toEqual({});
-  });
+const LEGACY_ERRORS_KEY = 'mathquizz:profile:default:errors';
 
-  test('recordSession appends to history AND merges error stats', () => {
-    const session: SessionResult = {
+describe('the abandoned lifetime error counters', () => {
+  const legacy = () => ({ '7x8': { attempts: 9, errors: 3, timeouts: 1 } });
+
+  test('recordSession appends to history and writes nothing else', () => {
+    recordSession({
       ...mkSession(0),
       answers: [
         {
@@ -115,18 +114,22 @@ describe('errors', () => {
           given: 54,
           elapsedMs: 1500,
         },
-        {
-          question: { a: 9, b: 6, op: 'mul', expected: 54 },
-          given: null,
-          elapsedMs: 4000,
-        },
       ],
-    };
-    recordSession(session);
+    });
     expect(loadHistory()).toHaveLength(1);
-    const errors = loadErrors();
-    expect(errors['7x8']).toEqual({ attempts: 1, errors: 1, timeouts: 0 });
-    expect(errors['6x9']).toEqual({ attempts: 1, errors: 0, timeouts: 1 });
+    expect(localStorage.getItem(LEGACY_ERRORS_KEY)).toBeNull();
+  });
+
+  test('clearAll removes a key left behind by an older version', () => {
+    localStorage.setItem(LEGACY_ERRORS_KEY, JSON.stringify(legacy()));
+    clearAll();
+    expect(localStorage.getItem(LEGACY_ERRORS_KEY)).toBeNull();
+  });
+
+  test('importProfile drops it too, so nothing stale outlives a restore', () => {
+    localStorage.setItem(LEGACY_ERRORS_KEY, JSON.stringify(legacy()));
+    importProfile(exportProfile('0.11.0'));
+    expect(localStorage.getItem(LEGACY_ERRORS_KEY)).toBeNull();
   });
 });
 
@@ -136,7 +139,6 @@ describe('clearAll', () => {
     appendSession(mkSession(1));
     clearAll();
     expect(loadHistory()).toEqual([]);
-    expect(loadErrors()).toEqual({});
     expect(loadSettings().questionCount).toBe(11);
   });
 });
@@ -192,7 +194,15 @@ describe('export / import', () => {
     expect(backup.data.settings.questionCount).toBe(11);
     expect(backup.data.history).toHaveLength(1);
     expect(backup.data.trainingHistory).toHaveLength(1);
-    expect(backup.data.errors['7x8']).toEqual({ attempts: 1, errors: 0, timeouts: 0 });
+  });
+
+  it('exportProfile never emits the deprecated errors section', () => {
+    localStorage.setItem(
+      LEGACY_ERRORS_KEY,
+      JSON.stringify({ '7x8': { attempts: 9, errors: 3, timeouts: 1 } }),
+    );
+    recordSession(mkSession(1));
+    expect(exportProfile('0.11.0').data).not.toHaveProperty('errors');
   });
 
   it('exportProfile on a fresh profile yields defaults and empty collections', () => {
@@ -200,7 +210,6 @@ describe('export / import', () => {
     expect(backup.data.settings).toEqual(DEFAULT_SETTINGS);
     expect(backup.data.history).toEqual([]);
     expect(backup.data.trainingHistory).toEqual([]);
-    expect(backup.data.errors).toEqual({});
   });
 
   it('importProfile replaces every section, it does not merge', () => {
@@ -212,14 +221,12 @@ describe('export / import', () => {
     incoming.data.settings = { ...DEFAULT_SETTINGS, questionCount: 33 };
     incoming.data.history = [mkSession(9)];
     incoming.data.trainingHistory = [];
-    incoming.data.errors = { '2x3': { attempts: 5, errors: 2, timeouts: 1 } };
 
     importProfile(incoming);
 
     expect(loadSettings().questionCount).toBe(33);
     expect(loadHistory()).toEqual([mkSession(9)]);
     expect(loadTrainingHistory()).toEqual([]);
-    expect(loadErrors()).toEqual({ '2x3': { attempts: 5, errors: 2, timeouts: 1 } });
   });
 
   it('round-trips: export, wipe, import, and the profile is back', () => {
@@ -233,7 +240,6 @@ describe('export / import', () => {
 
     expect(loadSettings().questionCount).toBe(11);
     expect(loadHistory()).toEqual([mkSession(1)]);
-    expect(loadErrors()['7x8']).toEqual({ attempts: 1, errors: 0, timeouts: 0 });
   });
 
   it('trims an oversized incoming history to HISTORY_LIMIT, keeping the newest', () => {

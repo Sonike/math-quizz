@@ -101,7 +101,6 @@ describe('validateBackup — envelope', () => {
     const backup = ok(validateBackup({ format: BACKUP_FORMAT, formatVersion: 1, data: {} }));
     expect(backup.data.history).toEqual([]);
     expect(backup.data.trainingHistory).toEqual([]);
-    expect(backup.data.errors).toEqual({});
     expect(backup.data.settings).toEqual(DEFAULT_SETTINGS);
     expect(backup.exportedAt).toBe('');
     expect(backup.appVersion).toBe('');
@@ -175,6 +174,24 @@ describe('validateBackup — sessions', () => {
     ['given is neither a number nor null', [{ ...session(1), answers: [{ ...session(1).answers[0], given: '56' }] }]],
   ])('rejects the file when %s', (_label, history) => {
     expect(withHistory(history)).toEqual({ ok: false, problem: 'corrupt' });
+  });
+});
+
+describe('validateBackup — the deprecated errors section', () => {
+  it('still accepts a v1 file that carries it, so old backups keep working', () => {
+    const backup = ok(
+      validateBackup({
+        format: BACKUP_FORMAT,
+        formatVersion: 1,
+        data: { errors: { '7x8': { attempts: 3, errors: 1, timeouts: 0 } } },
+      }),
+    );
+    expect(backup.data.errors).toEqual({ '7x8': { attempts: 3, errors: 1, timeouts: 0 } });
+  });
+
+  it('leaves it absent when the file omits it', () => {
+    const backup = ok(validateBackup({ format: BACKUP_FORMAT, formatVersion: 1, data: {} }));
+    expect(backup.data).not.toHaveProperty('errors');
   });
 });
 
@@ -271,6 +288,12 @@ describe('published JSON Schema (drift guard)', () => {
 
   it('requires exactly what validateBackup requires', () => {
     expect(schema.required).toEqual(['format', 'formatVersion', 'data']);
+  });
+
+  it('marks the errors section deprecated rather than deleting it', () => {
+    // v1 files in the wild still carry it; removing it from the schema would
+    // make them fail validation against the URL they name.
+    expect(schema.properties.data.properties.errors.deprecated).toBe(true);
   });
 
   it('documents every top-level and data field', () => {

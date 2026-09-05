@@ -39,7 +39,7 @@ opening a tab each time. Low cost (< 1h), big UX gain.
 
 ## 2. Adaptive weighting of draws
 
-**Status**: 📋 Planned — blocked on history density (see prerequisite)
+**Status**: 📋 Planned — the weighting half is now built (see item 11)
 
 **Why**: today every pair `(a, b)` has the same probability of appearing.
 The child replays easy pairs as often as the ones that give them trouble.
@@ -47,9 +47,11 @@ The child replays easy pairs as often as the ones that give them trouble.
 **What's needed**:
 
 - in `domain/question.ts`, `generateQuestions(settings)` accepts an
-  optional `errorStats` parameter;
-- weight each pair in the pool by `1 + α × errorRate(canonicalKey)`
-  where `errorRate = (errors + timeouts) / max(attempts, 1)`;
+  optional stats parameter — `aggregatePairs(history)` from `domain/stats.ts`
+  already produces exactly the shape this needs;
+- weight each pair in the pool by `1 + α × weightedErrorRate(counters)`, which
+  v0.11.0 built for the progress screen. The recency curve is shared, so the
+  draw biases toward what is shaky *now* rather than what was shaky a year ago;
 - weighted draw (for example via reservoir sampling) instead of
   Fisher-Yates;
 - α adjustable from Settings (for example 0/2/5 = never / moderate / strong).
@@ -257,14 +259,10 @@ story for an app that deliberately has no backend.
 
 **Design notes worth keeping**:
 
-- `errors` travels separately from `history` — history is capped at 50 sessions
-  while the counters accumulate for the life of the profile, so they cannot be
-  recomputed from the sessions that survive. Noticed while building this: the
-  stored counters are currently **write-only**. `recordSession` maintains them,
-  but `ProgressScreen` recomputes its heat-map from the capped `history`
-  instead, so past 50 sessions the screen silently forgets what the counters
-  still remember. Item 2 (adaptive weighting) is their intended consumer;
-  pointing the heat-map at them is a smaller, separate fix;
+- the export carries the two histories and nothing else. A lifetime error
+  accumulator used to travel with them until v0.11.0 (item 11) removed it;
+  `data.errors` survives in the schema marked deprecated, so files already in
+  the wild keep validating;
 - structure is rejected, settings are sanitised. See `domain/backup.ts` for why
   the two halves are treated differently;
 - import is a restore, not a merge (item 10).
@@ -296,6 +294,44 @@ instead.
 
 **When**: once a real second device is in play. Until then, replace is the
 honest behaviour and says so in the confirmation dialog.
+
+---
+
+## 11. Recency-weighted statistics
+
+**Status**: ✅ Done — shipped in v0.11.0. `domain/stats.ts` →
+`aggregatePairs(history)` folds a history into raw and weighted counters in one
+pass; an attempt `n` sessions back counts `0.5 ^ (n / RECENCY_HALF_LIFE_SESSIONS)`
+with a half-life of 10.
+
+**Why**: found while building item 9. The app maintained a lifetime per-pair
+accumulator that **no screen ever read** — `ProgressScreen` recomputed from the
+capped `history` throughout. Two divergent statistics, no stated source of
+truth, one of them dead.
+
+The interesting part was that the dead one was arguably the *wrong* one to
+revive: lifetime counters never forget, so a pair the child mastered months ago
+keeps its old failures forever and crowds out what is actually shaky. Weighting
+by recency resolves both problems at once and makes the accumulator redundant —
+a running total with no timestamps cannot be decayed.
+
+**Decisions worth not re-litigating**:
+
+- decay is per **session**, not wall-clock. Elapsed-time decay is pedagogically
+  truer, but after a school holiday every weight collapses and the heat-map goes
+  grey — statistically correct, reads as broken. Session decay is also
+  deterministic and testable without mocking a clock;
+- **confidence from raw counts, ranking from weighted rate.** The `minAttempts`
+  filter and the "3 / 5" on each row stay raw; only ordering and colour are
+  weighted. Collapsing the two would drop a pair practised three times long ago
+  below the confidence threshold entirely;
+- `HISTORY_LIMIT` is now sized to the half-life rather than to storage. 50
+  sessions is 97 KB, ~2% of a 5 MB quota — it was never a real storage guard.
+  At half-life 10 the newest 50 carry >96% of all weight; a test asserts
+  `HISTORY_LIMIT >= 5 * RECENCY_HALF_LIFE_SESSIONS`.
+
+**Follow-up**: item 2 (adaptive weighting of draws) now only needs the draw
+side — the statistic it wants already exists.
 
 ---
 

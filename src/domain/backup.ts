@@ -23,7 +23,6 @@ import { DEFAULT_SETTINGS, SETTINGS_BOUNDS } from './session';
 import type { AnswerMode, AnswerRecord, SessionResult, Settings } from './session';
 import type { Mode, Operator, Question } from './question';
 import { MULTIPLICANDS } from './tables';
-import type { ErrorStat, ErrorStats } from './stats';
 import { LANGUAGES } from '../i18n';
 import type { Language } from '../i18n/types';
 
@@ -37,12 +36,28 @@ export const BACKUP_FORMAT_VERSION = 1;
 export const BACKUP_SCHEMA_URL =
   'https://math-quizz.mrpia.ch/schemas/math-quizz-backup-v1.schema.json';
 
+/**
+ * Lifetime per-pair counters, as written by versions up to 0.10.0.
+ * Deprecated: the app derives every statistic from the histories, weighting
+ * recent sessions more heavily, which a timestamp-less running total cannot
+ * express. Still validated on import (a v1 file may carry it) and then
+ * dropped; never written.
+ */
+export type LegacyErrorStat = {
+  attempts: number;
+  errors: number;
+  timeouts: number;
+};
+
+export type LegacyErrorStats = Record<string, LegacyErrorStat>;
+
 /** One profile's payload — one field per localStorage key the app owns. */
 export type BackupData = {
   settings: Settings;
   history: SessionResult[];
   trainingHistory: SessionResult[];
-  errors: ErrorStats;
+  /** @deprecated accepted for v1 files, ignored on import, never exported. */
+  errors?: LegacyErrorStats;
 };
 
 export type Backup = {
@@ -130,7 +145,7 @@ const isSessionResult = (value: unknown): value is SessionResult =>
   Array.isArray(value.answers) &&
   value.answers.every(isAnswerRecord);
 
-const isErrorStat = (value: unknown): value is ErrorStat =>
+const isErrorStat = (value: unknown): value is LegacyErrorStat =>
   isRecord(value) &&
   isNumber(value.attempts) &&
   value.attempts >= 0 &&
@@ -146,13 +161,16 @@ const readSessions = (value: unknown): SessionResult[] | null => {
   return value.every(isSessionResult) ? (value as SessionResult[]) : null;
 };
 
-const readErrors = (value: unknown): ErrorStats | null => {
-  if (value === undefined) return {};
+/** Tri-state: `undefined` = absent (fine), `null` = present but malformed. */
+const readLegacyErrors = (
+  value: unknown,
+): LegacyErrorStats | undefined | null => {
+  if (value === undefined) return undefined;
   if (!isRecord(value)) return null;
   for (const [key, stat] of Object.entries(value)) {
     if (!PAIR_KEY.test(key) || !isErrorStat(stat)) return null;
   }
-  return value as ErrorStats;
+  return value as LegacyErrorStats;
 };
 
 const clamp = (value: number, { min, max }: { min: number; max: number }) =>
@@ -237,7 +255,7 @@ export const validateBackup = (value: unknown): BackupParseResult => {
   const { data } = value;
   const history = readSessions(data.history);
   const trainingHistory = readSessions(data.trainingHistory);
-  const errors = readErrors(data.errors);
+  const errors = readLegacyErrors(data.errors);
   if (history === null || trainingHistory === null || errors === null) {
     return fail('corrupt');
   }
@@ -256,7 +274,7 @@ export const validateBackup = (value: unknown): BackupParseResult => {
         settings: sanitizeSettings(data.settings),
         history,
         trainingHistory,
-        errors,
+        ...(errors === undefined ? {} : { errors }),
       },
     },
   };
@@ -273,11 +291,21 @@ export const parseBackup = (text: string): BackupParseResult => {
 };
 
 /** Counts shown in the import confirmation, before anything is overwritten. */
-export const summarizeBackup = (backup: Backup) => ({
-  sessions: backup.data.history.length,
-  trainingSessions: backup.data.trainingHistory.length,
-  pairs: Object.keys(backup.data.errors).length,
-});
+export const summarizeBackup = (backup: Backup) => {
+  const pairs = new Set<string>();
+  for (const session of [...backup.data.history, ...backup.data.trainingHistory]) {
+    for (const { question } of session.answers) {
+      const lo = Math.min(question.a, question.b);
+      const hi = Math.max(question.a, question.b);
+      pairs.add(`${lo}x${hi}`);
+    }
+  }
+  return {
+    sessions: backup.data.history.length,
+    trainingSessions: backup.data.trainingHistory.length,
+    pairs: pairs.size,
+  };
+};
 
 export const backupFileName = (exportedAt: string): string => {
   const day = exportedAt.slice(0, 10);

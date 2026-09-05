@@ -151,6 +151,42 @@ describe('trickiestPairs', () => {
   });
 });
 
+describe('trickiestPairs — recency', () => {
+  const wrong = (a: number, b: number) => mkSession([rec(mkQ(a, b), 0, 1000)]);
+  const right = (a: number, b: number) => mkSession([rec(mkQ(a, b), a * b, 1000)]);
+  const idle = () => mkSession([]);
+
+  test('a pair the child has since fixed ranks below one failing now', () => {
+    // Identical raw records: 3 misses and 3 hits each, opposite order in time.
+    const history = [
+      wrong(2, 3), wrong(2, 3), wrong(2, 3),
+      right(7, 8), right(7, 8), right(7, 8),
+      ...Array.from({ length: 20 }, idle),
+      right(2, 3), right(2, 3), right(2, 3),
+      wrong(7, 8), wrong(7, 8), wrong(7, 8),
+    ];
+    const top = trickiestPairs(history);
+
+    // Raw counts are identical, so unweighted ranking could not separate these.
+    expect(top.map((p) => `${p.a}x${p.b}`)).toEqual(['7x8', '2x3']);
+    expect(top[0]).toMatchObject({ attempts: 6, errors: 3 });
+    expect(top[1]).toMatchObject({ attempts: 6, errors: 3 });
+    expect(top[0].errorRate).toBeGreaterThan(top[1].errorRate * 4);
+  });
+
+  test('the displayed counts stay raw even though the ranking is weighted', () => {
+    const history = [wrong(3, 4), ...Array.from({ length: 30 }, idle), right(3, 4), right(3, 4)];
+    const [pair] = trickiestPairs(history, { minAttempts: 3 });
+    // 1 miss out of 3 raw, but the miss is 32 sessions old.
+    expect(pair).toMatchObject({ attempts: 3, errors: 1 });
+    expect(pair.errorRate).toBeLessThan(1 / 3);
+  });
+
+  test('an all-correct pair is still excluded, however recent', () => {
+    expect(trickiestPairs([right(5, 5), right(5, 5), right(5, 5)])).toHaveLength(0);
+  });
+});
+
 describe('errorGrid', () => {
   const history = [
     mkSession([

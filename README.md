@@ -136,10 +136,19 @@ migration.
 | `…:settings` | `Settings` (timer duration, question count, selected tables, mode, answer mode, language) |
 | `…:history` | `SessionResult[]` capped at 50 |
 | `…:training-history` | `SessionResult[]` from training mode, capped at 50 |
-| `…:errors` | `ErrorStats` keyed by `${min(a,b)}x${max(a,b)}` |
 
-Use the in-app **Settings → Effacer l'historique** button to reset history
-and error stats; the user-facing `Settings` object is preserved.
+Every per-pair statistic — "Paires à revoir", the table heat-map — is recomputed
+from the histories on render; there is no separate statistics store. Sessions
+are weighted by recency, an attempt `n` sessions back counting `0.5 ^ (n / 10)`
+(`RECENCY_HALF_LIFE_SESSIONS` in `src/domain/stats.ts`). The 50-session cap is
+sized to that half-life: past ~5 half-lives the remaining weight is negligible,
+and a test asserts `HISTORY_LIMIT >= 5 * RECENCY_HALF_LIFE_SESSIONS`.
+
+> Versions up to 0.10.0 also kept `…:errors`, a lifetime accumulator no screen
+> ever read. It is no longer written; see `docs/data-format.md`.
+
+Use the in-app **Settings → Effacer l'historique** button to reset the
+histories; the user-facing `Settings` object is preserved.
 
 ## Export / import
 
