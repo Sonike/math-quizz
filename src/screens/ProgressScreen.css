@@ -236,3 +236,20 @@
     border: 1px solid var(--color-chip-border);
   }
 }
+
+/* Whose results these are. Only rendered when more than one profile exists —
+   see ProfileSwitcher for why a lone profile stays invisible. */
+.progress__profile {
+  margin: 0;
+  margin-inline-start: auto;
+  margin-inline-end: 0.6rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--color-chip-bg);
+  color: var(--color-fg-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

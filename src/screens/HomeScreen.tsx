@@ -2,12 +2,17 @@ import { TableSelector } from '../components/TableSelector';
 import { ModeToggle } from '../components/ModeToggle';
 import { AnswerModeToggle } from '../components/AnswerModeToggle';
 import { LanguageToggle } from '../components/LanguageToggle';
+import { ProfileSwitcher } from '../components/ProfileSwitcher';
+import type { ProfileEntry } from '../storage/profileRegistry';
 import type { Settings } from '../domain/session';
 import { useI18n } from '../i18n/I18nContext';
 import './HomeScreen.css';
 
 type Props = {
   settings: Settings;
+  profiles: ProfileEntry[];
+  activeProfileId: string;
+  onSwitchProfile: (id: string) => void;
   onChange: (next: Settings) => void;
   onStart: () => void;
   onOpenSettings: () => void;
@@ -17,6 +22,9 @@ type Props = {
 
 export const HomeScreen = ({
   settings,
+  profiles,
+  activeProfileId,
+  onSwitchProfile,
   onChange,
   onStart,
   onOpenSettings,
@@ -62,6 +70,11 @@ export const HomeScreen = ({
           </button>
         </div>
       </header>
+      <ProfileSwitcher
+        profiles={profiles}
+        activeId={activeProfileId}
+        onSwitch={onSwitchProfile}
+      />
       <LanguageToggle
         value={settings.language}
         onChange={(language) => onChange({ ...settings, language })}

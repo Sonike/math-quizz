@@ -127,15 +127,20 @@ npx -y sharp-cli --density 576 -i public/icon-maskable.svg -o public/apple-touch
 
 ## Storage layout
 
-All keys are namespaced under `mathquizz:profile:default:`, so a future
-multi-profile feature can swap `default` for any profile id without a
-migration.
+One key lists the people on this device; everything else is namespaced per
+profile under `mathquizz:profile:<id>:`.
 
 | Key | Type |
 |---|---|
+| `mathquizz:profiles` | `{ active, profiles: [{ id, name, createdAt }] }` — who exists, who is playing |
 | `…:settings` | `Settings` (timer duration, question count, selected tables, mode, answer mode, language) |
 | `…:history` | `SessionResult[]` capped at 50 |
 | `…:training-history` | `SessionResult[]` from training mode, capped at 50 |
+
+The profile that predates the feature keeps the id `default`, which is the id
+its keys already used, so the migration moves nothing. A profile is a name and a
+storage prefix, **not an identity**: no password, no PIN, no recovery — whoever
+holds the device can switch to any profile on it.
 
 Every per-pair statistic — "Paires à revoir", the table heat-map — is recomputed
 from the histories on render; there is no separate statistics store. Sessions
@@ -152,10 +157,12 @@ histories; the user-facing `Settings` object is preserved.
 
 ## Export / import
 
-**Settings → Tes données** writes all four keys to one JSON file and reads them
-back — the only backup an app with no backend can offer, and the way to move a
-history between devices. Import replaces the profile (it does not merge) behind
-a confirmation dialog.
+**Settings → Tes données** writes one profile to one JSON file and reads it back
+— the only backup an app with no backend can offer, and the way to move a
+history between devices. Import replaces the destination profile (it does not
+merge) behind a confirmation dialog that asks *which* profile to overwrite. The
+registry is not part of the file, so importing never creates, renames or removes
+a profile.
 
 The file format is a published contract, not an internal detail:
 
@@ -185,6 +192,7 @@ The file format is a published contract, not an internal detail:
 
 ## What's next
 
-See [`docs/roadmap.md`](docs/roadmap.md) for the backlog. Next up: multiple
-named local profiles, so siblings sharing a tablet stop mixing their histories
-— still with no accounts and no credentials.
+See [`docs/roadmap.md`](docs/roadmap.md) for the backlog. Multiple named local
+profiles shipped in 0.12.0; the open items are adaptive weighting of the draw
+(item 2), fill-in-the-blank division (item 5), end-of-session sounds (item 6),
+voice mode (item 8) and merging on import (item 10).

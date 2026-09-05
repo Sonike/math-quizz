@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, fireEvent } from '@testing-library/react';
 import { App } from '../App';
-import { STORAGE_KEYS, loadHistory } from '../storage/profileStore';
+import { storageKeys, loadHistory } from '../storage/profileStore';
 
 beforeEach(() => {
   vi.useFakeTimers({
@@ -9,7 +9,7 @@ beforeEach(() => {
   });
   vi.spyOn(Math, 'random').mockReturnValue(0);
   localStorage.setItem(
-    STORAGE_KEYS.settings,
+    storageKeys('default').settings,
     JSON.stringify({
       durationPerQuestionMs: 4000,
       questionCount: 2,
@@ -41,11 +41,11 @@ describe('App — pen-and-paper flow', () => {
     advance(4000); // question 2 → results
 
     expect(screen.getByText('Bilan')).toBeInTheDocument();
-    expect(loadHistory()).toHaveLength(0);
+    expect(loadHistory('default')).toHaveLength(0);
 
     fireEvent.click(screen.getByRole('button', { name: /Enregistrer/ }));
 
-    const history = loadHistory();
+    const history = loadHistory('default');
     expect(history).toHaveLength(1);
     expect(history[0].answerMode).toBe('paper');
     expect(history[0].answers).toHaveLength(2);

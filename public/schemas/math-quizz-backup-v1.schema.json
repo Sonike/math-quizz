@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://math-quizz.mrpia.ch/schemas/math-quizz-backup-v1.schema.json",
   "title": "Math Quizz backup, format version 1",
-  "description": "A full copy of one Math Quizz profile as exported from Settings → Tes données. Math Quizz is a fully client-side app: this file is the only way its data ever leaves the browser. Everything here is written and read locally; there is no server and no account. Only `format`, `formatVersion` and `data` are required — a third party generating a file may omit any other field, and the app will fill in a sensible default. Any property present must have the type declared here: the importer rejects the whole file on a type error rather than silently dropping records.",
+  "description": "A full copy of ONE Math Quizz profile as exported from Settings → Tes données. Since 0.12.0 a device can hold several named profiles (siblings sharing a tablet); a backup covers exactly one of them and carries no list of the others, so importing a file never creates, renames or removes a profile — it overwrites a destination the user picked. Math Quizz is a fully client-side app: this file is the only way its data ever leaves the browser. Everything here is written and read locally; there is no server and no account. Only `format`, `formatVersion` and `data` are required — a third party generating a file may omit any other field, and the app will fill in a sensible default. Any property present must have the type declared here: the importer rejects the whole file on a type error rather than silently dropping records.",
   "type": "object",
   "required": ["format", "formatVersion", "data"],
   "properties": {
@@ -27,7 +27,11 @@
       "type": "string"
     },
     "profile": {
-      "description": "Name of the profile the data belongs to. Always 'default' today: the app stores one profile per browser, under the localStorage prefix 'mathquizz:profile:default:'. The field exists so a future multi-profile release can tell exports apart; the current importer ignores it and always writes into the default profile.",
+      "description": "Id of the profile the data belongs to — the segment in its localStorage prefix, 'mathquizz:profile:<id>:'. The profile that predates multiple profiles keeps the id 'default'; ones created since carry an opaque id. Informational only: the importer writes into the destination the user chose, never into the profile this names, because an id minted on another device may mean someone else here, or nobody.",
+      "type": "string"
+    },
+    "profileName": {
+      "description": "Display name of that profile ('Léa'), or empty when it had none — the profile carried over from before 0.12.0 was never named. Informational: the app shows it in the import confirmation so the reader can tell whose file this is, and folds it into the suggested filename. Never used to pick or create a destination profile.",
       "type": "string"
     },
     "data": {
@@ -35,22 +39,22 @@
       "type": "object",
       "properties": {
         "settings": {
-          "description": "The child's preferences, from 'mathquizz:profile:default:settings'. Unlike the rest of the file, settings are sanitised rather than rejected: an out-of-range number is clamped and an unknown enum value falls back to the app default, because every setting has a safe default.",
+          "description": "The child's preferences, from 'mathquizz:profile:<id>:settings'. Unlike the rest of the file, settings are sanitised rather than rejected: an out-of-range number is clamped and an unknown enum value falls back to the app default, because every setting has a safe default.",
           "$ref": "#/$defs/settings"
         },
         "history": {
-          "description": "Completed timed tests, oldest first, from 'mathquizz:profile:default:history'. The app keeps at most the 50 most recent; a longer array imports fine but is trimmed to the newest 50.",
+          "description": "Completed timed tests, oldest first, from 'mathquizz:profile:<id>:history'. The app keeps at most the 50 most recent; a longer array imports fine but is trimmed to the newest 50.",
           "type": "array",
           "items": { "$ref": "#/$defs/sessionResult" }
         },
         "trainingHistory": {
-          "description": "Completed training sessions (the mode that corrects each answer immediately), oldest first, from 'mathquizz:profile:default:training-history'. Same shape and same 50-entry cap as `history`; kept separate so training practice does not distort test scores.",
+          "description": "Completed training sessions (the mode that corrects each answer immediately), oldest first, from 'mathquizz:profile:<id>:training-history'. Same shape and same 50-entry cap as `history`; kept separate so training practice does not distort test scores.",
           "type": "array",
           "items": { "$ref": "#/$defs/sessionResult" }
         },
         "errors": {
           "deprecated": true,
-          "description": "DEPRECATED since 0.11.0, and no longer written. Lifetime per-pair counters from 'mathquizz:profile:default:errors', as produced by versions up to 0.10.0. The app now derives every per-pair statistic from the histories and weights recent sessions more heavily, which a running total carrying no timestamps cannot express. A file carrying this section still validates and still imports: it is checked for shape, then dropped.",
+          "description": "DEPRECATED since 0.11.0, and no longer written. Lifetime per-pair counters from 'mathquizz:profile:<id>:errors', as produced by versions up to 0.10.0. The app now derives every per-pair statistic from the histories and weights recent sessions more heavily, which a running total carrying no timestamps cannot express. A file carrying this section still validates and still imports: it is checked for shape, then dropped.",
           "$ref": "#/$defs/errorStats"
         }
       }

@@ -14,16 +14,22 @@ import { downloadTextFile, readTextFile } from '../storage/fileTransfer';
 import { useI18n } from '../i18n/I18nContext';
 import type { TranslationKey } from '../i18n/types';
 import { LanguageToggle } from '../components/LanguageToggle';
+import { ProfileManager } from '../components/ProfileManager';
+import { findProfile, profileLabel } from '../storage/profileRegistry';
+import type { ProfileRegistry } from '../storage/profileRegistry';
 import './SettingsScreen.css';
 
 type Props = {
   settings: Settings;
+  /** Who exists on this device, and who is active. Edited by ProfileManager. */
+  registry: ProfileRegistry;
+  onRegistryChange: (next: ProfileRegistry) => void;
   onSave: (next: Settings) => void;
   onClearHistory: () => void;
-  /** Snapshot of the whole profile, ready to be written to a file. */
-  onExport: () => Backup;
-  /** Overwrites the profile. May throw if the browser refuses the write. */
-  onImport: (backup: Backup) => void;
+  /** Snapshot of one profile, ready to be written to a file. */
+  onExport: (profileId: string, profileName: string) => Backup;
+  /** Overwrites the named profile. May throw if the browser refuses the write. */
+  onImport: (profileId: string, backup: Backup) => void;
   onBack: () => void;
 };
 
@@ -44,6 +50,8 @@ const SECONDS_MAX = SETTINGS_BOUNDS.durationPerQuestionMs.max / 1000;
 
 export const SettingsScreen = ({
   settings,
+  registry,
+  onRegistryChange,
   onSave,
   onClearHistory,
   onExport,
@@ -55,8 +63,15 @@ export const SettingsScreen = ({
   const [partial, setPartial] = useState(settings.partialCreditFactor);
   const [confirming, setConfirming] = useState(false);
   const [pendingImport, setPendingImport] = useState<Backup | null>(null);
+  // Where a picked file will land. Defaults to the profile in use; the picker
+  // below only appears once there is somewhere else it could go.
+  const [importTarget, setImportTarget] = useState(registry.active);
   const [notice, setNotice] = useState<Notice | null>(null);
   const { t } = useI18n();
+
+  const unnamed = t('profiles.unnamed');
+  const nameOf = (profileId: string) =>
+    profileLabel(findProfile(registry, profileId), unnamed);
 
   const [formatBefore, formatAfter] = t('settings.formatDoc').split('{link}');
 
@@ -78,12 +93,17 @@ export const SettingsScreen = ({
     onBack();
   };
 
-  const handleExport = () => {
-    const backup = onExport();
-    downloadTextFile(backupFileName(backup.exportedAt), serializeBackup(backup));
+  const exportOne = (profileId: string) => {
+    const backup = onExport(profileId, findProfile(registry, profileId)?.name ?? '');
+    downloadTextFile(
+      backupFileName(backup.exportedAt, backup.profileName),
+      serializeBackup(backup),
+    );
     setPendingImport(null);
     setNotice({ kind: 'info', key: 'settings.exportDone' });
   };
+
+  const handleExport = () => exportOne(registry.active);
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -99,13 +119,14 @@ export const SettingsScreen = ({
     }
     // Valid, but nothing is written until the confirmation below.
     setNotice(null);
+    setImportTarget(registry.active);
     setPendingImport(result.backup);
   };
 
   const confirmImport = () => {
     if (!pendingImport) return;
     try {
-      onImport(pendingImport);
+      onImport(importTarget, pendingImport);
     } catch {
       setPendingImport(null);
       setNotice({ kind: 'error', key: 'settings.importErrorStorage' });
@@ -114,11 +135,15 @@ export const SettingsScreen = ({
     // The three inputs above are seeded from props on first render only, so an
     // import has to refresh them by hand. Without this they keep showing the
     // pre-import values, and the next "Enregistrer" writes those stale numbers
-    // back over what was just imported.
-    const imported = pendingImport.data.settings;
-    setSeconds(imported.durationPerQuestionMs / 1000);
-    setCount(imported.questionCount);
-    setPartial(imported.partialCreditFactor);
+    // back over what was just imported. Only when the file landed in the
+    // profile being edited, though — importing into another one must leave
+    // this form exactly as it was.
+    if (importTarget === registry.active) {
+      const imported = pendingImport.data.settings;
+      setSeconds(imported.durationPerQuestionMs / 1000);
+      setCount(imported.questionCount);
+      setPartial(imported.partialCreditFactor);
+    }
     setPendingImport(null);
     setNotice({ kind: 'info', key: 'settings.importDone' });
   };
@@ -195,6 +220,14 @@ export const SettingsScreen = ({
 
       <hr className="settings__divider" />
 
+      <ProfileManager
+        registry={registry}
+        onChange={onRegistryChange}
+        onExportProfile={exportOne}
+      />
+
+      <hr className="settings__divider" />
+
       <section className="settings__section">
         <h3 className="settings__section-title">{t('settings.dataTitle')}</h3>
         <p className="settings__hint">{t('settings.dataHint')}</p>
@@ -233,7 +266,29 @@ export const SettingsScreen = ({
                 pairs: summary.pairs,
               })}
             </p>
-            <p className="settings__hint">{t('settings.importWarning')}</p>
+            {pendingImport.profileName !== '' && (
+              <p className="settings__hint">
+                {t('settings.importSource', { name: pendingImport.profileName })}
+              </p>
+            )}
+            {registry.profiles.length > 1 && (
+              <label className="settings__field">
+                <span className="settings__label">{t('settings.importTarget')}</span>
+                <select
+                  value={importTarget}
+                  onChange={(event) => setImportTarget(event.target.value)}
+                >
+                  {registry.profiles.map((profile) => (
+                    <option key={profile.id} value={profile.id}>
+                      {profileLabel(profile, unnamed)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <p className="settings__hint">
+              {t('settings.importWarning', { name: nameOf(importTarget) })}
+            </p>
             <div className="settings__confirm-row">
               <button type="button" className="settings__danger" onClick={confirmImport}>
                 {t('settings.importYes')}

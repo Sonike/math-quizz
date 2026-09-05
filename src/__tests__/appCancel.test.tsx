@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { App } from '../App';
-import { STORAGE_KEYS, loadHistory } from '../storage/profileStore';
+import { storageKeys, loadHistory } from '../storage/profileStore';
 
 beforeEach(() => {
   vi.useFakeTimers({
@@ -9,7 +9,7 @@ beforeEach(() => {
   });
   vi.spyOn(Math, 'random').mockReturnValue(0);
   localStorage.setItem(
-    STORAGE_KEYS.settings,
+    storageKeys('default').settings,
     JSON.stringify({
       durationPerQuestionMs: 4000,
       questionCount: 5,
@@ -38,6 +38,6 @@ describe('App — cancelling a session', () => {
 
     // Back on the home screen, nothing persisted.
     expect(screen.getByRole('button', { name: /Lancer/ })).toBeInTheDocument();
-    expect(loadHistory()).toHaveLength(0);
+    expect(loadHistory('default')).toHaveLength(0);
   });
 });

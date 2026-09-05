@@ -6,9 +6,17 @@ import { DEFAULT_SETTINGS } from '../domain/session';
 import { InfoScreen } from '../screens/InfoScreen';
 import { releaseNotes } from '../domain/releaseNotes';
 import { ErrorHeatmap } from '../components/ErrorHeatmap';
+import type { ProfileEntry } from '../storage/profileRegistry';
+
+// One nameless profile: the switcher renders nothing, so only the language
+// of the home screen itself is under test here.
+const PROFILES: ProfileEntry[] = [{ id: 'default', name: '', createdAt: '' }];
 
 const homeProps = {
   settings: DEFAULT_SETTINGS,
+  profiles: PROFILES,
+  activeProfileId: 'default',
+  onSwitchProfile: () => {},
   onChange: () => {},
   onStart: () => {},
   onOpenSettings: () => {},

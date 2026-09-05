@@ -1,12 +1,12 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { App } from '../App';
-import { STORAGE_KEYS, loadHistory, loadTrainingHistory } from '../storage/profileStore';
+import { storageKeys, loadHistory, loadTrainingHistory } from '../storage/profileStore';
 
 beforeEach(() => {
   vi.spyOn(Math, 'random').mockReturnValue(0);
   localStorage.setItem(
-    STORAGE_KEYS.settings,
+    storageKeys('default').settings,
     JSON.stringify({
       durationPerQuestionMs: 4000,
       questionCount: 11,
@@ -32,8 +32,8 @@ describe('App — exercise list flow', () => {
     expect(
       screen.getAllByRole('button', { name: 'montrer la réponse' }),
     ).toHaveLength(11);
-    expect(loadHistory()).toHaveLength(0);
-    expect(loadTrainingHistory()).toHaveLength(0);
+    expect(loadHistory('default')).toHaveLength(0);
+    expect(loadTrainingHistory('default')).toHaveLength(0);
   });
 
   test('the list back button returns home', () => {

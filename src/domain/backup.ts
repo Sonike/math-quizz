@@ -68,8 +68,14 @@ export type Backup = {
   exportedAt: string;
   /** package.json version of the app that wrote the file, or ''. */
   appVersion: string;
-  /** Profile the data came from. Informational — see the schema. */
+  /** Id of the profile the data came from. Informational — see the schema. */
   profile: string;
+  /**
+   * Display name of that profile, or '' when it had none. Informational: it
+   * lets the import confirmation say which child a file belongs to, and it
+   * names the exported file. Never used to pick the destination profile.
+   */
+  profileName: string;
   data: BackupData;
 };
 
@@ -77,6 +83,7 @@ export type BackupMeta = {
   appVersion: string;
   exportedAt: string;
   profile: string;
+  profileName: string;
 };
 
 /** Why a file could not be imported. Each maps to its own message in the UI. */
@@ -239,6 +246,7 @@ export const createBackup = (data: BackupData, meta: BackupMeta): Backup => ({
   exportedAt: meta.exportedAt,
   appVersion: meta.appVersion,
   profile: meta.profile,
+  profileName: meta.profileName,
   data,
 });
 
@@ -270,6 +278,7 @@ export const validateBackup = (value: unknown): BackupParseResult => {
       exportedAt: isString(value.exportedAt) ? value.exportedAt : '',
       appVersion: isString(value.appVersion) ? value.appVersion : '',
       profile: isString(value.profile) ? value.profile : '',
+      profileName: isString(value.profileName) ? value.profileName : '',
       data: {
         settings: sanitizeSettings(data.settings),
         history,
@@ -307,9 +316,27 @@ export const summarizeBackup = (backup: Backup) => {
   };
 };
 
-export const backupFileName = (exportedAt: string): string => {
+/**
+ * ASCII, lowercase, hyphenated — a filename that survives every filesystem and
+ * every mail client. Accents are folded ("Léa" → "lea"); a name that folds
+ * away to nothing (a non-Latin script, say) simply drops out of the filename
+ * rather than producing a file called "math-quizz-backup--2026-09-05.json".
+ */
+const slugify = (name: string): string =>
+  name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 24)
+    .replace(/-+$/, '');
+
+export const backupFileName = (exportedAt: string, profileName = ''): string => {
   const day = exportedAt.slice(0, 10);
-  return /^\d{4}-\d{2}-\d{2}$/.test(day)
-    ? `math-quizz-backup-${day}.json`
-    : 'math-quizz-backup.json';
+  const who = slugify(profileName);
+  const parts = ['math-quizz-backup'];
+  if (who !== '') parts.push(who);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(day)) parts.push(day);
+  return `${parts.join('-')}.json`;
 };

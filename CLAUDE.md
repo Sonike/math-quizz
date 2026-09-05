@@ -46,6 +46,37 @@ So forgetting the changelog entry, or any of the three language notes, on a bump
 makes `pnpm test` fail. The `CHANGELOG.md` check is intentionally loose — it
 only verifies the section header exists, not its contents.
 
+## Profiles: the id is always an argument
+
+Several people can share a device (siblings, a tablet). `storage/profileRegistry.ts`
+owns one key, `mathquizz:profiles`, holding `{ active, profiles: [{ id, name,
+createdAt }] }` **outside** every profile prefix. `storage/profileStore.ts` owns
+everything *inside* a prefix, and every function there takes the profile id as
+its first argument.
+
+Do not give that argument a default. The store knowing nothing about who is
+active is what stops a screen reading the wrong profile by forgetting to pass an
+id — without a default it fails to compile instead. It also keeps the dependency
+one-way (registry → store, for `purgeProfile` on delete), so there is no cycle.
+
+Two invariants worth not breaking:
+
+- **`App` holds `{ registry, settings }` as one state value.** Two `useState`s
+  allow a render where `registry.active` is the new profile and `settings` is
+  still the old one; the effect that persists settings then writes one child's
+  preferences into another child's key. One object makes that unrepresentable.
+- **`SettingsScreen` is keyed by the active profile id.** Its three numeric
+  inputs seed from props on first render only, so deleting the active profile
+  must remount the screen rather than leave stale numbers behind.
+
+The profile that predates this feature keeps the id `default`, which is the id
+its keys already use — migration moves nothing. Its `name` is `''` on purpose:
+the app never asked for one, so the UI supplies a label (`profiles.unnamed`) and
+renaming starts from an empty field.
+
+A profile is a name and a storage prefix, **not an identity** — no password, no
+PIN, no recovery. That is the design, not a gap.
+
 ## The backup format is a published contract
 
 Settings → Tes données exports/imports the whole profile as one JSON file. Three
@@ -64,6 +95,12 @@ documented field — so a new field with no documentation fails `pnpm test`.
 Additive changes keep `formatVersion: 1`. Anything that would make an existing
 export unreadable bumps it and ships a `-v2` schema next to v1; the old URL keeps
 resolving.
+
+**A backup is one profile, and the registry is not in it.** `profile` (an id)
+and `profileName` are informational; the import destination is always the
+profile the user picks in the dialog. So importing can never create, rename or
+remove a profile, and a file from another device cannot rearrange this device's
+people.
 
 Two validation policies, deliberately different — don't "simplify" them into
 one: **structure is rejected** (a malformed session or a non-canonical error key

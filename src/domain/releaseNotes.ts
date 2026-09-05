@@ -21,6 +21,24 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.12.0',
+    date: '2026-09-05',
+    changes: {
+      fr: [
+        "Vous pouvez maintenant être plusieurs à utiliser l'appli sur le même appareil. Dans les Paramètres, section « Profils », crée un profil pour ton frère ou ta sœur : chacun garde ses propres réglages et ses propres résultats, et vos scores ne se mélangent plus.",
+        "Dès qu'il y a deux profils, une rangée de prénoms apparaît en haut de l'accueil : tape le tien avant de lancer une session. Le nom du profil apparaît aussi dans « Mes résultats » et dans le fichier que tu exportes.",
+      ],
+      de: [
+        'Ihr könnt die App jetzt zu mehreren auf demselben Gerät benutzen. Lege in den Einstellungen unter « Profile » ein Profil für deinen Bruder oder deine Schwester an: Jede und jeder behält eigene Einstellungen und eigene Ergebnisse, und eure Punkte vermischen sich nicht mehr.',
+        'Sobald es zwei Profile gibt, erscheint oben auf der Startseite eine Reihe mit Vornamen: Tippe auf deinen, bevor du eine Runde startest. Der Profilname steht auch in « Meine Ergebnisse » und in der Datei, die du exportierst.',
+      ],
+      en: [
+        'Several of you can now use the app on the same device. In Settings, under "Profiles", create one for your brother or sister: everyone keeps their own settings and their own results, and your scores stop getting mixed up.',
+        'As soon as there are two profiles, a row of names appears at the top of the home screen: tap yours before starting a session. The profile name also shows in "My results" and in the file you export.',
+      ],
+    },
+  },
+  {
     version: '0.11.0',
     date: '2026-09-05',
     changes: {

@@ -4,19 +4,29 @@ import { createBackup } from '../domain/backup';
 import type { Backup } from '../domain/backup';
 
 /**
- * The one profile this build stores. Roadmap item 4 (multiple named profiles)
- * turns this constant into a parameter — everything below already reads the
- * keys through it.
+ * Everything one profile owns, addressed by id.
+ *
+ * Until 0.11.0 the id was a `PROFILE_ID = 'default'` constant; 0.12.0 turned it
+ * into the first argument of every function here, which is the whole storage
+ * side of multiple profiles. The key shape is unchanged, so the profile that
+ * already exists keeps the id `default` and its data never moves.
+ *
+ * This module deliberately knows nothing about *which* profile is active —
+ * that lives in `profileRegistry.ts`. Keeping the direction one-way (registry
+ * imports the purge from here, never the reverse) means a screen cannot read
+ * the wrong profile by forgetting to pass an id: there is no default to fall
+ * back to.
  */
-export const PROFILE_ID = 'default';
+const prefix = (profileId: string) => `mathquizz:profile:${profileId}:`;
 
-const PREFIX = `mathquizz:profile:${PROFILE_ID}:`;
-
-export const STORAGE_KEYS = {
-  settings: `${PREFIX}settings`,
-  history: `${PREFIX}history`,
-  trainingHistory: `${PREFIX}training-history`,
-} as const;
+export const storageKeys = (profileId: string) => {
+  const at = prefix(profileId);
+  return {
+    settings: `${at}settings`,
+    history: `${at}history`,
+    trainingHistory: `${at}training-history`,
+  } as const;
+};
 
 /**
  * Abandoned in v0.11.0. It held lifetime per-pair counters that no screen ever
@@ -24,7 +34,7 @@ export const STORAGE_KEYS = {
  * sessions more heavily — something a timestamp-less running total cannot do.
  * Removed whenever we rewrite the profile, so nothing stale is left behind.
  */
-const LEGACY_ERRORS_KEY = `${PREFIX}errors`;
+const legacyErrorsKey = (profileId: string) => `${prefix(profileId)}errors`;
 
 export const HISTORY_LIMIT = 50;
 
@@ -37,81 +47,114 @@ const safeParse = <T>(raw: string | null, fallback: T): T => {
   }
 };
 
-export const loadSettings = (): Settings => {
+export const loadSettings = (profileId: string): Settings => {
   const stored = safeParse<Partial<Settings>>(
-    localStorage.getItem(STORAGE_KEYS.settings),
+    localStorage.getItem(storageKeys(profileId).settings),
     {},
   );
   return { ...DEFAULT_SETTINGS, ...stored };
 };
 
-export const saveSettings = (settings: Settings): void => {
-  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+export const saveSettings = (profileId: string, settings: Settings): void => {
+  localStorage.setItem(storageKeys(profileId).settings, JSON.stringify(settings));
 };
 
-export const loadHistory = (): SessionResult[] =>
-  safeParse(localStorage.getItem(STORAGE_KEYS.history), [] as SessionResult[]);
+export const loadHistory = (profileId: string): SessionResult[] =>
+  safeParse(
+    localStorage.getItem(storageKeys(profileId).history),
+    [] as SessionResult[],
+  );
 
-export const appendSession = (session: SessionResult): void => {
-  const next = [...loadHistory(), session].slice(-HISTORY_LIMIT);
-  localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(next));
+export const appendSession = (profileId: string, session: SessionResult): void => {
+  const next = [...loadHistory(profileId), session].slice(-HISTORY_LIMIT);
+  localStorage.setItem(storageKeys(profileId).history, JSON.stringify(next));
 };
 
-export const recordSession = (session: SessionResult): void => {
-  appendSession(session);
+export const recordSession = (profileId: string, session: SessionResult): void => {
+  appendSession(profileId, session);
 };
 
-export const loadTrainingHistory = (): SessionResult[] =>
-  safeParse(localStorage.getItem(STORAGE_KEYS.trainingHistory), [] as SessionResult[]);
+export const loadTrainingHistory = (profileId: string): SessionResult[] =>
+  safeParse(
+    localStorage.getItem(storageKeys(profileId).trainingHistory),
+    [] as SessionResult[],
+  );
 
-export const recordTrainingSession = (session: SessionResult): void => {
-  const next = [...loadTrainingHistory(), session].slice(-HISTORY_LIMIT);
-  localStorage.setItem(STORAGE_KEYS.trainingHistory, JSON.stringify(next));
+export const recordTrainingSession = (
+  profileId: string,
+  session: SessionResult,
+): void => {
+  const next = [...loadTrainingHistory(profileId), session].slice(-HISTORY_LIMIT);
+  localStorage.setItem(
+    storageKeys(profileId).trainingHistory,
+    JSON.stringify(next),
+  );
 };
 
 /**
  * Everything this profile owns, wrapped in the published backup envelope.
  * Both histories carry every per-pair statistic the app derives, so there is
- * nothing else to export.
+ * nothing else to export. The registry is *not* included: a backup is one
+ * profile, and importing one must never rearrange who exists on the device.
  */
 export const exportProfile = (
+  profileId: string,
   appVersion: string,
+  profileName = '',
   now: Date = new Date(),
 ): Backup =>
   createBackup(
     {
-      settings: loadSettings(),
-      history: loadHistory(),
-      trainingHistory: loadTrainingHistory(),
+      settings: loadSettings(profileId),
+      history: loadHistory(profileId),
+      trainingHistory: loadTrainingHistory(profileId),
     },
-    { appVersion, exportedAt: now.toISOString(), profile: PROFILE_ID },
+    {
+      appVersion,
+      exportedAt: now.toISOString(),
+      profile: profileId,
+      profileName,
+    },
   );
 
 /**
- * Overwrites the profile with a validated backup — a restore, not a merge.
+ * Overwrites one profile with a validated backup — a restore, not a merge.
  * Merging is deliberately out of scope: sessions carry no id, so two files
  * recorded on two devices cannot be reconciled without guessing from
  * `startedAt`. Throws if storage refuses the write (quota, private mode).
+ *
+ * `profileId` is the *destination* the user picked, never `backup.profile`:
+ * the id inside the file names a profile on the machine that wrote it, which
+ * may mean something else here, or nothing at all.
  */
-export const importProfile = (backup: Backup): void => {
+export const importProfile = (profileId: string, backup: Backup): void => {
   const { settings, history, trainingHistory } = backup.data;
-  saveSettings(settings);
+  const keys = storageKeys(profileId);
+  saveSettings(profileId, settings);
   // A hand-written file may carry more than the app itself would keep.
+  localStorage.setItem(keys.history, JSON.stringify(history.slice(-HISTORY_LIMIT)));
   localStorage.setItem(
-    STORAGE_KEYS.history,
-    JSON.stringify(history.slice(-HISTORY_LIMIT)),
-  );
-  localStorage.setItem(
-    STORAGE_KEYS.trainingHistory,
+    keys.trainingHistory,
     JSON.stringify(trainingHistory.slice(-HISTORY_LIMIT)),
   );
   // A v1 file may carry the deprecated `errors` section; it is validated on
   // read and then dropped, since nothing derives statistics from it any more.
-  localStorage.removeItem(LEGACY_ERRORS_KEY);
+  localStorage.removeItem(legacyErrorsKey(profileId));
 };
 
-export const clearAll = (): void => {
-  localStorage.removeItem(STORAGE_KEYS.history);
-  localStorage.removeItem(STORAGE_KEYS.trainingHistory);
-  localStorage.removeItem(LEGACY_ERRORS_KEY);
+/** Wipes the results but keeps the settings — the "🧹" button in Settings. */
+export const clearAll = (profileId: string): void => {
+  const keys = storageKeys(profileId);
+  localStorage.removeItem(keys.history);
+  localStorage.removeItem(keys.trainingHistory);
+  localStorage.removeItem(legacyErrorsKey(profileId));
+};
+
+/**
+ * Everything, settings included. Used when a profile is deleted: leaving its
+ * keys behind would be storage nobody can reach, export or clear again.
+ */
+export const purgeProfile = (profileId: string): void => {
+  clearAll(profileId);
+  localStorage.removeItem(storageKeys(profileId).settings);
 };
