@@ -40,6 +40,17 @@ export type Settings = {
   language: Language;
 };
 
+/**
+ * Accepted range for each numeric setting. Shared by the Settings form and the
+ * backup importer, so a hand-edited file cannot smuggle in a value the UI would
+ * refuse.
+ */
+export const SETTINGS_BOUNDS = {
+  durationPerQuestionMs: { min: 1000, max: 60000 },
+  questionCount: { min: 1, max: 200 },
+  partialCreditFactor: { min: 0, max: 1 },
+} as const;
+
 export const DEFAULT_SETTINGS: Settings = {
   durationPerQuestionMs: 4000,
   questionCount: 22,

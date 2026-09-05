@@ -87,29 +87,42 @@ session, and spots the most fragile tables.
 
 ---
 
-## 4. Multi-profile
+## 4. Multiple named local profiles
 
-**Status**: 📋 Planned
+**Status**: 📋 Planned — next up
 
-**Why**: let several children (or contexts: practice, test) share the app
-without mixing their histories.
+**Why**: siblings share one tablet. The app stores exactly one profile per
+browser, so a brother's timeouts land in his sister's heat-map and the score
+curve mixes two children into one line. Named profiles separate them without
+giving up the rule that nothing leaves the device.
+
+**Explicitly still stateless and credential-free**: a profile is a name and a
+storage prefix, not an identity. No password, no PIN, no recovery, no account —
+whoever holds the device can switch to any profile. That is the point: the data
+is a child's practice history on a family tablet, not something to protect from
+the family. If a profile ever needs protecting, that is a different feature and
+a different conversation.
 
 **What's needed**:
 
-- the storage schema is **already prefixed** `mathquizz:profile:default:`,
-  so on the `storage/profileStore.ts` side it's enough to replace the
-  `default` constant with an id passed as an argument;
-- add a profile selector on the home screen (list of profiles + "new
-  profile" button);
-- store the list of profiles + the active profile under
-  `mathquizz:profiles` (outside the profile prefix to avoid a circular
-  reference);
-- migrate existing data: on first open after the update, create a
-  "default" profile and keep `default:` as is.
+- storage keys are already prefixed `mathquizz:profile:default:`, and
+  `storage/profileStore.ts` routes every key through the exported `PROFILE_ID`
+  constant — turning that constant into an argument is the whole storage change;
+- a registry outside the per-profile prefix, e.g. `mathquizz:profiles` holding
+  `{ active: string, profiles: { id, name, createdAt }[] }`. Ids stay stable and
+  opaque; the name is what the child sees and can rename;
+- a profile switcher on the home screen, with create / rename / delete in
+  Settings. Deleting a profile must offer an export first (item 9);
+- migration on first open after the update: register the existing `default:`
+  data as a profile, keeping the id `default` so nothing has to move;
+- export / import (item 9) follows. The backup envelope already carries a
+  `profile` field, but the importer ignores it and always writes the default
+  profile. With several profiles, importing should ask *which* profile to write
+  into, and the suggested filename should carry the profile name.
 
-**Minor risk**: if a parent and a child use the app alternately without
-properly selecting the profile, the stats become wrong. Solution: display
-the active profile prominently on every screen.
+**Minor risk**: if a parent and a child use the app alternately without properly
+selecting the profile, the stats become wrong. Solution: display the active
+profile prominently on every screen.
 
 ---
 
@@ -225,6 +238,64 @@ the UI locale.
 each keystroke nor at the end of the session. Consistent with the "no
 feedback during the session" rule: the voice reads the question, it doesn't
 comment on the answer.
+
+---
+
+## 9. Export / import of the local data
+
+**Status**: ✅ Done — shipped in v0.10.0. **Settings → Tes données** writes the
+whole profile to one JSON file and reads it back. The envelope is a published
+contract: `public/schemas/math-quizz-backup-v1.schema.json` is served next to the
+app and linked from the Settings screen, `docs/data-format.md` documents it in
+prose, and `src/__tests__/backup.test.ts` pins the schema to the constants in
+`src/domain/backup.ts` so the two cannot drift.
+
+**Why**: `localStorage` is the only copy. Clearing browser data, switching
+device or reinstalling the PWA loses months of practice history, and nothing
+short of an account could bring it back. An export file is the whole backup
+story for an app that deliberately has no backend.
+
+**Design notes worth keeping**:
+
+- `errors` travels separately from `history` — history is capped at 50 sessions
+  while the counters accumulate for the life of the profile, so they cannot be
+  recomputed from the sessions that survive. Noticed while building this: the
+  stored counters are currently **write-only**. `recordSession` maintains them,
+  but `ProgressScreen` recomputes its heat-map from the capped `history`
+  instead, so past 50 sessions the screen silently forgets what the counters
+  still remember. Item 2 (adaptive weighting) is their intended consumer;
+  pointing the heat-map at them is a smaller, separate fix;
+- structure is rejected, settings are sanitised. See `domain/backup.ts` for why
+  the two halves are treated differently;
+- import is a restore, not a merge (item 10).
+
+---
+
+## 10. Merge on import
+
+**Status**: 📋 Planned — deliberately deferred out of item 9
+
+**Why**: today importing replaces the profile. That covers backup / restore and
+moving to a new device, but not "the child practised on the tablet and on the
+laptop, and both histories should survive".
+
+**What makes it harder than it looks**: sessions carry no id — `startedAt` is
+the closest thing, and it is only unique by luck. Worse, `errors` cannot simply
+be added: the counters already include sessions that have aged out of the capped
+history, so summing two files double-counts every pair the two devices share,
+and recomputing from the merged history silently drops the older statistics
+instead.
+
+**What's needed**:
+
+- a stable session id written at record time (a bump to `formatVersion`, or an
+  additive optional field that older files simply lack);
+- provenance on the error counters — enough to tell "already counted in a
+  session I have" from "counted in a session that aged out";
+- a UI choice on import (replace / merge) rather than a silent behaviour.
+
+**When**: once a real second device is in play. Until then, replace is the
+honest behaviour and says so in the confirmation dialog.
 
 ---
 

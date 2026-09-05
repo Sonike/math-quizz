@@ -9,6 +9,8 @@ import {
   loadTrainingHistory,
   recordTrainingSession,
   clearAll,
+  exportProfile,
+  importProfile,
   HISTORY_LIMIT,
   STORAGE_KEYS,
 } from '../storage/profileStore';
@@ -174,4 +176,76 @@ describe('training history', () => {
 it('defaults language to fr when absent from stored settings', () => {
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify({ questionCount: 10 }));
   expect(loadSettings().language).toBe('fr');
+});
+
+describe('export / import', () => {
+  it('exportProfile captures settings, both histories and the error stats', () => {
+    saveSettings({ ...DEFAULT_SETTINGS, questionCount: 11 });
+    recordSession(mkSession(1));
+    recordTrainingSession({ ...mkSession(2), answerMode: 'training' });
+
+    const backup = exportProfile('0.10.0', new Date('2026-09-05T10:11:12.000Z'));
+
+    expect(backup.appVersion).toBe('0.10.0');
+    expect(backup.exportedAt).toBe('2026-09-05T10:11:12.000Z');
+    expect(backup.profile).toBe('default');
+    expect(backup.data.settings.questionCount).toBe(11);
+    expect(backup.data.history).toHaveLength(1);
+    expect(backup.data.trainingHistory).toHaveLength(1);
+    expect(backup.data.errors['7x8']).toEqual({ attempts: 1, errors: 0, timeouts: 0 });
+  });
+
+  it('exportProfile on a fresh profile yields defaults and empty collections', () => {
+    const backup = exportProfile('0.10.0');
+    expect(backup.data.settings).toEqual(DEFAULT_SETTINGS);
+    expect(backup.data.history).toEqual([]);
+    expect(backup.data.trainingHistory).toEqual([]);
+    expect(backup.data.errors).toEqual({});
+  });
+
+  it('importProfile replaces every section, it does not merge', () => {
+    saveSettings({ ...DEFAULT_SETTINGS, questionCount: 11 });
+    recordSession(mkSession(1));
+    recordTrainingSession({ ...mkSession(2), answerMode: 'training' });
+
+    const incoming = exportProfile('0.10.0');
+    incoming.data.settings = { ...DEFAULT_SETTINGS, questionCount: 33 };
+    incoming.data.history = [mkSession(9)];
+    incoming.data.trainingHistory = [];
+    incoming.data.errors = { '2x3': { attempts: 5, errors: 2, timeouts: 1 } };
+
+    importProfile(incoming);
+
+    expect(loadSettings().questionCount).toBe(33);
+    expect(loadHistory()).toEqual([mkSession(9)]);
+    expect(loadTrainingHistory()).toEqual([]);
+    expect(loadErrors()).toEqual({ '2x3': { attempts: 5, errors: 2, timeouts: 1 } });
+  });
+
+  it('round-trips: export, wipe, import, and the profile is back', () => {
+    saveSettings({ ...DEFAULT_SETTINGS, questionCount: 11 });
+    recordSession(mkSession(1));
+    const backup = exportProfile('0.10.0');
+
+    clearAll();
+    saveSettings(DEFAULT_SETTINGS);
+    importProfile(backup);
+
+    expect(loadSettings().questionCount).toBe(11);
+    expect(loadHistory()).toEqual([mkSession(1)]);
+    expect(loadErrors()['7x8']).toEqual({ attempts: 1, errors: 0, timeouts: 0 });
+  });
+
+  it('trims an oversized incoming history to HISTORY_LIMIT, keeping the newest', () => {
+    const backup = exportProfile('0.10.0');
+    backup.data.history = Array.from({ length: HISTORY_LIMIT + 5 }, (_, i) => mkSession(i));
+    backup.data.trainingHistory = Array.from({ length: HISTORY_LIMIT + 5 }, (_, i) => mkSession(i));
+
+    importProfile(backup);
+
+    const history = loadHistory();
+    expect(history).toHaveLength(HISTORY_LIMIT);
+    expect(history[0].startedAt).toBe(mkSession(5).startedAt);
+    expect(loadTrainingHistory()).toHaveLength(HISTORY_LIMIT);
+  });
 });

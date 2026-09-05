@@ -133,12 +133,32 @@ migration.
 
 | Key | Type |
 |---|---|
-| `…:settings` | `Settings` (timer duration, question count, selected tables, mode) |
+| `…:settings` | `Settings` (timer duration, question count, selected tables, mode, answer mode, language) |
 | `…:history` | `SessionResult[]` capped at 50 |
+| `…:training-history` | `SessionResult[]` from training mode, capped at 50 |
 | `…:errors` | `ErrorStats` keyed by `${min(a,b)}x${max(a,b)}` |
 
 Use the in-app **Settings → Effacer l'historique** button to reset history
 and error stats; the user-facing `Settings` object is preserved.
+
+## Export / import
+
+**Settings → Tes données** writes all four keys to one JSON file and reads them
+back — the only backup an app with no backend can offer, and the way to move a
+history between devices. Import replaces the profile (it does not merge) behind
+a confirmation dialog.
+
+The file format is a published contract, not an internal detail:
+
+- [`docs/data-format.md`](docs/data-format.md) documents it in prose, with `jq`
+  recipes for processing your own export;
+- [`public/schemas/math-quizz-backup-v1.schema.json`](public/schemas/math-quizz-backup-v1.schema.json)
+  is the JSON Schema (2020-12), deployed alongside the app at
+  `/schemas/math-quizz-backup-v1.schema.json` and linked from the Settings
+  screen;
+- `src/__tests__/backup.test.ts` pins the schema's `$id`, `format` and
+  `formatVersion` to the constants in `src/domain/backup.ts`, so the published
+  contract cannot drift from the code.
 
 ## Contributing
 
@@ -149,11 +169,13 @@ and error stats; the user-facing `Settings` object is preserved.
 3. Keep the zero-runtime-dependency rule — no chart or UI libraries. An
    inline SVG or a few lines of CSS almost always do the job.
 4. Follow the existing shape: pure logic in `src/domain/`, presentational
-   components in `src/components/`, screens orchestrate. UI strings stay in
-   French until the i18n item lands.
+   components in `src/components/`, screens orchestrate. Every user-facing
+   string is keyed in `src/i18n/{fr,de,en}.ts` — all three, or `pnpm test`
+   fails.
 5. Keep commits small and focused, then open a pull request against `main`.
 
 ## What's next
 
-See [`docs/roadmap.md`](docs/roadmap.md) for the backlog
-(PWA, adaptive weighting, progress charts, multi-profile, etc.).
+See [`docs/roadmap.md`](docs/roadmap.md) for the backlog. Next up: multiple
+named local profiles, so siblings sharing a tablet stop mixing their histories
+— still with no accounts and no credentials.

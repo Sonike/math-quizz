@@ -10,11 +10,14 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
 import { InfoScreen } from './screens/InfoScreen';
 import type { SessionResult, Settings } from './domain/session';
+import type { Backup } from './domain/backup';
 import {
   loadSettings,
   saveSettings,
   recordSession,
   recordTrainingSession,
+  exportProfile,
+  importProfile,
   clearAll,
 } from './storage/profileStore';
 
@@ -39,6 +42,13 @@ export const App = () => {
     }
     setLastResult(result);
     setScreen('results');
+  };
+
+  const handleImport = (backup: Backup) => {
+    // Storage first: if the browser refuses the write, the screen reports it
+    // and React state still matches what is actually stored.
+    importProfile(backup);
+    setSettings(backup.data.settings);
   };
 
   const handleSaveResult = (final: SessionResult) => {
@@ -97,6 +107,8 @@ export const App = () => {
             settings={settings}
             onSave={setSettings}
             onClearHistory={clearAll}
+            onExport={() => exportProfile(__APP_VERSION__)}
+            onImport={handleImport}
             onBack={() => setScreen('home')}
           />
         )}

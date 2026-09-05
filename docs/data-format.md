@@ -1,0 +1,157 @@
+# Export / import file format
+
+Math Quizz stores everything in the browser's `localStorage`. **Settings → Tes
+données** writes that data to a single JSON file and reads it back. That file is
+the only way the data ever leaves the device, so its shape is a published
+contract rather than an internal detail.
+
+- Machine-readable schema: [`public/schemas/math-quizz-backup-v1.schema.json`](../public/schemas/math-quizz-backup-v1.schema.json),
+  served at <https://math-quizz.mrpia.ch/schemas/math-quizz-backup-v1.schema.json>
+  and linked from the Settings screen.
+- Code: [`src/domain/backup.ts`](../src/domain/backup.ts) (envelope, validation),
+  [`src/storage/profileStore.ts`](../src/storage/profileStore.ts) (read/write).
+
+## Envelope
+
+```json
+{
+  "$schema": "https://math-quizz.mrpia.ch/schemas/math-quizz-backup-v1.schema.json",
+  "format": "math-quizz-backup",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-05T10:11:12.000Z",
+  "appVersion": "0.10.0",
+  "profile": "default",
+  "data": {
+    "settings": { "…": "…" },
+    "history": [],
+    "trainingHistory": [],
+    "errors": {}
+  }
+}
+```
+
+`formatVersion` versions **this envelope**, not the app; it moves only on a
+breaking change. `appVersion` is informational — compatibility is never decided
+from it.
+
+Only `format`, `formatVersion` and `data` are required. A third party generating
+a file may omit everything else, and the importer fills in a default. Inside
+`data`, every section is optional too: an absent `history` imports as `[]`.
+
+## What each section holds
+
+| `data.*` | localStorage key | Contents |
+|---|---|---|
+| `settings` | `…:settings` | Timer target, question count, selected tables, mode, answer mode, language |
+| `history` | `…:history` | Completed timed tests, oldest first, capped at 50 |
+| `trainingHistory` | `…:training-history` | Completed training sessions, same shape, same cap |
+| `errors` | `…:errors` | Lifetime per-pair counters (`attempts` / `errors` / `timeouts`), never evicted |
+
+All four live under the prefix `mathquizz:profile:default:`.
+
+**`errors` is not derivable from `history`.** History keeps only the 50 most
+recent sessions; the counters accumulate for the life of the profile and are
+never evicted, so they are the sole record of everything that has aged out. Both
+travel for that reason.
+
+Worth knowing if you process an export: the progress screen currently recomputes
+its heat-map and "trickiest pairs" from `history` alone, so the `errors`
+counters are *not* what is drawn on screen — they are the longer, unbounded
+record sitting behind it. Beyond 50 sessions the two diverge, and `errors` is
+the one that remembers.
+
+## Two conventions worth knowing
+
+**Questions are stored as a pair, never as rendered text.** A question is
+`{ a, b, op, expected }`. For `op: "mul"` the child sees `a × b` and `expected`
+is `a×b`. For `op: "div"` the child sees `(a×b) ÷ a` and `expected` is `b`. The
+same stored pair backs both directions.
+
+**Error keys are canonical.** `errors` is keyed `"<low>x<high>"` with the
+operands sorted ascending, so 7×8, 8×7 and 56÷7 all accumulate under `"7x8"`.
+
+**Paper mode has no `given`.** When answers are written on paper the app never
+sees them: `given` is `null` and `selfMarkedCorrect` records what the child
+ticked on the results screen. When present, that flag overrides the
+`given`/`expected` comparison for both scoring and statistics.
+
+## How the importer treats a file
+
+Import is a **restore, not a merge**: each section replaces the one in the
+browser. Nothing is written until the confirmation dialog is accepted.
+
+Structure and settings are handled by deliberately different rules:
+
+- **Structure is rejected, never repaired.** A malformed session, an
+  unknown operator or an error key that is not a canonical pair fails the whole
+  file. Dropping the bad records silently would hand the child a partial history
+  that looks complete, and a junk pair key renders as "NaN × NaN" on the
+  progress screen.
+- **Settings are sanitised, never rejected.** Every setting has a safe default,
+  so an out-of-range number is clamped to the range the Settings form accepts
+  and an unknown enum value falls back to the default. `selectedTables` can
+  never end up empty — question generation throws on an empty selection.
+
+Unknown fields in the envelope are dropped on import. A `history` longer than 50
+imports fine but is trimmed to the newest 50, the same cap the app applies to
+its own writes.
+
+The four rejection reasons map to their own message on screen:
+
+| Reason | Meaning |
+|---|---|
+| `unreadable` | Not valid JSON |
+| `not-a-backup` | Valid JSON, but `format` is not `math-quizz-backup` |
+| `unsupported-version` | Right marker, `formatVersion` other than 1 |
+| `corrupt` | Right envelope, malformed payload |
+
+## Processing an export yourself
+
+The file is plain JSON, pretty-printed with two-space indentation, so ordinary
+tooling works. A few examples:
+
+```bash
+# Score of every recorded test, as a ratio.
+# selfMarkedCorrect wins when present — in paper mode `given` is always null.
+jq '.data.history[] | {
+      at: .startedAt,
+      correct: ([.answers[] | select(
+                   if has("selfMarkedCorrect")
+                   then .selfMarkedCorrect
+                   else .given == .question.expected end)] | length),
+      total: (.answers | length)
+    }' math-quizz-backup-2026-09-05.json
+
+# The ten shakiest pairs by error rate
+jq -r '.data.errors | to_entries
+       | map(select(.value.attempts >= 3))
+       | sort_by((.value.errors + .value.timeouts) / .value.attempts) | reverse
+       | .[:10][] | "\(.key)\t\((.value.errors + .value.timeouts) / .value.attempts)"' \
+   math-quizz-backup-2026-09-05.json
+```
+
+To validate a file against the schema with any JSON Schema 2020-12 validator:
+
+```bash
+npx -y ajv-cli validate --spec=draft2020 \
+  -s public/schemas/math-quizz-backup-v1.schema.json \
+  -d math-quizz-backup-2026-09-05.json
+```
+
+Add `--all-errors` to see every problem at once; ajv stops at the first by
+default.
+
+The schema and the importer agree on structure, and differ only where the
+importer is deliberately more forgiving: a validator fails a settings value
+outside its declared range, while the importer clamps it. Two behaviours the
+schema does not express at all: the 50-entry trim on `history` /
+`trainingHistory`, and the dropping of unknown envelope fields.
+
+## Changing the format
+
+Additive changes — a new optional field — keep `formatVersion: 1`. Anything that
+would make an existing file unreadable bumps it, ships a
+`math-quizz-backup-v2.schema.json` next to v1 (the old URL keeps resolving), and
+teaches the importer to read both. `src/__tests__/backup.test.ts` pins the
+schema's `$id`, `format` and `formatVersion` to the constants in
+`src/domain/backup.ts`, so the two cannot drift unnoticed.

@@ -33,6 +33,7 @@ describe('dictionaries', () => {
     for (const lang of ['fr', 'de', 'en'] as const) {
       expect(dictionaries[lang]['info.coffee']).toContain('{link}');
       expect(dictionaries[lang]['info.credit']).toContain('{link}');
+      expect(dictionaries[lang]['settings.formatDoc']).toContain('{link}');
     }
   });
 });

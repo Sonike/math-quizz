@@ -122,3 +122,56 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
 }
+
+.settings__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.settings__section-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.settings__transfer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+/* A <label> styled as a button: the file input is the real control, kept
+   focusable (not display:none) so the keyboard path still works. */
+.settings__file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.settings__file:focus-within {
+  border-color: var(--color-accent);
+}
+
+.settings__file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.settings__notice {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.settings__notice--info {
+  color: var(--color-fg-muted);
+}
+
+.settings__notice--error {
+  color: var(--color-error);
+}

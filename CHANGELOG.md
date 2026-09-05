@@ -5,6 +5,53 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-09-05
+
+### Added
+- Export and import of the local data, from a new "Tes données" panel in
+  Settings. Export writes settings, test history, training history and the
+  lifetime error counters to one pretty-printed JSON file
+  (`math-quizz-backup-<date>.json`); import reads one back after a confirmation
+  dialog that shows what the file contains. `errors` travels alongside
+  `history` rather than being recomputed from it: history is capped at 50
+  sessions while the counters accumulate for the life of the profile and are
+  never evicted, so past that point they are the only record left. (The progress
+  screen recomputes from `history` today and does not read them — see the note
+  below.)
+- The file format is published, not internal. `public/schemas/math-quizz-backup-v1.schema.json`
+  (JSON Schema 2020-12, every field documented) is deployed with the app at
+  `/schemas/math-quizz-backup-v1.schema.json` and linked from the Settings
+  panel, so anyone can process their own export; `docs/data-format.md` covers
+  the same ground in prose with `jq` recipes.
+- `src/domain/backup.ts` — envelope (`format` / `formatVersion` / `data`),
+  `validateBackup`, and the two validation policies: structure is rejected
+  (a malformed session or a non-canonical error key fails the whole file,
+  rather than silently importing a partial history), settings are sanitised
+  (out-of-range numbers clamped, unknown enum values defaulted, and
+  `selectedTables` never left empty — `generateQuestions` throws on empty).
+- `exportProfile` / `importProfile` in `storage/profileStore.ts`. Import is a
+  restore, not a merge; an oversized incoming history is trimmed to the newest
+  50, the cap the app applies to its own writes.
+- `SETTINGS_BOUNDS` in `domain/session.ts`, now the single source of the
+  numeric ranges shared by the Settings form and the importer.
+- `PROFILE_ID` exported from `storage/profileStore.ts`: every storage key now
+  routes through it, which is the whole storage-side change that multi-profile
+  (roadmap item 4) will need.
+
+### Fixed
+- Importing left the three numeric inputs on the Settings form showing their
+  pre-import values — they are seeded from props on first render only. Pressing
+  "Enregistrer" afterwards wrote those stale numbers back over the imported
+  settings. `confirmImport` now refreshes the fields from the imported backup.
+
+### Changed
+- `SettingsScreen` takes two new props, `onExport` and `onImport`; `App` wires
+  them to the store and re-syncs its `settings` state after an import.
+- Roadmap item 4 is rewritten as "Multiple named local profiles", with the
+  no-credentials constraint stated explicitly, and new items 9 (export/import,
+  done) and 10 (merge on import, deferred — sessions carry no id, and summing
+  error counters double-counts pairs shared between two devices).
+
 ## [0.9.0] - 2026-06-15
 
 ### Changed

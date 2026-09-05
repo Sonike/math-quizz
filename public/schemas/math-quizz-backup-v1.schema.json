@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://math-quizz.mrpia.ch/schemas/math-quizz-backup-v1.schema.json",
+  "title": "Math Quizz backup, format version 1",
+  "description": "A full copy of one Math Quizz profile as exported from Settings → Tes données. Math Quizz is a fully client-side app: this file is the only way its data ever leaves the browser. Everything here is written and read locally; there is no server and no account. Only `format`, `formatVersion` and `data` are required — a third party generating a file may omit any other field, and the app will fill in a sensible default. Any property present must have the type declared here: the importer rejects the whole file on a type error rather than silently dropping records.",
+  "type": "object",
+  "required": ["format", "formatVersion", "data"],
+  "properties": {
+    "$schema": {
+      "description": "URL of this schema. Written on export so an editor or a validator can pick it up automatically; ignored on import.",
+      "type": "string"
+    },
+    "format": {
+      "description": "Fixed marker identifying the file as a Math Quizz backup. The importer rejects any other value as 'not a Math Quizz export'.",
+      "const": "math-quizz-backup"
+    },
+    "formatVersion": {
+      "description": "Version of THIS envelope format, not of the app. Bumped only on a breaking change to the shape below. The importer accepts version 1 and reports anything else as coming from a newer (or unknown) version.",
+      "const": 1
+    },
+    "exportedAt": {
+      "description": "When the file was written, ISO 8601 with milliseconds and a UTC 'Z' suffix. Informational: it dates the suggested filename and the import confirmation. Empty or absent is accepted.",
+      "type": "string"
+    },
+    "appVersion": {
+      "description": "The package.json version of the app that produced the file (e.g. '0.10.0'). Informational only — compatibility is decided by formatVersion, never by this.",
+      "type": "string"
+    },
+    "profile": {
+      "description": "Name of the profile the data belongs to. Always 'default' today: the app stores one profile per browser, under the localStorage prefix 'mathquizz:profile:default:'. The field exists so a future multi-profile release can tell exports apart; the current importer ignores it and always writes into the default profile.",
+      "type": "string"
+    },
+    "data": {
+      "description": "The profile payload — one property per localStorage key the app owns. Every property is optional; an absent one imports as empty (or, for settings, as the app defaults).",
+      "type": "object",
+      "properties": {
+        "settings": {
+          "description": "The child's preferences, from 'mathquizz:profile:default:settings'. Unlike the rest of the file, settings are sanitised rather than rejected: an out-of-range number is clamped and an unknown enum value falls back to the app default, because every setting has a safe default.",
+          "$ref": "#/$defs/settings"
+        },
+        "history": {
+          "description": "Completed timed tests, oldest first, from 'mathquizz:profile:default:history'. The app keeps at most the 50 most recent; a longer array imports fine but is trimmed to the newest 50.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/sessionResult" }
+        },
+        "trainingHistory": {
+          "description": "Completed training sessions (the mode that corrects each answer immediately), oldest first, from 'mathquizz:profile:default:training-history'. Same shape and same 50-entry cap as `history`; kept separate so training practice does not distort test scores.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/sessionResult" }
+        },
+        "errors": {
+          "description": "Lifetime per-pair counters from 'mathquizz:profile:default:errors', updated by every recorded session and never evicted. NOT derivable from `history`: history keeps only the 50 most recent sessions, so these counters are the sole record of everything before that. Note that the progress screen currently recomputes its heat-map from `history` rather than reading these, so they are not what is drawn on screen today.",
+          "$ref": "#/$defs/errorStats"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "settings": {
+      "type": "object",
+      "properties": {
+        "durationPerQuestionMs": {
+          "description": "Target answer time in milliseconds. Answering within it earns a full point; slower but correct earns partialCreditFactor. Clamped to 1000–60000 on import.",
+          "type": "number",
+          "minimum": 1000,
+          "maximum": 60000
+        },
+        "questionCount": {
+          "description": "How many questions a session draws. Clamped to 1–200 on import.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "selectedTables": {
+          "description": "Which multiplication tables the questions are drawn from. Values outside the app's table list are dropped; if nothing valid remains, the default selection is restored — an empty selection would make question generation fail.",
+          "type": "array",
+          "items": { "type": "integer", "enum": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 24, 25] }
+        },
+        "mode": {
+          "description": "Which operations are asked: multiplication only, division only, or a mix.",
+          "enum": ["mul", "div", "mix"]
+        },
+        "answerMode": {
+          "description": "How answers are collected: 'screen' (on-screen numpad, timed), 'paper' (answers written on paper, self-marked afterwards), 'training' (immediate correction, untimed scoring), 'list' (a printable list of problems — a view, so it records no session).",
+          "enum": ["screen", "paper", "training", "list"]
+        },
+        "partialCreditFactor": {
+          "description": "Points awarded for a correct answer given after the target time, from 0 (none) to 1 (as good as a fast answer). Clamped to 0–1 on import.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "language": {
+          "description": "UI language.",
+          "enum": ["fr", "de", "en"]
+        }
+      }
+    },
+    "sessionResult": {
+      "description": "One completed session. The settings fields are copied in at the time the session ran, so a score can be re-derived exactly even after the child changes their settings.",
+      "type": "object",
+      "required": [
+        "startedAt",
+        "durationPerQuestionMs",
+        "partialCreditFactor",
+        "questionCount",
+        "selectedTables",
+        "mode",
+        "answers"
+      ],
+      "properties": {
+        "startedAt": {
+          "description": "When the session began, ISO 8601. Also the sort key and the de-facto identifier of a session.",
+          "type": "string"
+        },
+        "durationPerQuestionMs": {
+          "description": "The target time in force during this session.",
+          "type": "number"
+        },
+        "partialCreditFactor": {
+          "description": "The partial-credit factor in force during this session.",
+          "type": "number"
+        },
+        "questionCount": {
+          "description": "How many questions were requested. May exceed answers.length if the session was cut short.",
+          "type": "number"
+        },
+        "selectedTables": {
+          "description": "The tables in play during this session.",
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "mode": {
+          "description": "The operation mode in force during this session.",
+          "enum": ["mul", "div", "mix"]
+        },
+        "answerMode": {
+          "description": "How the answers were collected. Absent on sessions recorded before the field existed — read an absent value as 'screen'. Never 'list', which records no session.",
+          "enum": ["screen", "paper", "training"]
+        },
+        "answers": {
+          "description": "One record per question actually presented, in the order asked.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/answerRecord" }
+        }
+      }
+    },
+    "answerRecord": {
+      "type": "object",
+      "required": ["question", "given", "elapsedMs"],
+      "properties": {
+        "question": { "$ref": "#/$defs/question" },
+        "given": {
+          "description": "What the child answered, or null if time ran out with no answer.",
+          "type": ["number", "null"]
+        },
+        "elapsedMs": {
+          "description": "Time taken to answer, in milliseconds. Compared against the session's durationPerQuestionMs to decide full or partial credit.",
+          "type": "number"
+        },
+        "selfMarkedCorrect": {
+          "description": "Paper mode only: whether the child marked their handwritten answer right when comparing against the screen. When present it overrides the given/expected comparison — on paper the app never sees what was written, so `given` is null.",
+          "type": "boolean"
+        }
+      }
+    },
+    "question": {
+      "description": "A question is always stored as the pair (a, b) plus an operator, never as the rendered text. For 'mul' the child is shown 'a × b' and `expected` is a×b. For 'div' the child is shown '(a×b) ÷ a' and `expected` is b — so the same stored pair backs both directions, and both feed the same error counter.",
+      "type": "object",
+      "required": ["a", "b", "op", "expected"],
+      "properties": {
+        "a": { "description": "First operand: the table being drilled.", "type": "number" },
+        "b": { "description": "Second operand: the multiplier.", "type": "number" },
+        "op": {
+          "description": "Which way the pair is asked.",
+          "enum": ["mul", "div"]
+        },
+        "expected": {
+          "description": "The correct answer: a×b for 'mul', b for 'div'.",
+          "type": "number"
+        }
+      }
+    },
+    "errorStats": {
+      "description": "Counters keyed by canonical pair. The key is '<low>x<high>' with the two operands sorted ascending (7×8 and 8×7 both key '7x8'), so multiplication and division of the same pair accumulate together. Keys that do not match that shape are rejected.",
+      "type": "object",
+      "propertyNames": { "pattern": "^[0-9]+x[0-9]+$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["attempts", "errors", "timeouts"],
+        "properties": {
+          "attempts": {
+            "description": "How many times the pair was presented. Every presentation counts here, right or wrong.",
+            "type": "number",
+            "minimum": 0
+          },
+          "errors": {
+            "description": "How many of those attempts got a wrong answer (a subset of attempts).",
+            "type": "number",
+            "minimum": 0
+          },
+          "timeouts": {
+            "description": "How many of those attempts got no answer before time ran out (a subset of attempts).",
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

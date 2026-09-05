@@ -46,6 +46,31 @@ So forgetting the changelog entry, or any of the three language notes, on a bump
 makes `pnpm test` fail. The `CHANGELOG.md` check is intentionally loose — it
 only verifies the section header exists, not its contents.
 
+## The backup format is a published contract
+
+Settings → Tes données exports/imports the whole profile as one JSON file. Three
+things describe that file and must move together:
+
+- `src/domain/backup.ts` — the envelope constants and `validateBackup`;
+- `public/schemas/math-quizz-backup-v1.schema.json` — the JSON Schema, deployed
+  with the app and linked from the Settings screen, so third parties can process
+  their own export;
+- `docs/data-format.md` — the same contract in prose.
+
+`src/__tests__/backup.test.ts` pins the schema's `$id`, `format`, `formatVersion`
+and `required` list to the code, and requires a non-empty `description` on every
+documented field — so a new field with no documentation fails `pnpm test`.
+
+Additive changes keep `formatVersion: 1`. Anything that would make an existing
+export unreadable bumps it and ships a `-v2` schema next to v1; the old URL keeps
+resolving.
+
+Two validation policies, deliberately different — don't "simplify" them into
+one: **structure is rejected** (a malformed session or a non-canonical error key
+fails the whole file, because a partial history that looks complete is worse than
+a refusal), **settings are sanitised** (every setting has a safe default, and
+`selectedTables` must never end up empty — `generateQuestions` throws on empty).
+
 ## Deploy
 
 Static bundle on **Firebase Hosting** (GCP project `modern-ally-102412`), live at

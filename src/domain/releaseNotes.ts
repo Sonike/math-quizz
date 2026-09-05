@@ -21,6 +21,21 @@ export type ReleaseNote = {
 /** Newest first. */
 export const releaseNotes: ReleaseNote[] = [
   {
+    version: '0.10.0',
+    date: '2026-09-05',
+    changes: {
+      fr: [
+        'Tes données ne sont plus prisonnières du navigateur : dans les Paramètres, « Exporter mes données » enregistre tes réglages, tes tests et tes statistiques dans un fichier, et « Importer un fichier » les remet en place — pratique pour garder une copie ou continuer sur un autre appareil.',
+      ],
+      de: [
+        'Deine Daten stecken nicht mehr im Browser fest: In den Einstellungen speichert « Meine Daten exportieren » deine Einstellungen, Tests und Statistiken in einer Datei, und « Datei importieren » holt sie zurück — praktisch für eine Kopie oder um auf einem anderen Gerät weiterzumachen.',
+      ],
+      en: [
+        'Your data is no longer stuck in the browser: in Settings, "Export my data" saves your settings, tests and stats to a file, and "Import a file" puts them back — handy for keeping a copy or carrying on from another device.',
+      ],
+    },
+  },
+  {
     version: '0.9.0',
     date: '2026-06-15',
     changes: {
