@@ -5,6 +5,31 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- **`pnpm build` failed on typecheck.** `vite.config.ts` used
+  `/// <reference types="vitest" />` to graft the `test` key onto Vite's config
+  type. Vitest 4 no longer augments `UserConfig` that way, so `tsc --noEmit`
+  reported `'test' does not exist in type 'UserConfigExport'`. It now imports
+  `defineConfig` from `vitest/config`, which is the supported shape. (The
+  companion failure — `pnpm test` dying with `ERR_PACKAGE_PATH_NOT_EXPORTED`
+  because vitest 4 needs `vite >= 6` for `vite/module-runner` — was fixed by
+  the vite 6 bump in #4.)
+- `vite.config.ts` imported `./package.json` without an import attribute, which
+  Vite warns will break once `configLoader: 'native'` becomes the default. Now
+  `import pkg from './package.json' with { type: 'json' }`.
+
+### Changed
+- `vite` `^6.4.3` → `^8.3.0`, `@vitejs/plugin-react` `^4.3.4` → `^6.1.1`,
+  `jsdom` `^25.0.1` → `^30.1.0`. Together these take `pnpm audit` from 11
+  findings (7 high, 3 moderate, 1 low) to **zero** — the remainder were
+  transitive through jsdom's `ws`/`form-data`, Vite's `postcss`/`nanoid`, and
+  the plugin's `@babel/core` → `browserslist`.
+
+Still on older majors, deliberately left for their own changes: React 18,
+TypeScript 5, vitest 4 (5 is out), `@testing-library/jest-dom` 6.
+
 ## [0.12.0] - 2026-09-05
 
 ### Added
