@@ -75,6 +75,12 @@ and the project uses [Semantic Versioning](https://semver.org/).
   4-digit input cap) that exist nowhere else in the repo.
 
 ### Fixed
+- README's "What's next" and the roadmap's summary table both listed the five
+  open issues by number, which re-created the duplication that moving them to
+  GitHub was meant to remove — and would have gone stale the moment one closed.
+  Both now point at the issue list and its `enhancement` / `good first issue`
+  label views instead. The 1:1 link inside each planned roadmap section stays:
+  that is a pointer, not a list that can disagree with reality.
 - **`pnpm build` failed on typecheck.** `vite.config.ts` used
   `/// <reference types="vitest" />` to graft the `test` key onto Vite's config
   type. Vitest 4 no longer augments `UserConfig` that way, so `tsc --noEmit`
