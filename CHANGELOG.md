@@ -48,6 +48,20 @@ and the project uses [Semantic Versioning](https://semver.org/).
   findings (7 high, 3 moderate, 1 low) to **zero** — the remainder were
   transitive through jsdom's `ws`/`form-data`, Vite's `postcss`/`nanoid`, and
   the plugin's `@babel/core` → `browserslist`.
+- **React 18 → 19** (`react`, `react-dom`, `@types/react`, `@types/react-dom`
+  to 19.3.0; `@testing-library/react` to 16.3.3, the first line that supports
+  React 19). No source change was needed: the app already renders through
+  `createRoot`, and every `useRef` already passes an initial value, which React
+  19's types now require. Nothing in `src/` used `forwardRef`, `JSX.Element`,
+  `PropTypes`, `defaultProps` or `React.FC`.
+
+  **Costs 23 kB gzip.** The bundle goes from 214.78 kB (67.52 kB gzip) to
+  293.84 kB (90.34 kB gzip) — +36.8% raw, +33.8% gzipped — measured on the same
+  commit and the same Vite 8 build. That is React 19's client runtime, not a
+  packaging mistake: the production bundle carries no dev-build markers and no
+  server-rendering code. Worth knowing for an offline-first app whose stated
+  rule is to avoid runtime dependencies; the service worker caches it, so the
+  cost is per install rather than per session.
 
 ### Fixed
 - **`pnpm build` failed on typecheck.** `vite.config.ts` used
@@ -62,8 +76,8 @@ and the project uses [Semantic Versioning](https://semver.org/).
   Vite warns will break once `configLoader: 'native'` becomes the default. Now
   `import pkg from './package.json' with { type: 'json' }`.
 
-Still on older majors, deliberately left for their own changes: React 18,
-TypeScript 5, vitest 4 (5 is out), `@testing-library/jest-dom` 6.
+Still on older majors, deliberately left for their own changes: TypeScript 5,
+vitest 4 (5 is out), `@testing-library/jest-dom` 6.
 
 No version bump: nothing here is user-visible, so `src/domain/releaseNotes.ts`
 is untouched.
