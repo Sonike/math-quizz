@@ -12,18 +12,6 @@ cite sections of this file by number (`docs/roadmap.md §1`, `§2`, `§3`), and
 **Status legend**: ✅ done (written up below) · 📋 planned (one line, linking to
 the issue that holds the detail).
 
-## What is still open
-
-| | | |
-|---|---|---|
-| §2 | Adaptive weighting of draws | [#14](https://github.com/mrpia/math-quizz/issues/14) |
-| §5 | Fill-in-the-blank division | [#15](https://github.com/mrpia/math-quizz/issues/15) |
-| §6 | Sounds and animations at the end of a session | [#16](https://github.com/mrpia/math-quizz/issues/16) |
-| §8 | Voice mode | [#17](https://github.com/mrpia/math-quizz/issues/17) |
-| §10 | Merge on import | [#18](https://github.com/mrpia/math-quizz/issues/18) |
-
----
-
 ## 1. PWA / service worker (offline + installable)
 
 **Status**: ✅ Done — shipped in v0.3.0. Hand-rolled service worker
