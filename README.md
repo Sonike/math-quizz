@@ -244,15 +244,11 @@ The file format is a published contract, not an internal detail:
 
 ## What's next
 
-Open work lives in
-[GitHub issues](https://github.com/mrpia/math-quizz/issues) — planned features
-are labelled `enhancement`, and a couple are marked `good first issue`:
-
-- [#14](https://github.com/mrpia/math-quizz/issues/14) adaptive weighting of the draw
-- [#15](https://github.com/mrpia/math-quizz/issues/15) fill-in-the-blank division
-- [#16](https://github.com/mrpia/math-quizz/issues/16) end-of-session sounds and animations
-- [#17](https://github.com/mrpia/math-quizz/issues/17) voice mode
-- [#18](https://github.com/mrpia/math-quizz/issues/18) merge on import
+Open work is tracked in
+[GitHub issues](https://github.com/mrpia/math-quizz/issues). Planned features
+carry the [`enhancement`](https://github.com/mrpia/math-quizz/labels/enhancement)
+label; the approachable ones are marked
+[`good first issue`](https://github.com/mrpia/math-quizz/labels/good%20first%20issue).
 
 [`docs/roadmap.md`](docs/roadmap.md) is no longer the backlog. It is kept as the
 decision record: why each shipped feature ended up the way it did, and the
