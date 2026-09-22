@@ -62,6 +62,17 @@ and the project uses [Semantic Versioning](https://semver.org/).
   server-rendering code. Worth knowing for an offline-first app whose stated
   rule is to avoid runtime dependencies; the service worker caches it, so the
   cost is per install rather than per session.
+- **The backlog moved to GitHub issues.** The five open roadmap items are now
+  #14 (adaptive draw weighting), #15 (fill-in-the-blank division), #16
+  (end-of-session sounds), #17 (voice mode) and #18 (merge on import), each
+  carrying the full write-up plus the invariants a contributor must not break.
+  `docs/roadmap.md` keeps its eleven numbered sections — `CHANGELOG.md` cites
+  "roadmap item N" and the design notes under `docs/superpowers/specs/` cite
+  `§1`/`§2`/`§3`, so renumbering would break both — but the five planned ones
+  are now a one-line pointer to their issue. The file is reframed as a decision
+  record: why each shipped feature ended up as it did, and the deliberate
+  non-goals (no learning mode, tables beyond the curriculum, no telemetry, the
+  4-digit input cap) that exist nowhere else in the repo.
 
 ### Fixed
 - **`pnpm build` failed on typecheck.** `vite.config.ts` used

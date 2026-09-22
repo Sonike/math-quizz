@@ -1,10 +1,26 @@
-# Roadmap
+# Roadmap — decision record
 
-Direct follow-up to the shipped V1. Each entry states: the motivation, the
-area of code affected, and the condition that makes the work worthwhile.
-**Unprioritized** list — we'll choose based on real usage.
+> **The backlog moved to [GitHub issues](https://github.com/mrpia/math-quizz/issues).**
+> Open work is tracked there and nowhere else. This file is kept as the record of
+> *why* each shipped feature ended up the way it did, plus the design choices
+> that were made deliberately and are not up for re-litigation.
 
-**Status legend**: ✅ done · 📋 planned.
+Numbering is stable on purpose: the design notes under `docs/superpowers/specs/`
+cite sections of this file by number (`docs/roadmap.md §1`, `§2`, `§3`), and
+`CHANGELOG.md` refers to "roadmap item N". Renumbering would break both.
+
+**Status legend**: ✅ done (written up below) · 📋 planned (one line, linking to
+the issue that holds the detail).
+
+## What is still open
+
+| | | |
+|---|---|---|
+| §2 | Adaptive weighting of draws | [#14](https://github.com/mrpia/math-quizz/issues/14) |
+| §5 | Fill-in-the-blank division | [#15](https://github.com/mrpia/math-quizz/issues/15) |
+| §6 | Sounds and animations at the end of a session | [#16](https://github.com/mrpia/math-quizz/issues/16) |
+| §8 | Voice mode | [#17](https://github.com/mrpia/math-quizz/issues/17) |
+| §10 | Merge on import | [#18](https://github.com/mrpia/math-quizz/issues/18) |
 
 ---
 
@@ -39,28 +55,11 @@ opening a tab each time. Low cost (< 1h), big UX gain.
 
 ## 2. Adaptive weighting of draws
 
-**Status**: 📋 Planned — the weighting half is now built (see item 11)
+**Status**: 📋 Planned — tracked as [#14](https://github.com/mrpia/math-quizz/issues/14).
 
-**Why**: today every pair `(a, b)` has the same probability of appearing.
-The child replays easy pairs as often as the ones that give them trouble.
-
-**What's needed**:
-
-- in `domain/question.ts`, `generateQuestions(settings)` accepts an
-  optional stats parameter — `aggregatePairs(history)` from `domain/stats.ts`
-  already produces exactly the shape this needs;
-- weight each pair in the pool by `1 + α × weightedErrorRate(counters)`, which
-  v0.11.0 built for the progress screen. The recency curve is shared, so the
-  draw biases toward what is shaky *now* rather than what was shaky a year ago;
-- weighted draw (for example via reservoir sampling) instead of
-  Fisher-Yates;
-- α adjustable from Settings (for example 0/2/5 = never / moderate / strong).
-
-**Prerequisite**: having real history density. Useless until the child has
-played around twenty sessions.
-
-**Tests to add**: on a large sample with a biased stats map, verify that the
-appearance frequency of the problematic pair increases.
+The full write-up (motivation, what is needed, guardrails and the invariants not
+to break) moved to that issue, so there is one place to read and one place to
+update.
 
 ---
 
@@ -160,39 +159,21 @@ login could eliminate it, and a login is explicitly out of scope.
 
 ## 5. Fill-in-the-blank division (`a × ? = a×b`)
 
-**Status**: 📋 Planned
+**Status**: 📋 Planned — tracked as [#15](https://github.com/mrpia/math-quizz/issues/15).
 
-**Why**: a pedagogical variant that asks for the missing factor instead of
-the result. Reinforces memorization in both directions.
-
-**What's needed**:
-
-- new type `Operator = 'mul' | 'div' | 'div-hole'` (or a separate mode);
-- `Question.expected` stays `b`, the display becomes `${a} × ? = ${a*b}`
-  (touches `QuestionCard.tsx`);
-- add a toggle in `ModeToggle.tsx` or a sub-mode in Settings.
-
-**Tests to add**: error aggregation must always use the same canonical key
-so that mul / div / div-hole feed the same counter.
+The full write-up (motivation, what is needed, guardrails and the invariants not
+to break) moved to that issue, so there is one place to read and one place to
+update.
 
 ---
 
 ## 6. Sounds and animations at the end of a session
 
-**Status**: 📋 Planned
+**Status**: 📋 Planned — tracked as [#16](https://github.com/mrpia/math-quizz/issues/16).
 
-**Why**: reward perseverance without breaking the "no feedback during the
-session" rule.
-
-**What's needed**:
-
-- short jingle (Web Audio API, locally generated sounds — no external
-  audio file, to stay offline-first) on `ResultsScreen`;
-- animation of the ✅ appearing one after another;
-- "sound off" option in Settings (on by default).
-
-**Guardrail**: anything triggered during `SessionScreen` is excluded —
-that's deliberate, to avoid disturbing concentration.
+The full write-up (motivation, what is needed, guardrails and the invariants not
+to break) moved to that issue, so there is one place to read and one place to
+update.
 
 ---
 
@@ -238,45 +219,11 @@ universal.
 
 ## 8. Voice mode (audio reading of the question)
 
-**Status**: 📋 Planned — unblocked, item 7 (language choice) shipped in v0.5.0
+**Status**: 📋 Planned — tracked as [#17](https://github.com/mrpia/math-quizz/issues/17).
 
-**Why**: trains oral mental arithmetic — that's the real modality of the
-school test ("how much is seven times eight?"). Also useful for a younger
-child who reads more slowly than the 4-second target.
-
-**What's needed**:
-
-- native `window.speechSynthesis` API (Web Speech API) — free, offline on
-  most platforms, voices vary by OS;
-- new field `Settings.voiceEnabled: boolean` (default `false`, so as not to
-  surprise);
-- on mount of each question, create a `SpeechSynthesisUtterance` with:
-  - `lang = settings.language` (`fr-FR` / `de-DE` / `en-US`);
-  - `text`: the question in words, not digits — for example
-    `"seven times eight"` rather than `"7 × 8"` (TTS engines pronounce `×`
-    unpredictably). So a small `numberToWords(n, lang)` function to write
-    (covering 0–225 is enough);
-- `speechSynthesis.getVoices()` to pick a voice matching the locale; silent
-  fallback if no voice available;
-- a "🔊 Replay" button in `SessionScreen` to replay the question, with no
-  score cost (the child hears but doesn't cheat).
-
-**Prerequisite**: item **7. Language choice** — done, so this is ready to
-start. The TTS locale must follow `settings.language`.
-
-**Caveats**:
-
-- voice quality depends on the OS — Chrome desktop is decent, Safari iOS is
-  variable, German voices sometimes absent on Linux;
-- feature detection required: `if ('speechSynthesis' in window)` before
-  exposing the option in Settings;
-- no relevant automated tests (browser API not simulated by jsdom) —
-  manual verification on the three target languages.
-
-**Guardrail**: the voice triggers at the start of each question, not on
-each keystroke nor at the end of the session. Consistent with the "no
-feedback during the session" rule: the voice reads the question, it doesn't
-comment on the answer.
+The full write-up (motivation, what is needed, guardrails and the invariants not
+to break) moved to that issue, so there is one place to read and one place to
+update.
 
 ---
 
@@ -314,44 +261,11 @@ story for an app that deliberately has no backend.
 
 ## 10. Merge on import
 
-**Status**: 📋 Planned — deliberately deferred out of item 9, and **cheaper than
-it used to be** since v0.11.0
+**Status**: 📋 Planned — tracked as [#18](https://github.com/mrpia/math-quizz/issues/18).
 
-**Why**: today importing replaces the profile. That covers backup / restore and
-moving to a new device, but not "the child practised on the tablet and on the
-laptop, and both histories should survive".
-
-**What changed**: this entry used to say the error counters made merging
-intractable — they already included sessions aged out of the capped history, so
-summing two files double-counted every shared pair while recomputing from the
-merged history dropped the older statistics. Item 11 deleted that accumulator.
-Every statistic is now derived from the histories, so **merging the histories
-merges the statistics**. There is no second store to reconcile.
-
-**What is left**: sessions still carry no id. `startedAt` is the closest thing
-and is unique only by luck — two devices can stamp the same second, and a device
-with a wrong clock breaks ordering outright.
-
-**Two consequences of recency weighting to respect**:
-
-- weights come from a session's *position* in the list, so a merged history has
-  to be sorted chronologically before it means anything. Concatenating two files
-  in import order would silently mis-weight both;
-- the result is still trimmed to `HISTORY_LIMIT`, so merging two full histories
-  keeps the 50 most recent *overall*. That is the right answer, but it means a
-  merge can drop sessions from the file just imported — the confirmation dialog
-  should say so rather than implying everything was kept.
-
-**What's needed**:
-
-- a stable session id written at record time. Additive, so `formatVersion` stays
-  1: older files simply lack it and fall back to matching on `startedAt` plus
-  answer count;
-- dedupe on that id when concatenating, then sort by `startedAt`, then trim;
-- a UI choice on import (replace / merge) rather than a silent behaviour.
-
-**When**: once a real second device is in play. Until then, replace is the
-honest behaviour and the confirmation dialog says so.
+The full write-up (motivation, what is needed, guardrails and the invariants not
+to break) moved to that issue, so there is one place to read and one place to
+update.
 
 ---
 
