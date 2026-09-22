@@ -32,8 +32,8 @@ version matters more than the long one:
 The two outbound links in the app — the author credit and a "Buy me a coffee"
 link, both on the À propos screen — are ordinary `<a href>`s that do nothing
 until tapped. Adding any collection would be an explicit decision about what,
-where and with what consent; see "No telemetry, no analytics" in
-[`docs/roadmap.md`](docs/roadmap.md).
+where and with what consent; see "No telemetry, no analytics" under
+[Residual reservations](docs/roadmap.md#residual-reservations-to-reconsider-if-the-context-changes).
 
 ## Prerequisites
 
@@ -244,10 +244,20 @@ The file format is a published contract, not an internal detail:
 
 ## What's next
 
-See [`docs/roadmap.md`](docs/roadmap.md) for the backlog. Multiple named local
-profiles shipped in 0.12.0; the open items are adaptive weighting of the draw
-(item 2), fill-in-the-blank division (item 5), end-of-session sounds (item 6),
-voice mode (item 8) and merging on import (item 10).
+Open work lives in
+[GitHub issues](https://github.com/mrpia/math-quizz/issues) — planned features
+are labelled `enhancement`, and a couple are marked `good first issue`:
+
+- [#14](https://github.com/mrpia/math-quizz/issues/14) adaptive weighting of the draw
+- [#15](https://github.com/mrpia/math-quizz/issues/15) fill-in-the-blank division
+- [#16](https://github.com/mrpia/math-quizz/issues/16) end-of-session sounds and animations
+- [#17](https://github.com/mrpia/math-quizz/issues/17) voice mode
+- [#18](https://github.com/mrpia/math-quizz/issues/18) merge on import
+
+[`docs/roadmap.md`](docs/roadmap.md) is no longer the backlog. It is kept as the
+decision record: why each shipped feature ended up the way it did, and the
+choices made deliberately — no learning mode, tables beyond the curriculum, no
+telemetry, the 4-digit input cap — that are not up for re-litigation.
 
 ## License
 
