@@ -122,7 +122,7 @@ compression is automatic. `.firebaserc` pins the default project.
 
 ### Deploying a fork
 
-Three files carry the identity of *this* deployment. Change them and nothing
+Four files carry the identity of *this* deployment. Change them and nothing
 else points back here:
 
 | File | What to change |
@@ -130,10 +130,13 @@ else points back here:
 | [`src/config/site.ts`](src/config/site.ts) | `SITE_URL`, `AUTHOR_URL`, `SUPPORT_URL` — the credit line, the support link, and the origin the backup schema URL is built on |
 | `.firebaserc` | your own Firebase project id (or delete it and host the `dist/` folder anywhere — Netlify, Vercel, GitHub Pages, any static server) |
 | `public/schemas/math-quizz-backup-v1.schema.json` | its `$id`, to match your new `SITE_URL` |
+| `.github/FUNDING.yml` | the sponsor account GitHub shows on the repo, which should match `SUPPORT_URL` |
 
-`pnpm test` enforces the last two: `siteConfig.test.ts` fails if any file under
-`src/` hard-codes one of those hosts again, and `backup.test.ts` fails if the
-published schema's `$id` drifts from `BACKUP_SCHEMA_URL`.
+Two of the four are enforced by `pnpm test`: `siteConfig.test.ts` fails if any
+file under `src/` hard-codes one of those hosts again, and `backup.test.ts`
+fails if the published schema's `$id` drifts from `BACKUP_SCHEMA_URL`. The other
+two are not — `.firebaserc` is read by the Firebase CLI and `FUNDING.yml` by
+GitHub, so nothing in the suite will remind you.
 
 ## Project layout
 

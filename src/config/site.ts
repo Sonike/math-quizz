@@ -11,6 +11,8 @@
  *   `BACKUP_SCHEMA_URL`. `src/__tests__/backup.test.ts` asserts that, so
  *   changing `SITE_URL` without updating the schema fails `pnpm test`.
  * - `.firebaserc` — the Firebase project a `pnpm ship` deploys to.
+ * - `.github/FUNDING.yml` — GitHub's own sponsor button, which must name the
+ *   same account as `SUPPORT_URL`.
  *
  * `src/__tests__/siteConfig.test.ts` guards the rest: if any other file under
  * `src/` hard-codes one of these hosts again, the suite fails.
