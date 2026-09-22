@@ -1,5 +1,8 @@
 # Math Quizz
 
+[![CI](https://github.com/mrpia/math-quizz/actions/workflows/ci.yml/badge.svg)](https://github.com/mrpia/math-quizz/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Timed mental-math drills (multiplication and division) for a child who already
 knows the tables and wants to automate recall. Single-page app, trilingual UI
 (FR/DE/EN), runs entirely in the browser, stores progress in `localStorage`.
@@ -224,7 +227,10 @@ The file format is a published contract, not an internal detail:
 1. Branch off `main`: `git switch -c feat/<short-name>`.
 2. Work test-first. Anything in `src/domain/` or a new component ships with a
    Vitest case; run `pnpm test` and `pnpm build` (the build also type-checks)
-   before pushing.
+   before pushing. CI runs both on every pull request
+   ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) — including
+   Dependabot's, which is the point: a dependency bump that breaks the build
+   should fail before it reaches `main`, not after.
 3. Keep the zero-runtime-dependency rule — no chart or UI libraries. An
    inline SVG or a few lines of CSS almost always do the job.
 4. Follow the existing shape: pure logic in `src/domain/`, presentational

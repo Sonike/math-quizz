@@ -22,6 +22,14 @@ and the project uses [Semantic Versioning](https://semver.org/).
   `localStorage`-only position up front (the app is for children, so it is the
   first question a reader has), and a **Deploying a fork** table listing the
   three files that carry this deployment's identity.
+- `.github/workflows/ci.yml` — runs `pnpm install --frozen-lockfile`,
+  `pnpm test` and `pnpm build` on every pull request and every push to `main`.
+  Dependabot's pull requests are covered too, which is the point: #2 raised
+  vitest two majors without raising vite, and nothing caught that `pnpm test`
+  no longer started until it was already on `main`.
+- `packageManager: "pnpm@10.11.0"` in `package.json`, so CI and a local
+  checkout resolve the same pnpm rather than pinning the version twice.
+- README: CI and licence badges.
 
 ### Changed
 - `BACKUP_SCHEMA_URL` is now built on `SITE_URL` instead of being a literal.
