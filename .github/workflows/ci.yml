@@ -1,0 +1,47 @@
+name: CI
+
+# Runs on pull requests (including Dependabot's) and on pushes to main.
+# A dependency bump that breaks the build is exactly what this is here to catch:
+# PR #2 raised vitest two majors without raising vite, and `pnpm test` could not
+# start on main until #5 repaired it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A new push to the same branch supersedes the run in flight.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# The app is a static bundle with no backend; CI only ever needs to read.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: test + build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pnpm version from package.json's `packageManager` field,
+      # so CI and a local checkout cannot drift.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # --frozen-lockfile fails if pnpm-lock.yaml is out of step with
+      # package.json, rather than quietly resolving something else.
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test
+
+      # Also type-checks: the build script is `tsc --noEmit && vite build`.
+      # Worth keeping separate from the tests — vitest 4 stopped augmenting
+      # Vite's config type, which broke `tsc` while every test still passed.
+      - run: pnpm build
